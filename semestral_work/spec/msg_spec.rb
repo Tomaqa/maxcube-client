@@ -1,44 +1,51 @@
 require 'base64'
+require 'date'
 require_relative '../messages'
 require_relative 'spec_helper'
 
 describe 'MessageReceiver' do
   subject(:recv) { MaxCube::MessageReceiver.new }
 
-  # Proper messages:
+  # Proper message examples:
   # A:\r\n
   # H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\n
-  # M:00,01,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr
-  #   1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD
-  #   M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a
-  #   W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB\r\n
+  # L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A\r\n
 
   describe 'invalid message' do
     context 'empty message' do
-      it 'raises proper exception' do
-        expect { recv.recv_data('') }.to raise_error MaxCube::MessageHandler::InvalidMessageEmpty
-      end
-    end
-
-    context 'invalid type' do
       let(:inputs) do
         [
-          nil,
-          0,
-          1,
-          1.5,
-          /abc/,
-          Object.new,
-          [],
-          {},
+          '',
+          "\r\n",
+          "\r\n\r\n",
         ]
       end
-      it 'raises proper exception' do
-        inputs.each do |inp|
-          expect { recv.recv_data(inp) }.to raise_error TypeError
+      it 'returns empty array' do
+        inputs.each do |i|
+          expect(recv.recv_data(i)).to eq([])
         end
       end
     end
+
+    # context 'invalid type' do
+    #   let(:inputs) do
+    #     [
+    #       nil,
+    #       0,
+    #       1,
+    #       1.5,
+    #       /abc/,
+    #       Object.new,
+    #       [],
+    #       {},
+    #     ]
+    #   end
+    #   it 'raises proper exception' do
+    #     inputs.each do |inp|
+    #       expect { recv.recv_data(inp) }.to raise_error TypeError
+    #     end
+    #   end
+    # end
 
     context 'invalid format' do
       context 'of single message' do
@@ -239,6 +246,117 @@ describe 'MessageReceiver' do
       end
     end
 
+    # L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A
+    describe 'L message' do
+      context 'invalid message body' do
+        let(:msgs) do
+          [
+          ]
+        end
+        it 'raises proper exception' do
+          msgs.each do |m|
+            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
+      end
+
+      context 'valid message body' do
+        let(:msgs) do
+          [
+            'L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x12\x18\x18\xa8\x9d\x0b\x04\x24"),
+            'L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A',
+          ]
+        end
+        let(:ret) do
+          [
+            { type: 'L', devices: [
+                { length: 12, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_position: 24, temperature: 20.0,
+                  datetime_until: DateTime.new(2011, 8, 29, 2, 0),
+                  actual_temperature: 29.2,
+                },
+              ],
+            },
+            { type: 'L', devices: [
+                {
+                  length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_position: 24, temperature: 20.0,
+                  actual_temperature: 20.4,
+                },
+                {
+                  length: 11, rf_address: "\x0f\xc3\x73".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_position: 24, temperature: 20.0,
+                  actual_temperature: 20.7,
+                },
+                {
+                  length: 11, rf_address: "\x0f\xc3\x80".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_position: 24, temperature: 20.0,
+                  actual_temperature: 20.6,
+                },
+              ],
+            },
+          ]
+        end
+        it 'returns proper hash' do
+          msgs.each_with_index do |m, i|
+            expect(recv.recv_msg(m)).to eq(ret[i])
+          end
+        end
+      end
+    end
+
     # M:00,01,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr
     #   1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD
     #   M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a
@@ -279,7 +397,7 @@ describe 'MessageReceiver' do
       context 'valid message body' do
         let(:msgs) do
           [
-            'M:00,01,' + Base64.strict_encode64("V\x02\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!"),
+            'M:00,01,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!"),
             'M:00,01,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr' \
               '1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD' \
               'M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a' \
@@ -289,7 +407,7 @@ describe 'MessageReceiver' do
         let(:ret) do
           [
             {
-              type: 'M', index: 0, count: 1, unknown: "V\x02",
+              type: 'M', index: 0, count: 1, unknown: "Vx",
               rooms_count: 1, rooms: [
                 { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '123'},
               ],
@@ -298,42 +416,30 @@ describe 'MessageReceiver' do
               ],
             },
             {
-              type: 'M', index: 0, count: 1, unknown: "V\x02",
+              type: 'M', index: 0, count: 1, unknown: "V\x02".b,
               rooms_count: 4, rooms: [
-                { id: 1, name_length: 3, name: 'Bad', rf_address: "\x0a\xed\x69" },
-                { id: 2, name_length: 4, name: 'Buro', rf_address: "\x0a\xf3\x00" },
-                { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: "\x0a\xf3\x0c" },
-                { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: "\x0a\xf5\x40" },
+                { id: 1, name_length: 3, name: 'Bad', rf_address: "\x0a\xed\x69".b },
+                { id: 2, name_length: 4, name: 'Buro', rf_address: "\x0a\xf3\x00".b },
+                { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: "\x0a\xf3\x0c".b },
+                { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: "\x0a\xf5\x40".b },
               ],
               devices_count: 5, devices: [
-                { type: 2, rf_address: "\x0a\xed\x69", serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
-                { type: 2, rf_address: "\n\xF3\x00", serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
-                { type: 2, rf_address: "\n\xF3\f", serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
-                { type: 2, rf_address: "\n\xF3y", serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
-                { type: 2, rf_address: "\n\xF5@", serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
+                { type: 2, rf_address: "\x0a\xed\x69".b, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
+                { type: 2, rf_address: "\x0a\xf3\x00".b, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
+                { type: 2, rf_address: "\x0a\xf3\x0c".b, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
+                { type: 2, rf_address: "\x0a\xf3\x79".b, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
+                { type: 2, rf_address: "\x0a\xf5\x40".b, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
               ],
             },
           ]
         end
-        # let(:test) { [{a:"V\x02"}] }
-        # let(:test2) { [{a:"V\u0002"}] }
         it 'returns proper hash' do
           msgs.each_with_index do |m, i|
             expect(recv.recv_msg(m)).to eq(ret[i])
-            # expect(ret[i]).to eq(ret[i])
-            # expect(recv.recv_msg(m)).to eql(ret[i])
-            # expect("V\x02").to eq("V\u0002")
-            # expect({a:"V\u0002"}).to eq({a:"V\x02"})
-            # expect(test).to eq("V\u0002")
-            # expect("V\u0002").to eq(test)
-            # expect(test[0]).to eq(test[0])
-            # expect(test[0]).to eq([{a:"V\x02"}][0])
-            # expect(test[0]).to eq([{a:"V\u0002"}][0])
-            # expect(test[0]).to eq(test2[0])
-            # expect(test2[0]).to eq(test[0])
           end
         end
       end
     end
+
   end
 end
