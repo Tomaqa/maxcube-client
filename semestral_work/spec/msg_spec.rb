@@ -8,6 +8,7 @@ describe 'MessageReceiver' do
 
   # Proper message examples:
   # A:\r\n
+  # C:03f25d,7QPyXQATAQBKRVEwNTQ0OTIzAAsABEAAAAAAAAAAAPIA==\r\n
   # H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\n
   # L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A\r\n
 
@@ -200,6 +201,44 @@ describe 'MessageReceiver' do
       end
     end
 
+    # C:03f25d,7QPyXQATAQBKRVEwNTQ0OTIzAAsABEAAAAAAAAAAAPIA==
+    describe 'C message' do
+      context 'invalid message body' do
+        let(:msgs) do
+          [
+          ]
+        end
+        it 'raises proper exception' do
+          msgs.each do |m|
+            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
+      end
+
+      context 'valid message body' do
+        let(:msgs) do
+          [
+            # 'C:03f25d,7QPyXQATAQBKRVEwNTQ0OTIzAAsABEAAAAAAAAAAAPIA==',
+            # radiator thermostat data
+            'C:06c961,' + Base64.strict_encode64("\xd2\x06\xc9\x41\x01\x01\x18\xff\x4b\x45\x51\x30\x33\x35\x32\x32\x37\x36\x24\x20\x3d\x09\x07\x18\x03\xf4\x0c\xff\x00\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x06\x18\xf4"),
+            # wall thermostat data
+            # 'C:0a12bd,' + Base64.strict_encode64("\xce\x0a\x12\xbd\x03\x01\x10\xff\x4b\x45\x51\x30\x37\x30\x34\x37\x35\x32\x24\x20\x3d\x09\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x06\x18\xf4"),
+          ]
+        end
+        let(:ret) do
+          [
+            { type: 'C' },
+          ]
+        end
+        it 'returns proper hash' do
+          msgs.each_with_index do |m, i|
+            p recv.recv_msg(m)
+            # expect(recv.recv_msg(m)).to eq(ret[i])
+          end
+        end
+      end
+    end
+
     # H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000
     describe 'H message' do
       context 'invalid message body' do
@@ -251,6 +290,27 @@ describe 'MessageReceiver' do
       context 'invalid message body' do
         let(:msgs) do
           [
+            # unexpected EOF
+            'L:' + Base64.strict_encode64("\x06\x0f\xda\xed\x09\x00"),
+            'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00"),
+            'L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x12\x18\x18\xa8\x9d\x0b\x04"),
+            # invalid length of submessage
+            'L:' + Base64.strict_encode64("\x00"),
+            'L:' + Base64.strict_encode64("\x03\x0f\xda\xed"),
+            'L:' + Base64.strict_encode64("\x05\x0f\xda\xed\x09\x00\x00"),
+            'L:' + Base64.strict_encode64("\x07\x0f\xda\xed\x09\x00\x00"),
+            'L:' + Base64.strict_encode64("\x07\x0f\xda\xed\x09\x00\x00\x00"),
+            'L:' + Base64.strict_encode64("\x07\x0f\xda\xed\x09\x00\x00\x18"),
+            'L:' + Base64.strict_encode64("\x08\x0f\xda\xed\x09\x00\x00\x18"),
+            'L:' + Base64.strict_encode64("\x0a\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00"),
+            'L:' + Base64.strict_encode64("\x0a\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00"),
+            'L:' + Base64.strict_encode64("\x0d\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00\x00\x00"),
+            'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00\x00"),
+            # 'date_until' part is not valid date and 'actual_temperature' is currently present at offset 12
+            'L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00\x00"),
+            'L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x00\x00\x18\xa8\x00\x00\x04\x24"),
+            # 'date_until' part is not valid date and 'mode' is not 'auto'
+            'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x00\x01\x18\xa8\x00\x00\x04"),
           ]
         end
         it 'raises proper exception' do
@@ -263,12 +323,54 @@ describe 'MessageReceiver' do
       context 'valid message body' do
         let(:msgs) do
           [
+            'L:',
+            'L:' + Base64.strict_encode64("\x06\x0f\xda\xed\x09\x00\x03"),
+            'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00"),
             'L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x12\x18\x18\xa8\x9d\x0b\x04\x24"),
             'L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A',
           ]
         end
         let(:ret) do
           [
+            { type: 'L', devices: [] },
+            { type: 'L', devices: [
+                { length: 6, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x0003,
+                    mode: :boost,
+                    dst_setting_active: false,
+                    gateway_known: false,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: false,
+                    is_answer: false,
+                    error: false,
+                    valid_info: false,
+                  },
+                },
+              ],
+            },
+            { type: 'L', devices: [
+                { length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x0000,
+                    mode: :auto,
+                    dst_setting_active: false,
+                    gateway_known: false,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: false,
+                    is_answer: false,
+                    error: false,
+                    valid_info: false,
+                  },
+                  valve_position: 24, temperature: 12.0,
+                  actual_temperature: 25.6,
+                },
+              ],
+            },
             { type: 'L', devices: [
                 { length: 12, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
                   flags: {
@@ -371,6 +473,7 @@ describe 'MessageReceiver' do
             'M:00,,',
             'M:00,01',
             'M:00,01,',
+            'M:00,01,' + Base64.strict_encode64('a'),
             'M:00,01,' + Base64.strict_encode64('ab1'),
             'M:00,01,' + Base64.strict_encode64('ab01'),
             'M:00,01,' + Base64.strict_encode64('ab192XY123'),

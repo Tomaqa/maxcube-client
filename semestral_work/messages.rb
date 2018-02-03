@@ -15,6 +15,15 @@ module MaxCube
     # Without '\r\n', with it it is 1900
     MSG_MAX_LEN = 1898
 
+    DEVICE_MODE = %i[auto manual vacation boost].freeze
+    DEVICE_TYPE = %i[cube
+                     radiator_thermostat radiator_thermostat_plus
+                     wall_thermostat
+                     shutter_contact eco_button].freeze
+
+    DAYS_OF_WEEK = %w[Saturday Sunday Monday
+                      Tuesday Wednesday Thursday Friday].freeze
+
     class InvalidMessage < RuntimeError; end
 
     class InvalidMessageLength < InvalidMessage
@@ -81,40 +90,42 @@ module MaxCube
       end
     end
 
-    def check_msg_part_lengths(msg_type, lengths, *args)
+    def check_msg_part_lengths(lengths, *args)
       return if valid_msg_part_lengths(lengths, *args)
       raise InvalidMessageBody
-        .new(msg_type,
+        .new(@msg_type,
              "invalid lengths of message parts #{args}" \
              " (lengths should be: #{lengths})")
     end
 
     # Convert string of characters (not binary data!) to hex number
     # For binary data use #String.unpack
-    def hex_to_i_check(msg_type, info, *args)
+    def hex_to_i_check(info, *args)
       if args.all? { |x| x && !x[/\H/] && !x[/^$/] }
         return args.map { |x| x.to_i(16) }
       end
       raise InvalidMessageBody
-        .new(msg_type,
+        .new(@msg_type,
              "invalid hex format of message parts #{args}" \
              " (#{info})")
     end
 
-    def check_msg_min_data_length(msg_type, min_length, length, info)
+    def check_msg_min_data_length(min_length, length, info)
       return unless length < min_length
       raise InvalidMessageBody
-        .new(msg_type,
+        .new(@msg_type,
              "#{info} - remaining data length is insufficient" \
              " (#{length} < #{min_length})")
     end
 
     def encode(data)
-      Base64.strict_encode64(data)
+      Base64.encode64(data)
+      # Base64.strict_encode64(data)
     end
 
     def decode(data)
-      Base64.strict_decode64(data)
+      Base64.decode64(data)
+      # Base64.strict_decode64(data)
     end
 
   end
@@ -129,9 +140,9 @@ module MaxCube
     end
 
     def check_recv_msg_type(msg)
-      msg_type = valid_recv_msg_type(msg)
-      return if msg_type
-      raise InvalidMessageType.new(msg_type)
+      @msg_type = valid_recv_msg_type(msg)
+      return if @msg_type
+      raise InvalidMessageType.new(msg[0])
     end
 
     # Check single message validity, which is already without '\r\n'
@@ -142,6 +153,12 @@ module MaxCube
     def check_recv_msg(msg)
       check_msg(msg)
       check_recv_msg_type(msg)
+    end
+
+    def read(count, unpack = '')
+      raise IOError if @io.size - @io.pos < count
+      str = @io.read(count)
+      unpack.empty? ? str : str.unpack1(unpack)
     end
 
     # Process set of messages - raw data separated by '\r\n'
@@ -157,201 +174,20 @@ module MaxCube
     # @return [Hash] particular message parts separated into hash
     def recv_msg(msg)
       check_recv_msg(msg)
-      msg_type, body = msg.split(':')
-      body ||= ''
-      send("recv_msg_#{msg_type.downcase}", msg_type, body)
-        .merge(type: msg_type)
+      body = msg.split(':')[1] || ''
+      # send("recv_msg_#{@msg_type.downcase}", body)
+      # send("Message#{@msg_type.upcase}::parse", body)
+      # send("MaxCube::Message#{@msg_type.upcase}::parse", body)
+      send("parse_#{@msg_type.downcase}", body)
+        .merge(type: @msg_type)
     end
 
-    private
+    require_relative 'a_message'
+    require_relative 'c_message'
+    require_relative 'h_message'
+    require_relative 'l_message'
+    require_relative 'm_message'
 
-    # Acknowledgement message to previous reset
-    # Ignore all contents of the message
-    def recv_msg_a(_msg_type, _body)
-      {}
-    end
-
-    # Hello message
-    def recv_msg_h(msg_type, body)
-      values = body.split(',')
-      # lengths = [10, 6, 4, 8, 8, 2, 2, 6, 4, 2, 4]
-      lengths = [10, 6, 4]
-      check_msg_part_lengths(msg_type, lengths, *values)
-      values[2] = hex_to_i_check(msg_type, 'firmware version', values[2])[0]
-      keys = %i[
-        serial_number
-        rf_address
-        firmware_version
-      ]
-      # unknown
-      # http_id
-      # duty_cycle
-      # free_memory_slots
-      # cube_date
-      # cube_time
-      # state_cube_time
-      # ntp_counter
-      keys.zip(values).to_h
-    end
-
-    # Device list message
-    def recv_msg_l(msg_type, body)
-      data_io = StringIO.new(decode(body))
-
-      hash = { devices: [] }
-      until data_io.eof?
-        check_msg_min_data_length(msg_type,
-                                  6,
-                                  data_io.size - data_io.pos,
-                                  'submessage')
-        length = data_io.read(1).unpack1('C')
-
-        subhash = {
-          length: length,
-          rf_address: data_io.read(3),
-          unknown: data_io.read(1),
-        }
-        flags = data_io.read(2).unpack1('n')
-        mode = %i[auto manual vacation boost][flags & 0x3]
-        subhash[:flags] = {
-          value: flags,
-          mode: mode,
-          dst_setting_active: !((flags & 0x8) >> 3).zero?,
-          gateway_known: !((flags & 0x10) >> 4).zero?,
-          panel_locked: !((flags & 0x20) >> 5).zero?,
-          link_error: !((flags & 0x40) >> 6).zero?,
-          low_battery: !((flags & 0x80) >> 7).zero?,
-          status_initialized: !((flags & 0x200) >> 9).zero?,
-          is_answer: !((flags & 0x400) >> 10).zero?,
-          error: !((flags & 0x800) >> 11).zero?,
-          valid_info: !((flags & 0x1000) >> 12).zero?,
-        }
-
-        if length > 6
-          subhash[:valve_position] = data_io.read(1).unpack1('C')
-
-          temperature = data_io.read(1).unpack1('C')
-          # This bit may be used later
-          temperature_msb = temperature >> 7
-          subhash[:temperature] = (temperature & 0x3f).to_f / 2
-
-          date_until = data_io.read(2).unpack1('n')
-          year = (date_until & 0x1f) + 2000
-          month = ((date_until & 0x40) >> 6) | ((date_until & 0xe000) >> 12)
-          day = (date_until & 0x1f00) >> 8
-          time_until = data_io.read(1).unpack1('C')
-          hour = time_until / 2
-          minute = (time_until % 2) * 30
-          begin
-            datetime_until = DateTime.new(year, month, day, hour, minute)
-            subhash[:datetime_until] = datetime_until
-          rescue ArgumentError
-            if mode != :auto || length > 11
-              raise InvalidMessageBody
-                .new(msg_type, "unrecognized message part: #{date_until}" \
-                               " (it does not seem to be 'date until'" \
-                               " nor 'actual temperature')")
-            end
-            subhash[:actual_temperature] = date_until.to_f / 10
-          end
-        end
-
-        if length > 11
-          subhash[:actual_temperature] = ((temperature_msb << 8) |
-                                       data_io.read(1).unpack1('C')).to_f / 10
-        end
-
-        hash[:devices] << subhash
-      end # until
-
-      hash
-    end
-
-    # Metadata message
-    def recv_msg_m(msg_type, body)
-      index, count, enc_data = body.split(',')
-      lengths = [2, 2]
-      check_msg_part_lengths(msg_type, lengths, index, count)
-      index, count = hex_to_i_check(msg_type,
-                                    'message index, count',
-                                    index, count)
-      unless index < count
-        raise InvalidMessageBody
-          .new(msg_type,
-               "index >= count: #{index} >= #{count}")
-      end
-
-      unless enc_data
-        raise InvalidMessageBody
-          .new(msg_type, 'message data is missing')
-      end
-      data_io = StringIO.new(decode(enc_data))
-      check_msg_min_data_length(msg_type, 4, data_io.size, 'rooms/devices')
-
-      hash = {
-        index: index, count: count,
-        unknown: data_io.read(2),
-        rooms: [], devices: [],
-      }
-
-      # Rooms
-      rooms_count = data_io.read(1).unpack1('C')
-      check_msg_min_data_length(msg_type,
-                                rooms_count * 5,
-                                data_io.size - data_io.pos,
-                                'rooms')
-      hash[:rooms_count] = rooms_count
-      rooms_count.times do
-        room_id = data_io.read(1).unpack1('C')
-        room_name_length = data_io.read(1).unpack1('C')
-        check_msg_min_data_length(msg_type,
-                                  room_name_length + 3,
-                                  data_io.size - data_io.pos,
-                                  'room')
-        room = {
-          id: room_id,
-          name_length: room_name_length,
-          name: data_io.read(room_name_length),
-          rf_address: data_io.read(3),
-        }
-
-        # hash[:rooms][room_id] = room
-        hash[:rooms] << room
-      end
-
-      # Devices
-      check_msg_min_data_length(msg_type, 1,
-                                data_io.size - data_io.pos,
-                                'devices')
-      devices_count = data_io.read(1).unpack1('C')
-      devices_min_length = devices_count * 16
-      check_msg_min_data_length(msg_type,
-                                devices_min_length,
-                                data_io.size - data_io.pos,
-                                'devices')
-      hash[:devices_count] = devices_count
-      devices_count.times do
-        device = {
-          type: data_io.read(1).unpack1('C'),
-          rf_address: data_io.read(3),
-          serial_number: data_io.read(10),
-        }
-        device_name_length = data_io.read(1).unpack1('C')
-        check_msg_min_data_length(msg_type,
-                                  device_name_length + 1,
-                                  data_io.size - data_io.pos,
-                                  'device')
-        device.merge!(
-          name_length: device_name_length,
-          name: data_io.read(device_name_length),
-          room_id: data_io.read(1).unpack1('C'),
-        )
-
-        hash[:devices] << device
-      end
-
-      hash
-    end
   end
 
   class MessageSender < MessageHandler
@@ -374,4 +210,9 @@ end
 # M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a
 # W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB\r\n")
 # p MaxCube::MessageReceiver.new.recv_data('L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A')
+# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00"))
+# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x00"))
+# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x0a\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00"))
+# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00\x00"))
+# p MaxCube::MessageReceiver.new.recv_data('C:03f25d,7QPyXQATAQBKRVEwNTQ0OTIzAAsABEAAAAAAAAAAAPIA==')
 
