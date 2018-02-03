@@ -175,11 +175,7 @@ module MaxCube
     def recv_msg(msg)
       check_recv_msg(msg)
       body = msg.split(':')[1] || ''
-      # send("recv_msg_#{@msg_type.downcase}", body)
-      # send("Message#{@msg_type.upcase}::parse", body)
-      # send("MaxCube::Message#{@msg_type.upcase}::parse", body)
-      send("parse_#{@msg_type.downcase}", body)
-        .merge(type: @msg_type)
+      { type: @msg_type }.merge(send("parse_#{@msg_type.downcase}", body))
     end
 
     require_relative 'a_message'
@@ -187,7 +183,6 @@ module MaxCube
     require_relative 'h_message'
     require_relative 'l_message'
     require_relative 'm_message'
-
   end
 
   class MessageSender < MessageHandler
