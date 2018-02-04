@@ -1,6 +1,6 @@
 require 'base64'
 require 'date'
-require_relative '../messages'
+require_relative '../messages/messages'
 require_relative 'spec_helper'
 
 describe 'MessageReceiver' do
@@ -116,6 +116,28 @@ describe 'MessageReceiver' do
       end
     end
 
+    context 'valid message type but not implemented (yet)' do
+      let(:msgs) do
+        [
+          'D:ZXhhbXBsZQoAAAAAAAAAAA==',
+          'E:encrypted-base64',
+          "w:message1,message2,\x00\x01",
+        ]
+      end
+      let(:ret) do
+        [
+          { type: 'D', data: 'ZXhhbXBsZQoAAAAAAAAAAA==' },
+          { type: 'E', data: 'encrypted-base64' },
+          { type: 'w', data: "message1,message2,\x00\x01".b },
+        ]
+      end
+      it 'returns hash with unparsed data' do
+        msgs.each_with_index do |m, i|
+          expect(recv.recv_msg(m)).to eq(ret[i])
+        end
+      end
+    end
+
     context 'invalid message body in general' do
       let(:msgs) do
         [
@@ -185,6 +207,7 @@ describe 'MessageReceiver' do
   end
 
   describe 'concrete message types' do
+
     describe 'A message' do
       let(:msgs) do
         [
@@ -307,6 +330,31 @@ describe 'MessageReceiver' do
       end
     end
 
+    # F:ntp.homematic.com,ntp.homematic.com
+    describe 'F message' do
+      let(:msgs) do
+        [
+          'F:',
+          'F:ntp.homematic.com',
+          'F:ntp.homematic.com,',
+          'F:ntp.homematic.com,ntp.homematic.com',
+        ]
+      end
+      let(:ret) do
+        [
+          { type: 'F', ntp_servers: [] },
+          { type: 'F', ntp_servers: ['ntp.homematic.com'] },
+          { type: 'F', ntp_servers: ['ntp.homematic.com'] },
+          { type: 'F', ntp_servers: ['ntp.homematic.com', 'ntp.homematic.com'] },
+        ]
+      end
+      it 'returns proper hash' do
+        msgs.each_with_index do |m, i|
+          expect(recv.recv_msg(m)).to eq(ret[i])
+        end
+      end
+    end
+
     # H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000
     describe 'H message' do
       context 'invalid message body' do
@@ -321,8 +369,19 @@ describe 'MessageReceiver' do
             'H:IKEQ0523864,97f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
             'H:IEQ0523864,197f2c,113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
             'H:IKEQ0523864,197f2c,113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
-            # invalid hex format of 3rd part
+            'H:IKEQ0523864,197f2c,0113,0000000,477719c0,00,32,0d0c09,1404,03,0000',
+            'H:IKEQ0523864,197f2c,0113,00000000,77719c0,00,32,0d0c09,1404,03,0000',
+            'H:IKEQ0523864,197f2c,0113,00000000,477719c0,0,32,0d0c09,1404,03,0000',
+            'H:IKEQ0523864,197f2c,0113,00000000,477719c0,00,2,0d0c09,1404,03,0000',
+            'H:IKEQ0523864,197f2c,0113,00000000,477719c0,00,32,d0c09,1404,03,0000',
+            'H:IKEQ0523864,197f2c,0113,00000000,477719c0,00,32,0d0c09,404,03,0000',
+            'H:IKEQ0523864,197f2c,0113,00000000,477719c0,00,32,0d0c09,1404,3,0000',
+            'H:IKEQ0523864,197f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,000',
+            # invalid hex format
             'H:KEQ0523864,097f2c,x113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
+            'H:KEQ0523864,097f2c,0113,00000000,477719cx,00,32,0d0c09,1404,03,0000',
+            'H:KEQ0523864,097f2c,0113,00000000,477719c0,x0,32,0d0c09,1404,03,0000',
+            'H:KEQ0523864,097f2c,0113,00000000,477719c0,00,3g,0d0c09,1404,03,0000',
           ]
         end
         it 'raises proper exception' do
@@ -336,13 +395,27 @@ describe 'MessageReceiver' do
         let(:msgs) do
           [
             'H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
-            'H:4KFK49VMD6,c233fe,211f,00000000,477719c0,00,32,0d0c09,1404,03,0000',
+            'H:4KFK49VMD6,c233fe,211f,00000000,478819c0,16,3c,000a03,1024,03,00fd',
+            'H:JEQ0544923,03f25d,0113,00000000,299ca43f,00,32,0d0c1d,1013,03,0000',
           ]
         end
         let(:ret) do
           [
-            { type: 'H', serial_number: 'KEQ0523864', rf_address: '097f2c', firmware_version: '0113' },
-            { type: 'H', serial_number: '4KFK49VMD6', rf_address: 'c233fe', firmware_version: '211f' },
+            { type: 'H', serial_number: 'KEQ0523864', rf_address: '097f2c',
+              firmware_version: '0113', unknown: '00000000',
+              http_id: 0x477719c0, duty_cycle: 0, free_memory_slots: 50,
+              cube_datetime: DateTime.new(2013, 12, 9, 20, 4),
+              state_cube_time: 3, ntp_counter: 0 },
+            { type: 'H', serial_number: '4KFK49VMD6', rf_address: 'c233fe',
+              firmware_version: '211f', unknown: '00000000',
+              http_id: 0x478819c0, duty_cycle: 22, free_memory_slots: 60,
+              cube_datetime: DateTime.new(2000, 10, 3, 16, 36),
+              state_cube_time: 3, ntp_counter: 253 },
+            { type: 'H', serial_number: 'JEQ0544923', rf_address: '03f25d',
+              firmware_version: '0113', unknown: '00000000',
+              http_id: 0x299ca43f, duty_cycle: 0, free_memory_slots: 50,
+              cube_datetime: DateTime.new(2013, 12, 29, 16, 19),
+              state_cube_time: 3, ntp_counter: 0 },
           ]
         end
         it 'returns proper hash' do
@@ -602,6 +675,100 @@ describe 'MessageReceiver' do
                 { type: 2, rf_address: "\x0a\xf5\x40".b, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
               ],
             },
+          ]
+        end
+        it 'returns proper hash' do
+          msgs.each_with_index do |m, i|
+            expect(recv.recv_msg(m)).to eq(ret[i])
+          end
+        end
+      end
+    end
+
+    # N:Aw4VzExFUTAwMTUzNDD/
+    describe 'N message' do
+      context 'invalid message body' do
+        let(:msgs) do
+          [
+            # invalid device type
+            'N:' + Base64.strict_encode64("\x06\x0e\x15\xccLEQ0015340\xff"),
+            # invalid length
+            'N:' + Base64.strict_encode64("\x00\x0e\x15\xccLEQ0015340"),
+          ]
+        end
+        it 'raises proper exception' do
+          msgs.each do |m|
+            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
+      end
+
+      context 'valid message body' do
+        let(:msgs) do
+          [
+            'N:Aw4VzExFUTAwMTUzNDD/',
+          ]
+        end
+        let(:ret) do
+          [
+            { type: 'N', device_type: :wall_thermostat,
+              rf_address: "\x0e\x15\xcc".b,
+              serial_number: 'LEQ0015340',
+              unknown: "\xff".b,
+            },
+          ]
+        end
+        it 'returns proper hash' do
+          msgs.each_with_index do |m, i|
+            expect(recv.recv_msg(m)).to eq(ret[i])
+          end
+        end
+      end
+    end
+
+    # S:00,0,31
+    describe 'S message' do
+      context 'invalid message body' do
+        let(:msgs) do
+          [
+            # invalid lengths of message parts
+            'S:',
+            'S:0,0,1',
+            'S:00,0',
+            'S:0,0,31',
+            'S:00,,31',
+            # invalid hex format
+            'S:0x,0,31',
+            'S:00,s,31',
+            'S:00,0,3g',
+          ]
+        end
+        it 'raises proper exception' do
+          msgs.each do |m|
+            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
+      end
+
+      context 'valid message body' do
+        let(:msgs) do
+          [
+            'S:00,0,31',
+            'S:00,1,31',
+            'S:63,2,fd',
+          ]
+        end
+        let(:ret) do
+          [
+            { type: 'S',
+              duty_cycle: 0, command_processed: true,
+              free_memory_slots: 49 },
+            { type: 'S',
+              duty_cycle: 0, command_processed: false,
+              free_memory_slots: 49 },
+            { type: 'S',
+              duty_cycle: 99, command_processed: false,
+              free_memory_slots: 253 },
           ]
         end
         it 'returns proper hash' do

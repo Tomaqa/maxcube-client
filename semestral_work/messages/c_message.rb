@@ -7,6 +7,20 @@ module MaxCube
       LENGTHS = [6].freeze
     end
 
+    # Configuration message
+    def parse_c(body)
+      addr, enc_data = parse_c_split(body)
+
+      @io = StringIO.new(decode(enc_data), 'rb')
+
+      hash = parse_c_head(addr)
+      parse_c_device_type(hash)
+
+      hash
+    end
+
+    ########################
+
     def parse_c_split(body)
       addr, enc_data = body.split(',')
       check_msg_part_lengths(MessageC::LENGTHS, addr)
@@ -16,13 +30,10 @@ module MaxCube
 
     def parse_c_head(addr)
       @length = read(1, 'C')
+      # 'rf_address' should correspond with 'addr',
+      # but it is not checked (yet)
       rf_address = read(3)
-      device_type_id = read(1, 'C')
-      device_type = DEVICE_TYPE[device_type_id]
-      unless device_type
-        raise InvalidMessageBody
-          .new(@msg_type, "unrecognized device type id: #{device_type_id}")
-      end
+      device_type = check_device_type(read(1, 'C'))
       hash = {
         address: addr,
         length: @length,
@@ -192,18 +203,6 @@ module MaxCube
              'unexpected EOF reached in decoded message data of ' \
              "'#{device_type.to_s.split('_').map(&:capitalize).join(' ')}'" \
              ' device type')
-    end
-
-    # Configuration message
-    def parse_c(body)
-      addr, enc_data = parse_c_split(body)
-
-      @io = StringIO.new(decode(enc_data), 'rb')
-
-      hash = parse_c_head(addr)
-      parse_c_device_type(hash)
-
-      hash
     end
   end
 end

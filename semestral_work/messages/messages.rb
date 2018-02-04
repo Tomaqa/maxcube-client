@@ -10,7 +10,8 @@ module MaxCube
   # X:message\r\n
   # As all messages are being split by '\r\n',
   # it does not occur in single message processing,
-  # only in raw data processing
+  # only in raw data processing.
+  # Presence of '\r\n' at the very end of raw_data is ignored
   class MessageHandler
     # Without '\r\n', with it it is 1900
     MSG_MAX_LEN = 1898
@@ -118,6 +119,13 @@ module MaxCube
              " (#{length} < #{min_length})")
     end
 
+    def check_device_type(device_type_id)
+      device_type = DEVICE_TYPE[device_type_id]
+      return device_type if device_type
+      raise InvalidMessageBody
+        .new(@msg_type, "unrecognized device type id: #{device_type_id}")
+    end
+
     def encode(data)
       Base64.encode64(data)
       # Base64.strict_encode64(data)
@@ -175,39 +183,25 @@ module MaxCube
     def recv_msg(msg)
       check_recv_msg(msg)
       body = msg.split(':')[1] || ''
-      { type: @msg_type }.merge(send("parse_#{@msg_type.downcase}", body))
+      hash = { type: @msg_type }
+      method = self.method("parse_#{@msg_type.downcase}")
+      hash.merge(method.call(body))
+    rescue NameError
+      hash[:data] = body
+      hash
     end
 
     require_relative 'a_message'
     require_relative 'c_message'
+    require_relative 'f_message'
     require_relative 'h_message'
     require_relative 'l_message'
     require_relative 'm_message'
+    require_relative 'n_message'
+    require_relative 's_message'
   end
 
   class MessageSender < MessageHandler
     MSG_TYPES = %w[u i s m n x g q e d B G J P O V W a r t w l c v f z].freeze
   end
 end
-
-# p MaxCube::MessageReceiver.new.recv_data('')
-# p MaxCube::MessageReceiver.new.recv_data("\r\n")
-# p MaxCube::MessageReceiver.new.recv_data("\r\n\r\n")
-# MaxCube::MessageReceiver.new.recv_data(':')
-# MaxCube::MessageReceiver.new.recv_data('H:')
-# MaxCube::MessageReceiver.new.recv_data('M:00,01,')
-# MaxCube::MessageReceiver.new.recv_data('M:00,01,'+Base64.encode64('abcd'))
-# p MaxCube::MessageReceiver.new.recv_data('M:00,01,'+Base64.encode64('ab192XY123'))
-# p MaxCube::MessageReceiver.new.recv_data('M:00,01,'+Base64.encode64('ab192XY1230'))
-# p MaxCube::MessageReceiver.new.recv_data('M:00,01,'+Base64.encode64("ab\x01!\x02XY123\x00"))
-# p MaxCube::MessageReceiver.new.recv_data("M:00,01,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr
-# 1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD
-# M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a
-# W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB\r\n")
-# p MaxCube::MessageReceiver.new.recv_data('L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A')
-# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00"))
-# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x00"))
-# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x0a\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00"))
-# p MaxCube::MessageReceiver.new.recv_data('L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00\x00"))
-# p MaxCube::MessageReceiver.new.recv_data('C:03f25d,7QPyXQATAQBKRVEwNTQ0OTIzAAsABEAAAAAAAAAAAPIA==')
-

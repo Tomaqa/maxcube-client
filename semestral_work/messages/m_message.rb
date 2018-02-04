@@ -7,6 +7,21 @@ module MaxCube
       LENGTHS = [2, 2].freeze
     end
 
+    # Metadata message
+    def parse_m(body)
+      index, count, enc_data = parse_m_split(body)
+
+      @io = StringIO.new(decode(enc_data), 'rb')
+
+      hash = parse_m_head(index, count)
+      parse_m_rooms(hash)
+      parse_m_devices(hash)
+
+      hash
+    end
+
+    ########################
+
     def parse_m_split(body)
       index, count, enc_data = body.split(',')
       check_msg_part_lengths(MessageM::LENGTHS, index, count)
@@ -85,19 +100,6 @@ module MaxCube
         .new(@msg_type,
              'unexpected EOF reached at devices data part' \
              ' of decoded message data')
-    end
-
-    # Metadata message
-    def parse_m(body)
-      index, count, enc_data = parse_m_split(body)
-
-      @io = StringIO.new(decode(enc_data), 'rb')
-
-      hash = parse_m_head(index, count)
-      parse_m_rooms(hash)
-      parse_m_devices(hash)
-
-      hash
     end
   end
 end

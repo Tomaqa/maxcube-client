@@ -7,6 +7,25 @@ module MaxCube
       LENGTHS = [6, 11, 12].freeze
     end
 
+    # Device list message
+    def parse_l(body)
+      @io = StringIO.new(decode(body), 'rb')
+
+      hash = { devices: [] }
+      until @io.eof?
+        subhash = parse_l_submsg_1
+
+        temperature_msb = parse_l_submsg_2(subhash) if @length > 6
+        parse_l_submsg_3(subhash, temperature_msb) if @length > 11
+
+        hash[:devices] << subhash
+      end # until
+
+      hash
+    end
+
+    ########################
+
     def parse_l_submsg_1
       @length = read(1, 'C')
       unless MessageL::LENGTHS.include?(@length)
@@ -56,13 +75,13 @@ module MaxCube
       month = ((date_until & 0x40) >> 6) | ((date_until & 0xe000) >> 12)
       day = (date_until & 0x1f00) >> 8
       time_until = read(1, 'C')
-      hour = time_until / 2
-      minute = (time_until % 2) * 30
+      hours = time_until / 2
+      minutes = (time_until % 2) * 30
       # Sometimes when device is in 'auto' mode,
       # this field can contain 'actual_temperature' instead
       # (but never if it is already contained in next byte)
       begin
-        datetime_until = DateTime.new(year, month, day, hour, minute)
+        datetime_until = DateTime.new(year, month, day, hours, minutes)
         subhash[:datetime_until] = datetime_until
       rescue ArgumentError
         if @mode != :auto || @length > 11
@@ -88,23 +107,6 @@ module MaxCube
       raise InvalidMessageBody
         .new(@msg_type,
              'unexpected EOF reached at submessage 3rd part')
-    end
-
-    # Device list message
-    def parse_l(body)
-      @io = StringIO.new(decode(body), 'rb')
-
-      hash = { devices: [] }
-      until @io.eof?
-        subhash = parse_l_submsg_1
-
-        temperature_msb = parse_l_submsg_2(subhash) if @length > 6
-        parse_l_submsg_3(subhash, temperature_msb) if @length > 11
-
-        hash[:devices] << subhash
-      end # until
-
-      hash
     end
   end
 end
