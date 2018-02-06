@@ -3,8 +3,8 @@ require 'date'
 require_relative '../messages/messages'
 require_relative 'spec_helper'
 
-describe 'MessageReceiver' do
-  subject(:recv) { MaxCube::MessageReceiver.new }
+describe 'MessageParser' do
+  subject(:parser) { MaxCube::MessageParser.new }
 
   # Proper message examples:
   # A:\r\n
@@ -12,18 +12,16 @@ describe 'MessageReceiver' do
   # H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\n
   # L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A\r\n
 
-  describe 'invalid message' do
+  describe 'invalid data' do
     context 'empty message' do
       let(:inputs) do
         [
           '',
-          "\r\n",
-          "\r\n\r\n",
         ]
       end
       it 'returns empty array' do
         inputs.each do |i|
-          expect(recv.recv_data(i)).to eq([])
+          expect(parser.parse_data(i)).to eq([])
         end
       end
     end
@@ -43,7 +41,7 @@ describe 'MessageReceiver' do
     #   end
     #   it 'raises proper exception' do
     #     inputs.each do |inp|
-    #       expect { recv.recv_data(inp) }.to raise_error TypeError
+    #       expect { parser.parse_data(inp) }.to raise_error TypeError
     #     end
     #   end
     # end
@@ -53,24 +51,25 @@ describe 'MessageReceiver' do
         let(:msgs) do
           [
             '::',
-            'H::',
-            'H:X:',
-            'A:A:',
             'HX:',
             'HX:A',
             'HX:A:',
             '1:',
+            "A:\x00",
+            "A:\r",
+            "A:\n",
+            "A:\n\r",
           ]
         end
-        it 'raises proper exception and #valid_recv_msg is falsey' do
+        it 'raises proper exception and #valid_parse_msg is falsey' do
           msgs.each do |m|
-            expect { recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
-            expect(recv.valid_recv_msg(m)).to be_falsey
+            expect { parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
+            expect(parser.valid_parse_msg(m)).to be_falsey
           end
         end
         it 'raises proper exception when passed as raw data' do
           msgs.each do |m|
-            expect { recv.recv_data(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
+            expect { parser.parse_data(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
           end
         end
       end
@@ -78,21 +77,21 @@ describe 'MessageReceiver' do
       context 'of raw data' do
         let(:data) do
           [
-            'A:\r\nA:',
-            'A:\nA:',
-            'A:\rA:',
+            "\r\n",
+            "\r\n\r\n",
+            'A:\r\n',
+            'A:\n',
+            'A:\r',
             'A:\r\nA:\r\n',
-            "A:A:\r\n",
-            "A:\r\nA:\r\naX:",
             "A:\r\nA:\r\naX:\r\n",
-            "H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\nA:\r\nA:\r\naX:",
-            "A:\r\nH:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\nA:\r\naX:",
-            "A:\nH:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\nA:\r\naX:",
+            "H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\nA:\r\nA:\r\naX:\r\n",
+            "A:\r\nH:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\nA:\r\naX:\r\n",
+            "A:\nH:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000\r\nA:\r\naX:\r\n",
           ]
         end
         it 'raises proper exception' do
           data.each do |d|
-            expect { recv.recv_data(d) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
+            expect { parser.parse_data(d) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
           end
         end
       end
@@ -108,46 +107,32 @@ describe 'MessageReceiver' do
           'l:',
         ]
       end
-      it 'raises proper exception and #valid_recv_msg_type is falsey' do
+      it 'raises proper exception and #valid_parse_msg_type is falsey' do
         msgs.each do |m|
-          expect { recv.recv_data(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
-          expect(recv.valid_recv_msg_type(m)).to be_falsey
+          expect { parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          expect(parser.valid_parse_msg_type(m)).to be_falsey
         end
       end
     end
 
-    context 'valid message type but not implemented (yet)' do
+    context 'valid message type but parser not implemented (yet)' do
       let(:msgs) do
         [
           'D:ZXhhbXBsZQoAAAAAAAAAAA==',
           'E:encrypted-base64',
-          "w:message1,message2,\x00\x01",
+          'w:message1,message2,0001',
         ]
       end
       let(:ret) do
         [
           { type: 'D', data: 'ZXhhbXBsZQoAAAAAAAAAAA==' },
           { type: 'E', data: 'encrypted-base64' },
-          { type: 'w', data: "message1,message2,\x00\x01".b },
+          { type: 'w', data: 'message1,message2,0001'},
         ]
       end
       it 'returns hash with unparsed data' do
         msgs.each_with_index do |m, i|
-          expect(recv.recv_msg(m)).to eq(ret[i])
-        end
-      end
-    end
-
-    context 'invalid message body in general' do
-      let(:msgs) do
-        [
-          'H:',
-          'M:',
-        ]
-      end
-      it 'raises proper exception' do
-        msgs.each do |m|
-          expect { recv.recv_data(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          expect(parser.parse_msg(m)).to eq(ret[i])
         end
       end
     end
@@ -162,8 +147,8 @@ describe 'MessageReceiver' do
       end
       it 'raises proper exception and #valid_msg_length is falsey' do
         msgs.each do |m|
-          expect { recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageLength
-          expect(recv.valid_msg_length(m)).to be_falsey
+          expect { parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageLength
+          expect(parser.valid_msg_length(m)).to be_falsey
         end
       end
     end
@@ -196,7 +181,7 @@ describe 'MessageReceiver' do
     end
     it 'returns array of hashes with proper message types' do
       data.each_with_index do |d, i|
-        ary = recv.recv_data(d)
+        ary = parser.parse_data(d)
         expect(ary).to be_an(Array).and all(be_a(Hash))
         ary.each_with_index do |h, j|
           expect(h).to include(:type)
@@ -219,7 +204,7 @@ describe 'MessageReceiver' do
       end
       it 'ignores any content of message' do
         msgs.each do |m|
-          expect(recv.recv_msg(m)).to eq({ type: 'A' })
+          expect(parser.parse_msg(m)).to eq({ type: 'A' })
         end
       end
     end
@@ -249,7 +234,7 @@ describe 'MessageReceiver' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
           end
         end
       end
@@ -314,7 +299,7 @@ describe 'MessageReceiver' do
         end
         it 'returns proper hash' do
           msgs.each_with_index do |m, i|
-            expect(recv.recv_msg(m)
+            expect(parser.parse_msg(m)
               .delete_if do |k, _|
                 [
                   :unknown1, :unknown2, :unknown3, :unknown4,
@@ -350,7 +335,7 @@ describe 'MessageReceiver' do
       end
       it 'returns proper hash' do
         msgs.each_with_index do |m, i|
-          expect(recv.recv_msg(m)).to eq(ret[i])
+          expect(parser.parse_msg(m)).to eq(ret[i])
         end
       end
     end
@@ -386,7 +371,7 @@ describe 'MessageReceiver' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
           end
         end
       end
@@ -420,7 +405,7 @@ describe 'MessageReceiver' do
         end
         it 'returns proper hash' do
           msgs.each_with_index do |m, i|
-            expect(recv.recv_msg(m)).to eq(ret[i])
+            expect(parser.parse_msg(m)).to eq(ret[i])
           end
         end
       end
@@ -456,7 +441,7 @@ describe 'MessageReceiver' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
           end
         end
       end
@@ -468,6 +453,8 @@ describe 'MessageReceiver' do
             'L:' + Base64.strict_encode64("\x06\x0f\xda\xed\x09\x00\x03"),
             'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x00\x00\x18\x18\x01\x00\x00"),
             'L:' + Base64.strict_encode64("\x0c\x0f\xda\xed\x09\x12\x18\x18\xa8\x9d\x0b\x04\x24"),
+            'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x12\x18\x18\xa8\xbd\xef\x04"),
+            'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x12\x18\x18\xa8\xbd\xf0\x05"),
             'L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A',
           ]
         end
@@ -507,7 +494,7 @@ describe 'MessageReceiver' do
                     error: false,
                     valid_info: false,
                   },
-                  valve_position: 24, temperature: 12.0,
+                  valve_opening: 24, temperature: 12.0,
                   actual_temperature: 25.6,
                 },
               ],
@@ -527,9 +514,49 @@ describe 'MessageReceiver' do
                     error: false,
                     valid_info: true,
                   },
-                  valve_position: 24, temperature: 20.0,
+                  valve_opening: 24, temperature: 20.0,
                   datetime_until: DateTime.new(2011, 8, 29, 2, 0),
                   actual_temperature: 29.2,
+                },
+              ],
+            },
+            { type: 'L', devices: [
+                { length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_opening: 24, temperature: 20.0,
+                  datetime_until: DateTime.new(2015, 11, 29, 2, 0),
+                },
+              ],
+            },
+            { type: 'L', devices: [
+                { length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_opening: 24, temperature: 20.0,
+                  datetime_until: DateTime.new(2016, 11, 29, 2, 30),
                 },
               ],
             },
@@ -549,7 +576,7 @@ describe 'MessageReceiver' do
                     error: false,
                     valid_info: true,
                   },
-                  valve_position: 24, temperature: 20.0,
+                  valve_opening: 24, temperature: 20.0,
                   actual_temperature: 20.4,
                 },
                 {
@@ -567,7 +594,7 @@ describe 'MessageReceiver' do
                     error: false,
                     valid_info: true,
                   },
-                  valve_position: 24, temperature: 20.0,
+                  valve_opening: 24, temperature: 20.0,
                   actual_temperature: 20.7,
                 },
                 {
@@ -585,7 +612,7 @@ describe 'MessageReceiver' do
                     error: false,
                     valid_info: true,
                   },
-                  valve_position: 24, temperature: 20.0,
+                  valve_opening: 24, temperature: 20.0,
                   actual_temperature: 20.6,
                 },
               ],
@@ -594,7 +621,7 @@ describe 'MessageReceiver' do
         end
         it 'returns proper hash' do
           msgs.each_with_index do |m, i|
-            expect(recv.recv_msg(m)).to eq(ret[i])
+            expect(parser.parse_msg(m)).to eq(ret[i])
           end
         end
       end
@@ -629,11 +656,13 @@ describe 'MessageReceiver' do
             'M:00,xx,' + Base64.strict_encode64("ab\x00\x00"),
             # index >= count
             'M:01,01,' + Base64.strict_encode64("ab\x00\x00"),
+            # invalid device type
+            'M:00,01,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x07RFAserial_num\x04NAME!"),
           ]
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
           end
         end
       end
@@ -641,7 +670,7 @@ describe 'MessageReceiver' do
       context 'valid message body' do
         let(:msgs) do
           [
-            'M:00,01,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!"),
+            'M:00,01,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
             'M:00,01,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr' \
               '1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD' \
               'M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a' \
@@ -651,16 +680,16 @@ describe 'MessageReceiver' do
         let(:ret) do
           [
             {
-              type: 'M', index: 0, count: 1, unknown: "Vx",
+              type: 'M', index: 0, count: 1, unknown1: 'Vx', unknown2: "\x01".b,
               rooms_count: 1, rooms: [
                 { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '123'},
               ],
               devices_count: 1, devices: [
-                { type: 4, rf_address: 'RFA', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+                { type: :shutter_contact, rf_address: 'RFA', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
               ],
             },
             {
-              type: 'M', index: 0, count: 1, unknown: "V\x02".b,
+              type: 'M', index: 0, count: 1, unknown1: "V\x02".b, unknown2: "\x01".b,
               rooms_count: 4, rooms: [
                 { id: 1, name_length: 3, name: 'Bad', rf_address: "\x0a\xed\x69".b },
                 { id: 2, name_length: 4, name: 'Buro', rf_address: "\x0a\xf3\x00".b },
@@ -668,18 +697,18 @@ describe 'MessageReceiver' do
                 { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: "\x0a\xf5\x40".b },
               ],
               devices_count: 5, devices: [
-                { type: 2, rf_address: "\x0a\xed\x69".b, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
-                { type: 2, rf_address: "\x0a\xf3\x00".b, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
-                { type: 2, rf_address: "\x0a\xf3\x0c".b, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
-                { type: 2, rf_address: "\x0a\xf3\x79".b, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
-                { type: 2, rf_address: "\x0a\xf5\x40".b, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
+                { type: :radiator_thermostat_plus, rf_address: "\x0a\xed\x69".b, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
+                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x00".b, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
+                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x0c".b, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
+                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x79".b, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
+                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf5\x40".b, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
               ],
             },
           ]
         end
         it 'returns proper hash' do
           msgs.each_with_index do |m, i|
-            expect(recv.recv_msg(m)).to eq(ret[i])
+            expect(parser.parse_msg(m)).to eq(ret[i])
           end
         end
       end
@@ -698,7 +727,7 @@ describe 'MessageReceiver' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
           end
         end
       end
@@ -720,7 +749,7 @@ describe 'MessageReceiver' do
         end
         it 'returns proper hash' do
           msgs.each_with_index do |m, i|
-            expect(recv.recv_msg(m)).to eq(ret[i])
+            expect(parser.parse_msg(m)).to eq(ret[i])
           end
         end
       end
@@ -745,7 +774,7 @@ describe 'MessageReceiver' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ recv.recv_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
           end
         end
       end
@@ -773,11 +802,476 @@ describe 'MessageReceiver' do
         end
         it 'returns proper hash' do
           msgs.each_with_index do |m, i|
-            expect(recv.recv_msg(m)).to eq(ret[i])
+            expect(parser.parse_msg(m)).to eq(ret[i])
           end
         end
       end
     end
 
   end
+end
+
+describe 'MessageSerializer' do
+  subject(:serializer) { MaxCube::MessageSerializer.new }
+
+  # Proper message examples:
+  # a:\r\n
+  # n:003c\r\n
+  # q:\r\n
+  # t:01,1,Dx1U\r\n
+
+  describe 'invalid data' do
+    context 'empty data' do
+      let(:inputs) do
+        [
+          [],
+        ]
+      end
+      it 'returns empty data' do
+        inputs.each do |i|
+          expect(serializer.serialize_data(i)).to eq('')
+        end
+      end
+    end
+
+    context 'invalid format' do
+      context 'of single hash' do
+        let(:hashes) do
+          [
+            {},
+            { type_: 'a', },
+            { _type: 'a', },
+          ]
+        end
+        it 'raises proper exception and #valid_serialize_hash is falsey' do
+          hashes.each do |h|
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+            expect(serializer.valid_serialize_hash(h)).to be_falsey
+          end
+        end
+        it 'raises proper exception when passed as array of hashes' do
+          hashes.each do |h|
+            expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          end
+        end
+      end
+
+      context 'of array of hashes' do
+        let(:data) do
+          [
+            [{}, { type: 'a' }],
+            [{ type: 'a' }, {}],
+          ]
+        end
+        it 'raises proper exception' do
+          data.each do |d|
+            expect{ serializer.serialize_data(d) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          end
+        end
+      end
+    end
+
+    context 'invalid message type' do
+      let(:hashes) do
+        [
+          { type: 'aa' },
+          { type: 'X' },
+          { type: 'A' },
+        ]
+      end
+      it 'raises proper exception and #valid_serialize_msg_type is falsey' do
+        hashes.each do |h|
+          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          expect(serializer.valid_serialize_msg_type(h)).to be_falsey
+        end
+      end
+    end
+
+    context 'valid message type but serializer not implemented yet' do
+      let(:hashes) do
+        [
+          { type: 'g' },
+          { type: 'W' },
+          { type: 'r' },
+        ]
+      end
+      it 'raises proper exception' do
+        hashes.each do |h|
+          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+        end
+      end
+    end
+
+  # Check whether output data is valid: length is not too long, format is OK, ..
+
+  end
+
+  describe 'valid data' do
+    let(:data) do
+      [
+        [{ type: 'a'}, ],
+        [{ type: 'a'}, { type: 'a'}, ],
+        [{ type: 'a'}, { type: 'l'}, { type: 'a'}, ],
+        [{ type: 'l'}, { type: 'l'}, { type: 'a'}, ],
+        [{ type: 'q'}, { type: 'l'}, { type: 'a'}, ],
+      ]
+    end
+    let(:res) do
+      [
+        %w[a],
+        %w[a a],
+        %w[a l a],
+        %w[l l a],
+        %w[q l a],
+      ]
+    end
+    it 'returns string with valid format and proper message types' do
+      data.each_with_index do |d, i|
+        data = serializer.serialize_data(d)
+        expect(data).to be_a(String)
+        expect(serializer.valid_data(data)).to be_truthy
+        expect(data[0]).to eq(res[i][0])
+        data.split("\r\n").each_with_index do |m, j|
+          expect(serializer.valid_msg(m)).to be_truthy
+          expect(m[0]).to eq(res[i][j])
+        end
+      end
+    end
+  end
+
+  describe 'concrete message types' do
+
+    describe 'a, c, l, q messages' do
+      let(:types) { %w[a c l q] }
+      let(:hashes) do
+        [
+          {},
+          { unknown: 'something' },
+          { data: 'super interesting' },
+        ]
+      end
+      it 'ignores any additional content of hash' do
+        types.each do |t|
+          hashes.each do |h|
+            h[:type] = t
+            expect(serializer.serialize_hash(h)).to eq("#{t}:\r\n")
+          end
+        end
+      end
+    end
+
+    # f:
+    # f:nl.pool.ntp.org,ntp.homematic.com
+    describe 'f message' do
+      let(:hashes) do
+        [
+          { type: 'f', },
+          { type: 'f', ntp_servers: [], },
+          { type: 'f', ntp_servers: ['nl.pool.ntp.org'], },
+          { type: 'f', ntp_servers: ['nl.pool.ntp.org', 'ntp.homematic.com'], },
+        ]
+      end
+      let(:ret) do
+        [
+          'f:',
+          'f:',
+          'f:nl.pool.ntp.org',
+          'f:nl.pool.ntp.org,ntp.homematic.com',
+        ].map { |s| s << "\r\n" }
+      end
+      it 'returns proper string' do
+        hashes.each_with_index do |h, i|
+          expect(serializer.serialize_hash(h)).to eq(ret[i])
+        end
+      end
+    end
+
+    # m:00,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr
+    #   1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD
+    #   M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a
+    #   W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB
+    describe 'm message' do
+      let(:hashes) do
+        [
+          {
+            type: 'm', index: 0, unknown1: 'Vx', unknown2: "\x01".b,
+            rooms_count: 1, rooms: [
+              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '123'},
+            ],
+            devices_count: 1, devices: [
+              { type: :shutter_contact, rf_address: 'RFA', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+            ],
+          },
+          {
+            type: 'm',
+            rooms_count: 1, rooms: [
+              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '123'},
+            ],
+            devices_count: 1, devices: [
+              { type: :shutter_contact, rf_address: 'RFA', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+            ],
+          },
+          {
+            type: 'm', index: 0, unknown1: "V\x02".b, unknown2: "\x01".b,
+            rooms_count: 4, rooms: [
+              { id: 1, name_length: 3, name: 'Bad', rf_address: "\x0a\xed\x69".b },
+              { id: 2, name_length: 4, name: 'Buro', rf_address: "\x0a\xf3\x00".b },
+              { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: "\x0a\xf3\x0c".b },
+              { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: "\x0a\xf5\x40".b },
+            ],
+            devices_count: 5, devices: [
+              { type: :radiator_thermostat_plus, rf_address: "\x0a\xed\x69".b, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
+              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x00".b, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
+              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x0c".b, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
+              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x79".b, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
+              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf5\x40".b, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
+            ],
+          },
+        ]
+      end
+      let(:ret) do
+        [
+          'm:00,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
+          'm:00,' + Base64.strict_encode64("\x00\x00\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x00"),
+          'm:00,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr' \
+            '1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD' \
+            'M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a' \
+            'W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB',
+        ].map { |s| s << "\r\n" }
+      end
+      it 'returns proper string' do
+        hashes.each_with_index do |h, i|
+          expect(serializer.serialize_hash(h)).to eq(ret[i])
+        end
+      end
+    end
+
+    # n:
+    # n:003c
+    describe 'n message' do
+      let(:hashes) do
+        [
+          { type: 'n', },
+          { type: 'n', timeout: 60 },
+        ]
+      end
+      let(:ret) do
+        [
+          'n:',
+          'n:003c',
+        ].map { |s| s << "\r\n" }
+      end
+      it 'returns proper string' do
+        hashes.each_with_index do |h, i|
+          expect(serializer.serialize_hash(h)).to eq(ret[i])
+        end
+      end
+    end
+
+    # s:AARAAAAAB5EAAWY=
+    describe 's message' do
+      context 'set temperature and mode' do
+        let(:hashes) do
+          [
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_temperature_mode,
+              rf_address_range: 0..0x079100, room_id: 1,
+              temperature: 19.0, mode: :manual, },
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_temperature_mode,
+              rf_address_range: 4..0x079100, room_id: 1,
+              temperature: 19.0, mode: :vacation,
+              datetime_until: DateTime.new(2011, 8, 29, 2, 0) },
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_temperature_mode,
+              rf_address: 0x179101, room_id: 3,
+              temperature: 19.0, mode: :vacation,
+              datetime_until: DateTime.new(2015, 11, 29, 2, 0) },
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_temperature_mode,
+              rf_address_to: 0x179101, room_id: 3,
+              temperature: 24.0, mode: :vacation,
+              datetime_until: DateTime.new(2016, 11, 29, 2, 30) },
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_temperature_mode,
+              rf_address_from: 0x01, rf_address_to: 0x179101, room_id: 3,
+              temperature: 24.5, mode: :vacation,
+              datetime_until: DateTime.new(2016, 11, 29, 2, 29) },
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_temperature_mode,
+              rf_address_from: 0x01, rf_address: 0x179101, room_id: 3,
+              temperature: 24.5, mode: :vacation,
+              datetime_until: DateTime.new(2016, 1, 29, 10, 59) },
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_temperature_mode,
+              rf_address: 0x0fdaed, room_id: 1,
+              temperature: 19.0, mode: :boost, },
+          ]
+        end
+        let(:ret) do
+          [
+            's:AARAAAAAB5EAAWY=',
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x04\x07\x91\x00\x01\xa6\x9d\x0b\x04"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xa6\xbd\x8f\x04"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xb0\xbd\x90\x05"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\xbd\x90\x04"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\x1d\x90\x15"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x0f\xda\xed\x01\xe6"),
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
+        end
+      end
+      context 'set program' do
+        let(:hashes) do
+          [
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :set_program,
+              rf_address: 0x0fc380, room_id: 1, day: 'Monday',
+              program: [
+                { temperature: 16.0, hours_until: 6, minutes_until: 5, },
+                { temperature: 19.0, hours_until: 9, minutes_until: 10, },
+                { temperature: 16.0, hours_until: 16, minutes_until: 55, },
+                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+              ],
+            },
+          ]
+        end
+        let(:ret) do
+          [
+            's:AAQQAAAAD8OAAQJASUxuQMtNIE0gTSBNIA==',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
+        end
+      end
+      context 'set temperature' do
+        let(:hashes) do
+          [
+            { type: 's', unknown: "\x00".b, rf_flags: 0x0,
+              command: :set_temperature,
+              rf_address: 0x0fc380, room_id: 0,
+              comfort_temperature: 21.5,
+              eco_temperature: 16.5,
+              max_setpoint_temperature: 30.5,
+              min_setpoint_temperature: 4.5,
+              temperature_offset: 0.0,
+              window_open_temperature: 12.0,
+              window_open_duration: 15,
+            },
+          ]
+        end
+        let(:ret) do
+          [
+            's:AAARAAAAD8OAACshPQkHGAM=',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
+        end
+      end
+      context 'config valve' do
+        let(:hashes) do
+          [
+            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+              command: :config_valve,
+              rf_address: 0x0fc380, room_id: 1,
+              boost_duration: 5,
+              valve_opening: 90,
+              decalcification_day: 'Saturday',
+              decalcification_hour: 12,
+              max_valve_setting: 100.0,
+              valve_offset: 0.0,
+            },
+          ]
+        end
+        let(:ret) do
+          [
+            's:AAQSAAAAD8OAATIM/wA=',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
+        end
+      end
+    end
+
+    # t:01,1,Dx1U
+    describe 't message' do
+      let(:hashes) do
+        [
+          { type: 't', count: 1, force: true, rf_addresses: ["\x0F\x1DT"], },
+        ]
+      end
+      let(:ret) do
+        [
+          't:01,1,Dx1U',
+        ].map { |s| s << "\r\n" }
+      end
+      it 'returns proper string' do
+        hashes.each_with_index do |h, i|
+          expect(serializer.serialize_hash(h)).to eq(ret[i])
+        end
+      end
+    end
+
+    # u:http://www.max-portal.elv.de:80
+    describe 'u message' do
+      let(:hashes) do
+        [
+          { type: 'u', url: 'http://www.max-portal.elv.de', port: 80, },
+        ]
+      end
+      let(:ret) do
+        [
+          'u:http://www.max-portal.elv.de:80',
+        ].map { |s| s << "\r\n" }
+      end
+      it 'returns proper string' do
+        hashes.each_with_index do |h, i|
+          expect(serializer.serialize_hash(h)).to eq(ret[i])
+        end
+      end
+    end
+
+    # z:1e,G,01
+    describe 'z message' do
+      let(:hashes) do
+        [
+          { type: 'z', time: 30, scope: :group, id: 1, },
+          { type: 'z', time: 33, scope: :room, id: 2, },
+          { type: 'z', time: 24, scope: :all, },
+          { type: 'z', time: 1, scope: :device, },
+        ]
+      end
+      let(:ret) do
+        [
+          'z:1e,G,01',
+          'z:21,G,02',
+          'z:18,A',
+          'z:01,D',
+        ].map { |s| s << "\r\n" }
+      end
+      it 'returns proper string' do
+        hashes.each_with_index do |h, i|
+          expect(serializer.serialize_hash(h)).to eq(ret[i])
+        end
+      end
+    end
+
+  end
+
 end

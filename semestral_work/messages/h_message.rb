@@ -1,6 +1,6 @@
 
 module MaxCube
-  class MessageReceiver < MessageHandler
+  class MessageParser < MessageHandler
     private
 
     module MessageH

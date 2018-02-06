@@ -1,6 +1,6 @@
 
 module MaxCube
-  class MessageReceiver < MessageHandler
+  class MessageParser < MessageHandler
     private
 
     module MessageL
@@ -40,7 +40,7 @@ module MaxCube
         unknown: read(1),
       }
       flags = read(2, 'n')
-      @mode = DEVICE_MODE[flags & 0x3]
+      @mode = device_mode(flags & 0x3)
       subhash[:flags] = {
         value: flags,
         mode: @mode,
@@ -63,7 +63,7 @@ module MaxCube
     end
 
     def parse_l_submsg_2(subhash)
-      subhash[:valve_position] = read(1, 'C')
+      subhash[:valve_opening] = read(1, 'C')
 
       temperature = read(1, 'C')
       # This bit may be used later
@@ -72,17 +72,20 @@ module MaxCube
 
       date_until = read(2, 'n')
       year = (date_until & 0x1f) + 2000
-      month = ((date_until & 0x40) >> 6) | ((date_until & 0xe000) >> 12)
+      month = ((date_until & 0x80) >> 7) | ((date_until & 0xe000) >> 12)
       day = (date_until & 0x1f00) >> 8
+
       time_until = read(1, 'C')
       hours = time_until / 2
       minutes = (time_until % 2) * 30
       # Sometimes when device is in 'auto' mode,
       # this field can contain 'actual_temperature' instead
       # (but never if it is already contained in next byte)
+      # !It seems that 'datetime' is used for 'vacation' mode,
+      # but it is not sure ...
       begin
-        datetime_until = DateTime.new(year, month, day, hours, minutes)
-        subhash[:datetime_until] = datetime_until
+        subhash[:datetime_until] = DateTime.new(year, month, day,
+                                                hours, minutes)
       rescue ArgumentError
         if @mode != :auto || @length > 11
           raise InvalidMessageBody
@@ -107,6 +110,19 @@ module MaxCube
       raise InvalidMessageBody
         .new(@msg_type,
              'unexpected EOF reached at submessage 3rd part')
+    end
+  end
+
+  class MessageSerializer < MessageHandler
+    private
+
+    module MessageL
+    end
+
+    # Command to resend device list (L)
+    # Does not contain any data
+    def serialize_l(_hash)
+      ''
     end
   end
 end

@@ -1,6 +1,6 @@
 
 module MaxCube
-  class MessageReceiver < MessageHandler
+  class MessageParser < MessageHandler
     private
 
     module MessageM
@@ -13,11 +13,16 @@ module MaxCube
 
       @io = StringIO.new(decode(enc_data), 'rb')
 
-      hash = parse_m_head(index, count)
+      hash = { index: index, count: count, unknown1: read(2), }
       parse_m_rooms(hash)
       parse_m_devices(hash)
+      hash[:unknown2] = read(1)
 
       hash
+    rescue IOError
+      raise InvalidMessageBody
+        .new(@msg_type,
+             'unexpected EOF reached at unknown parts of decoded message data')
     end
 
     ########################
@@ -39,17 +44,6 @@ module MaxCube
       end
 
       [index, count, enc_data]
-    end
-
-    def parse_m_head(index, count)
-      {
-        index: index, count: count,
-        unknown: read(2),
-      }
-    rescue IOError
-      raise InvalidMessageBody
-        .new(@msg_type,
-             'unexpected EOF reached at head of decoded message data')
     end
 
     def parse_m_rooms(hash)
@@ -82,7 +76,7 @@ module MaxCube
       hash[:devices] = []
       devices_count.times do
         device = {
-          type: read(1, 'C'),
+          type: device_type(read(1, 'C')),
           rf_address: read(3),
           serial_number: read(10),
         }
@@ -100,6 +94,56 @@ module MaxCube
         .new(@msg_type,
              'unexpected EOF reached at devices data part' \
              ' of decoded message data')
+    end
+  end
+
+  class MessageSerializer < MessageHandler
+    private
+
+    module MessageM
+    end
+
+    # Serialize metadata for Cube
+    # Message body has the same format as response (M)
+    # -> reverse operations
+    # ! I couldn't verify the assumption that bodies should be the same
+    # ! Cube does not check data format,
+    #   so things could break if invalid data is sent
+    def serialize_m(hash)
+      index = hash.include?(:index) ? hash[:index] : 0
+      head = format('%02x,', index)
+
+      @io = StringIO.new('', 'wb')
+      @io.write(hash.include?(:unknown1) ? hash[:unknown1] : "\x00\x00")
+
+      serialize_m_rooms(hash)
+      serialize_m_devices(hash)
+      @io.write(hash.include?(:unknown2) ? hash[:unknown2] : "\x00")
+
+      head.b << encode(@io.string)
+    end
+
+    ########################
+
+    def serialize_m_rooms(hash)
+      @io.write([hash[:rooms_count]].pack('C'))
+      hash[:rooms].each do |room|
+        @io.write([room[:id], room[:name_length]].pack('C2') <<
+                  room[:name] <<
+                  room[:rf_address])
+      end
+    end
+
+    def serialize_m_devices(hash)
+      @io.write([hash[:devices_count]].pack('C'))
+      hash[:devices].each do |device|
+        @io.write([device_type_id(device[:type])].pack('C') <<
+                  device[:rf_address] <<
+                  device[:serial_number] <<
+                  [device[:name_length]].pack('C') <<
+                  device[:name] <<
+                  [device[:room_id]].pack('C'))
+      end
     end
   end
 end

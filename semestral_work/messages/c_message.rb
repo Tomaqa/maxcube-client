@@ -1,6 +1,6 @@
 
 module MaxCube
-  class MessageReceiver < MessageHandler
+  class MessageParser < MessageHandler
     private
 
     module MessageC
@@ -33,7 +33,7 @@ module MaxCube
       # 'rf_address' should correspond with 'addr',
       # but it is not checked (yet)
       rf_address = read(3)
-      device_type = check_device_type(read(1, 'C'))
+      device_type = device_type(read(1, 'C'))
       hash = {
         address: addr,
         length: @length,
@@ -203,6 +203,19 @@ module MaxCube
              'unexpected EOF reached in decoded message data of ' \
              "'#{device_type.to_s.split('_').map(&:capitalize).join(' ')}'" \
              ' device type')
+    end
+  end
+
+  class MessageSerializer < MessageHandler
+    private
+
+    module MessageC
+    end
+
+    # Request for configuration message (C)
+    # Does not contain any data
+    def serialize_c(_hash)
+      ''
     end
   end
 end
