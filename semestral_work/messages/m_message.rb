@@ -47,17 +47,17 @@ module MaxCube
     end
 
     def parse_m_rooms(hash)
-      rooms_count = read(1, 'C')
+      rooms_count = read(1, true)
       hash[:rooms_count] = rooms_count
       hash[:rooms] = []
       rooms_count.times do
-        room_id = read(1, 'C')
-        room_name_length = read(1, 'C')
+        room_id = read(1, true)
+        room_name_length = read(1, true)
         room = {
           id: room_id,
           name_length: room_name_length,
           name: read(room_name_length),
-          rf_address: read(3)
+          rf_address: read(3, true)
         }
 
         # hash[:rooms][room_id] = room
@@ -71,20 +71,20 @@ module MaxCube
     end
 
     def parse_m_devices(hash)
-      devices_count = read(1, 'C')
+      devices_count = read(1, true)
       hash[:devices_count] = devices_count
       hash[:devices] = []
       devices_count.times do
         device = {
-          type: device_type(read(1, 'C')),
-          rf_address: read(3),
+          type: device_type(read(1, true)),
+          rf_address: read(3, true),
           serial_number: read(10),
         }
-        device_name_length = read(1, 'C')
+        device_name_length = read(1, true)
         device.merge!(
           name_length: device_name_length,
           name: read(device_name_length),
-          room_id: read(1, 'C'),
+          room_id: read(1, true),
         )
 
         hash[:devices] << device
@@ -114,11 +114,11 @@ module MaxCube
       head = format('%02x,', index)
 
       @io = StringIO.new('', 'wb')
-      @io.write(hash.include?(:unknown1) ? hash[:unknown1] : "\x00\x00")
+      write(hash.include?(:unknown1) ? hash[:unknown1] : "\x00\x00")
 
       serialize_m_rooms(hash)
       serialize_m_devices(hash)
-      @io.write(hash.include?(:unknown2) ? hash[:unknown2] : "\x00")
+      write(hash.include?(:unknown2) ? hash[:unknown2] : "\x00")
 
       head.b << encode(@io.string)
     end
@@ -126,23 +126,22 @@ module MaxCube
     ########################
 
     def serialize_m_rooms(hash)
-      @io.write([hash[:rooms_count]].pack('C'))
+      write(hash[:rooms_count], esize: 1)
       hash[:rooms].each do |room|
-        @io.write([room[:id], room[:name_length]].pack('C2') <<
-                  room[:name] <<
-                  room[:rf_address])
+        write(serialize(room[:id],
+                        room[:name_length], room[:name], esize: 1) <<
+              serialize(room[:rf_address], esize: 3))
       end
     end
 
     def serialize_m_devices(hash)
-      @io.write([hash[:devices_count]].pack('C'))
+      write(hash[:devices_count], esize: 1)
       hash[:devices].each do |device|
-        @io.write([device_type_id(device[:type])].pack('C') <<
-                  device[:rf_address] <<
-                  device[:serial_number] <<
-                  [device[:name_length]].pack('C') <<
-                  device[:name] <<
-                  [device[:room_id]].pack('C'))
+        write(serialize(device_type_id(device[:type]), esize: 1) <<
+              serialize(device[:rf_address], esize: 3) <<
+              serialize(device[:serial_number],
+                        device[:name_length], device[:name],
+                        device[:room_id], esize: 1))
       end
     end
   end

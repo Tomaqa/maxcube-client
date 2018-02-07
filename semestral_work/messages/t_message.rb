@@ -11,7 +11,7 @@ module MaxCube
     def serialize_t(hash)
       count = format('%02x', hash[:count])
       force = hash[:force] ? '1' : '0'
-      addrs = encode(hash[:rf_addresses].join)
+      addrs = encode(serialize(*hash[:rf_addresses], esize: 3))
       [count, force, addrs].join(',')
     end
   end

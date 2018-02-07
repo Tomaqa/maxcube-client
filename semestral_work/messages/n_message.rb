@@ -11,8 +11,8 @@ module MaxCube
       @io = StringIO.new(decode(body), 'rb')
 
       {
-        device_type: device_type(read(1, 'C')),
-        rf_address: read(3),
+        device_type: device_type(read(1, true)),
+        rf_address: read(3, true),
         serial_number: read(10),
         unknown: read(1),
       }

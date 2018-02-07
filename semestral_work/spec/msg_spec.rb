@@ -253,7 +253,7 @@ describe 'MessageParser' do
         let(:ret) do
           [
             { type: 'C', length: 237,
-              address: '03f25d', rf_address: "\x03\xf2\x5d".b,
+              address: '03f25d', rf_address: 0x03f25d,
               device_type: :cube,
               firmware_version: '0113',
               test_result: 0,
@@ -264,9 +264,9 @@ describe 'MessageParser' do
               portal_url: "http://max.eq-3.de:80/cube\x000/lookup\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".b,
             },
             { type: 'C', length: 210,
-              address: '06c941', rf_address: "\x06\xc9\x41".b,
+              address: '06c941', rf_address: 0x06c941,
               device_type: :radiator_thermostat,
-              room_id: 1, firmware_version: 24,
+              room_id: 1, _firmware_version: 24,
               test_result: 255,
               serial_number: 'KEQ0352276',
               comfort_temperature: 18.0,
@@ -284,9 +284,9 @@ describe 'MessageParser' do
               valve_offset: 0.0,
             },
             { type: 'C', length: 206,
-              address: '0a12bd', rf_address: "\x0a\x12\xbd".b,
+              address: '0a12bd', rf_address: 0x0a12bd,
               device_type: :wall_thermostat,
-              room_id: 1, firmware_version: 16,
+              room_id: 1, _firmware_version: 16,
               test_result: 255,
               serial_number: 'KEQ0704752',
               comfort_temperature: 18.0,
@@ -303,10 +303,10 @@ describe 'MessageParser' do
               .delete_if do |k, _|
                 [
                   :unknown1, :unknown2, :unknown3, :unknown4,
-                  :timezone_winter, :timezone_winter_offset,
-                  :timezone_winter_day, :timezone_winter_month,
-                  :timezone_daylight, :timezone_daylight_offset,
-                  :timezone_daylight_day, :timezone_daylight_month,
+                  # :_timezone_winter, :_timezone_winter_offset,
+                  # :timezone_winter_day, :timezone_winter_month,
+                  # :_timezone_daylight, :_timezone_daylight_offset,
+                  # :timezone_daylight_day, :timezone_daylight_month,
                   :weekly_program
                 ].include?(k)
               end).to eq(ret[i])
@@ -363,6 +363,7 @@ describe 'MessageParser' do
             'H:IKEQ0523864,197f2c,0113,00000000,477719c0,00,32,0d0c09,1404,3,0000',
             'H:IKEQ0523864,197f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,000',
             # invalid hex format
+            'H:KEQ0523864,x97f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
             'H:KEQ0523864,097f2c,x113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
             'H:KEQ0523864,097f2c,0113,00000000,477719cx,00,32,0d0c09,1404,03,0000',
             'H:KEQ0523864,097f2c,0113,00000000,477719c0,x0,32,0d0c09,1404,03,0000',
@@ -386,17 +387,17 @@ describe 'MessageParser' do
         end
         let(:ret) do
           [
-            { type: 'H', serial_number: 'KEQ0523864', rf_address: '097f2c',
+            { type: 'H', serial_number: 'KEQ0523864', rf_address: 0x097f2c,
               firmware_version: '0113', unknown: '00000000',
               http_id: 0x477719c0, duty_cycle: 0, free_memory_slots: 50,
               cube_datetime: DateTime.new(2013, 12, 9, 20, 4),
               state_cube_time: 3, ntp_counter: 0 },
-            { type: 'H', serial_number: '4KFK49VMD6', rf_address: 'c233fe',
+            { type: 'H', serial_number: '4KFK49VMD6', rf_address: 0xc233fe,
               firmware_version: '211f', unknown: '00000000',
               http_id: 0x478819c0, duty_cycle: 22, free_memory_slots: 60,
               cube_datetime: DateTime.new(2000, 10, 3, 16, 36),
               state_cube_time: 3, ntp_counter: 253 },
-            { type: 'H', serial_number: 'JEQ0544923', rf_address: '03f25d',
+            { type: 'H', serial_number: 'JEQ0544923', rf_address: 0x03f25d,
               firmware_version: '0113', unknown: '00000000',
               http_id: 0x299ca43f, duty_cycle: 0, free_memory_slots: 50,
               cube_datetime: DateTime.new(2013, 12, 29, 16, 19),
@@ -462,7 +463,7 @@ describe 'MessageParser' do
           [
             { type: 'L', devices: [] },
             { type: 'L', devices: [
-                { length: 6, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                { length: 6, rf_address: 0x0fdaed, unknown: "\x09".b,
                   flags: {
                     value: 0x0003,
                     mode: :boost,
@@ -480,7 +481,7 @@ describe 'MessageParser' do
               ],
             },
             { type: 'L', devices: [
-                { length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                { length: 11, rf_address: 0x0fdaed, unknown: "\x09".b,
                   flags: {
                     value: 0x0000,
                     mode: :auto,
@@ -500,7 +501,7 @@ describe 'MessageParser' do
               ],
             },
             { type: 'L', devices: [
-                { length: 12, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                { length: 12, rf_address: 0x0fdaed, unknown: "\x09".b,
                   flags: {
                     value: 0x1218,
                     mode: :auto,
@@ -521,7 +522,7 @@ describe 'MessageParser' do
               ],
             },
             { type: 'L', devices: [
-                { length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                { length: 11, rf_address: 0x0fdaed, unknown: "\x09".b,
                   flags: {
                     value: 0x1218,
                     mode: :auto,
@@ -541,7 +542,7 @@ describe 'MessageParser' do
               ],
             },
             { type: 'L', devices: [
-                { length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                { length: 11, rf_address: 0x0fdaed, unknown: "\x09".b,
                   flags: {
                     value: 0x1218,
                     mode: :auto,
@@ -562,7 +563,7 @@ describe 'MessageParser' do
             },
             { type: 'L', devices: [
                 {
-                  length: 11, rf_address: "\x0f\xda\xed".b, unknown: "\x09".b,
+                  length: 11, rf_address: 0x0fdaed, unknown: "\x09".b,
                   flags: {
                     value: 0x1218,
                     mode: :auto,
@@ -580,7 +581,7 @@ describe 'MessageParser' do
                   actual_temperature: 20.4,
                 },
                 {
-                  length: 11, rf_address: "\x0f\xc3\x73".b, unknown: "\x09".b,
+                  length: 11, rf_address: 0x0fc373, unknown: "\x09".b,
                   flags: {
                     value: 0x1218,
                     mode: :auto,
@@ -598,7 +599,7 @@ describe 'MessageParser' do
                   actual_temperature: 20.7,
                 },
                 {
-                  length: 11, rf_address: "\x0f\xc3\x80".b, unknown: "\x09".b,
+                  length: 11, rf_address: 0x0fc380, unknown: "\x09".b,
                   flags: {
                     value: 0x1218,
                     mode: :auto,
@@ -682,26 +683,26 @@ describe 'MessageParser' do
             {
               type: 'M', index: 0, count: 1, unknown1: 'Vx', unknown2: "\x01".b,
               rooms_count: 1, rooms: [
-                { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '123'},
+                { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233, },
               ],
               devices_count: 1, devices: [
-                { type: :shutter_contact, rf_address: 'RFA', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+                { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
               ],
             },
             {
               type: 'M', index: 0, count: 1, unknown1: "V\x02".b, unknown2: "\x01".b,
               rooms_count: 4, rooms: [
-                { id: 1, name_length: 3, name: 'Bad', rf_address: "\x0a\xed\x69".b },
-                { id: 2, name_length: 4, name: 'Buro', rf_address: "\x0a\xf3\x00".b },
-                { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: "\x0a\xf3\x0c".b },
-                { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: "\x0a\xf5\x40".b },
+                { id: 1, name_length: 3, name: 'Bad', rf_address: 0x0aed69, },
+                { id: 2, name_length: 4, name: 'Buro', rf_address: 0x0af300, },
+                { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: 0x0af30c, },
+                { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: 0x0af540, },
               ],
               devices_count: 5, devices: [
-                { type: :radiator_thermostat_plus, rf_address: "\x0a\xed\x69".b, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
-                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x00".b, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
-                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x0c".b, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
-                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x79".b, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
-                { type: :radiator_thermostat_plus, rf_address: "\x0a\xf5\x40".b, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
+                { type: :radiator_thermostat_plus, rf_address: 0x0aed69, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1, },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af300, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2, },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af30c, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3, },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af379, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3, },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af540, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4, },
               ],
             },
           ]
@@ -741,7 +742,7 @@ describe 'MessageParser' do
         let(:ret) do
           [
             { type: 'N', device_type: :wall_thermostat,
-              rf_address: "\x0e\x15\xcc".b,
+              rf_address: 0x0e15cc,
               serial_number: 'LEQ0015340',
               unknown: "\xff".b,
             },
@@ -996,35 +997,35 @@ describe 'MessageSerializer' do
           {
             type: 'm', index: 0, unknown1: 'Vx', unknown2: "\x01".b,
             rooms_count: 1, rooms: [
-              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '123'},
+              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233},
             ],
             devices_count: 1, devices: [
-              { type: :shutter_contact, rf_address: 'RFA', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+              { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
             ],
           },
           {
             type: 'm',
             rooms_count: 1, rooms: [
-              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '123'},
+              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233},
             ],
             devices_count: 1, devices: [
-              { type: :shutter_contact, rf_address: 'RFA', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+              { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
             ],
           },
           {
             type: 'm', index: 0, unknown1: "V\x02".b, unknown2: "\x01".b,
             rooms_count: 4, rooms: [
-              { id: 1, name_length: 3, name: 'Bad', rf_address: "\x0a\xed\x69".b },
-              { id: 2, name_length: 4, name: 'Buro', rf_address: "\x0a\xf3\x00".b },
-              { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: "\x0a\xf3\x0c".b },
-              { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: "\x0a\xf5\x40".b },
+              { id: 1, name_length: 3, name: 'Bad', rf_address: 0x0aed69 },
+              { id: 2, name_length: 4, name: 'Buro', rf_address: 0x0af300 },
+              { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: 0x0af30c },
+              { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: 0x0af540 },
             ],
             devices_count: 5, devices: [
-              { type: :radiator_thermostat_plus, rf_address: "\x0a\xed\x69".b, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
-              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x00".b, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
-              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x0c".b, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
-              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf3\x79".b, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
-              { type: :radiator_thermostat_plus, rf_address: "\x0a\xf5\x40".b, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
+              { type: :radiator_thermostat_plus, rf_address: 0x0aed69, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
+              { type: :radiator_thermostat_plus, rf_address: 0x0af300, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
+              { type: :radiator_thermostat_plus, rf_address: 0x0af30c, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
+              { type: :radiator_thermostat_plus, rf_address: 0x0af379, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
+              { type: :radiator_thermostat_plus, rf_address: 0x0af540, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
             ],
           },
         ]
@@ -1073,16 +1074,16 @@ describe 'MessageSerializer' do
       context 'set temperature and mode' do
         let(:hashes) do
           [
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+            { type: 's', unknown: "\x00".b,
               command: :set_temperature_mode,
               rf_address_range: 0..0x079100, room_id: 1,
               temperature: 19.0, mode: :manual, },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+            { type: 's', unknown: "\x00".b,
               command: :set_temperature_mode,
               rf_address_range: 4..0x079100, room_id: 1,
               temperature: 19.0, mode: :vacation,
               datetime_until: DateTime.new(2011, 8, 29, 2, 0) },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+            { type: 's', unknown: "\x00".b,
               command: :set_temperature_mode,
               rf_address: 0x179101, room_id: 3,
               temperature: 19.0, mode: :vacation,
@@ -1097,12 +1098,12 @@ describe 'MessageSerializer' do
               rf_address_from: 0x01, rf_address_to: 0x179101, room_id: 3,
               temperature: 24.5, mode: :vacation,
               datetime_until: DateTime.new(2016, 11, 29, 2, 29) },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+            { type: 's', unknown: "\x00".b, rf_flags: 0x3,
               command: :set_temperature_mode,
               rf_address_from: 0x01, rf_address: 0x179101, room_id: 3,
               temperature: 24.5, mode: :vacation,
               datetime_until: DateTime.new(2016, 1, 29, 10, 59) },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+            { type: 's', unknown: "\x00".b, rf_flags: 0x0,
               command: :set_temperature_mode,
               rf_address: 0x0fdaed, room_id: 1,
               temperature: 19.0, mode: :boost, },
@@ -1115,8 +1116,8 @@ describe 'MessageSerializer' do
             's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xa6\xbd\x8f\x04"),
             's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xb0\xbd\x90\x05"),
             's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\xbd\x90\x04"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\x1d\x90\x15"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x0f\xda\xed\x01\xe6"),
+            's:' + Base64.strict_encode64("\x00\x03\x40\x00\x00\x01\x17\x91\x01\x03\xb1\x1d\x90\x15"),
+            's:' + Base64.strict_encode64("\x00\x00\x40\x00\x00\x00\x0f\xda\xed\x01\xe6"),
           ].map { |s| s << "\r\n" }
         end
         it 'returns proper string' do
@@ -1128,7 +1129,7 @@ describe 'MessageSerializer' do
       context 'set program' do
         let(:hashes) do
           [
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+            { type: 's', unknown: "\x00".b,
               command: :set_program,
               rf_address: 0x0fc380, room_id: 1, day: 'Monday',
               program: [
@@ -1157,7 +1158,7 @@ describe 'MessageSerializer' do
       context 'set temperature' do
         let(:hashes) do
           [
-            { type: 's', unknown: "\x00".b, rf_flags: 0x0,
+            { type: 's', unknown: "\x00".b,
               command: :set_temperature,
               rf_address: 0x0fc380, room_id: 0,
               comfort_temperature: 21.5,
@@ -1184,11 +1185,11 @@ describe 'MessageSerializer' do
       context 'config valve' do
         let(:hashes) do
           [
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+            { type: 's', unknown: "\x00".b,
               command: :config_valve,
               rf_address: 0x0fc380, room_id: 1,
               boost_duration: 5,
-              valve_opening: 90,
+              valve_opening: 90.0,
               decalcification_day: 'Saturday',
               decalcification_hour: 12,
               max_valve_setting: 100.0,
@@ -1207,13 +1208,99 @@ describe 'MessageSerializer' do
           end
         end
       end
+      context 'add/remove link partner' do
+        let(:hashes) do
+          [
+            { type: 's', unknown: "\x00".b,
+              command: :add_link_partner,
+              rf_address: 0x0fc373, room_id: 0,
+              partner_rf_address: 0x0fdaed,
+              partner_type: :radiator_thermostat,
+            },
+            { type: 's', unknown: "\x00".b,
+              command: :remove_link_partner,
+              rf_address: 0x0fc373, room_id: 0,
+              partner_rf_address: 0x0fdaed,
+              partner_type: :radiator_thermostat,
+            },
+          ]
+        end
+        let(:ret) do
+          [
+            's:AAAgAAAAD8NzAA/a7QE=',
+            's:AAAhAAAAD8NzAA/a7QE=',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
+        end
+      end
+      context 'set/unset group address' do
+        let(:hashes) do
+          [
+            { type: 's', unknown: "\x00".b,
+              command: :set_group_address,
+              rf_address: 0x0fc380, room_id: 1,
+            },
+            { type: 's', unknown: "\x00".b,
+              command: :unset_group_address,
+              rf_address: 0x0fc380, room_id: 1,
+            },
+          ]
+        end
+        let(:ret) do
+          [
+            's:AAAiAAAAD8OAAAE=',
+            's:AAAjAAAAD8OAAAE=',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
+        end
+      end
+      context 'setting of current temperature display' do
+        let(:hashes) do
+          [
+            { type: 's', unknown: "\x00".b,
+              command: :display_temperature,
+              rf_address: 0x123abc, room_id: 0,
+              display_temperature: :measured,
+            },
+            { type: 's', unknown: "\x00".b,
+              command: :display_temperature,
+              rf_address: 0x123abc, room_id: 0,
+              display_temperature: :configured,
+            },
+            { type: 's', unknown: "\x00".b,
+              command: :display_temperature,
+              rf_address: 0x123abc, room_id: 0,
+            },
+          ]
+        end
+        let(:ret) do
+          [
+            's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x04"),
+            's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
+            's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
+        end
+      end
     end
 
     # t:01,1,Dx1U
     describe 't message' do
       let(:hashes) do
         [
-          { type: 't', count: 1, force: true, rf_addresses: ["\x0F\x1DT"], },
+          { type: 't', count: 1, force: true, rf_addresses: [0x0f1d54], },
         ]
       end
       let(:ret) do

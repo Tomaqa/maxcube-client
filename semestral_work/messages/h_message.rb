@@ -23,8 +23,10 @@ module MaxCube
     def parse_h(body)
       values = body.split(',')
       check_msg_part_lengths(MessageH::LENGTHS, *values)
-      _, values[4], values[5], values[6], _, _, values[9], values[10] =
-        hex_to_i_check('firmware version, ' \
+      values[1], _, values[4], values[5], values[6], _, _,
+        values[9], values[10] =
+        hex_to_i_check('RF address, ' \
+                       'firmware version, ' \
                        'HTTP connection ID, ' \
                        'duty cycle, ' \
                        'free memory slots, ' \
@@ -32,7 +34,7 @@ module MaxCube
                        'Cube time, ' \
                        'state Cube time (clock set), ' \
                        'NTP counter',
-                       values[2], values[4], values[5], values[6],
+                       values[1], values[2], values[4], values[5], values[6],
                        values[7], values[8], values[9], values[10])
 
       parse_h_cube_datetime(values)

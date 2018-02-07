@@ -27,7 +27,7 @@ module MaxCube
     ########################
 
     def parse_l_submsg_1
-      @length = read(1, 'C')
+      @length = read(1, true)
       unless MessageL::LENGTHS.include?(@length)
         raise InvalidMessageBody
           .new(@msg_type,
@@ -36,10 +36,10 @@ module MaxCube
       end
       subhash = {
         length: @length,
-        rf_address: read(3),
+        rf_address: read(3, true),
         unknown: read(1),
       }
-      flags = read(2, 'n')
+      flags = read(2, true)
       @mode = device_mode(flags & 0x3)
       subhash[:flags] = {
         value: flags,
@@ -63,19 +63,19 @@ module MaxCube
     end
 
     def parse_l_submsg_2(subhash)
-      subhash[:valve_opening] = read(1, 'C')
+      subhash[:valve_opening] = read(1, true)
 
-      temperature = read(1, 'C')
+      temperature = read(1, true)
       # This bit may be used later
       temperature_msb = temperature >> 7
       subhash[:temperature] = (temperature & 0x3f).to_f / 2
 
-      date_until = read(2, 'n')
+      date_until = read(2, true)
       year = (date_until & 0x1f) + 2000
       month = ((date_until & 0x80) >> 7) | ((date_until & 0xe000) >> 12)
       day = (date_until & 0x1f00) >> 8
 
-      time_until = read(1, 'C')
+      time_until = read(1, true)
       hours = time_until / 2
       minutes = (time_until % 2) * 30
       # Sometimes when device is in 'auto' mode,
@@ -105,7 +105,7 @@ module MaxCube
 
     def parse_l_submsg_3(subhash, temperature_msb)
       subhash[:actual_temperature] = ((temperature_msb << 8) |
-                                      read(1, 'C')).to_f / 10
+                                      read(1, true)).to_f / 10
     rescue IOError
       raise InvalidMessageBody
         .new(@msg_type,

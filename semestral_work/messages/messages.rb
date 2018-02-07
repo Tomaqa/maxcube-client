@@ -24,6 +24,8 @@ module MaxCube
     DAYS_OF_WEEK = %w[Saturday Sunday Monday
                       Tuesday Wednesday Thursday Friday].freeze
 
+    PACK_FORMAT = %w[x C n N N].freeze
+
     class InvalidMessage < RuntimeError; end
 
     class InvalidMessageLength < InvalidMessage
@@ -120,15 +122,6 @@ module MaxCube
              " (#{info})")
     end
 
-    # def check_msg_min_data_length(min_length, length, info)
-    #   return unless length < min_length
-    #   raise InvalidMessageBody
-    #     .new(@msg_type,
-    #          "#{info} - remaining data length is insufficient" \
-    #          " (#{length} < #{min_length})")
-    # end
-
-    # def check_device_type(device_type_id)
     def device_type(device_type_id)
       device_type = DEVICE_TYPE[device_type_id]
       return device_type if device_type
@@ -193,10 +186,17 @@ module MaxCube
       msg
     end
 
-    def read(count, unpack = '')
-      raise IOError if @io.size - @io.pos < count
-      str = @io.read(count)
-      unpack.empty? ? str : str.unpack1(unpack)
+    def read(count = 0, unpack = false)
+      str = if count.zero?
+              @io.read
+            else
+              raise IOError if @io.size - @io.pos < count
+              @io.read(count)
+            end
+      return str unless unpack
+      str = "\x00".b + str if count == 3
+      unpack = PACK_FORMAT[count] unless unpack.is_a?(String)
+      str.unpack1(unpack)
     end
 
     # Process set of messages - raw data separated by "\r\n"
@@ -257,6 +257,30 @@ module MaxCube
       check_serialize_msg_type(hash)
     end
 
+    def serialize(*args, esize: 0, size: 0, ocount: 0)
+      return args.join if size.zero? && esize.zero?
+
+      ocount, subcount, subsize = serialize_bounds(args,
+                                                   esize: esize,
+                                                   size: size,
+                                                   ocount: ocount)
+      str = ''
+      args.reverse!
+      ocount.times do
+        str << args.pop while args.last.is_a?(String)
+        substr = args.pop(subcount).pack(PACK_FORMAT[subsize])
+        substr = substr[1..-1] if subsize == 3
+        str << substr
+      end
+      str << args.pop until args.empty?
+
+      str
+    end
+
+    def write(*args, esize: 0, size: 0, ocount: 0)
+      @io.write(serialize(*args, esize: esize, size: size, ocount: ocount))
+    end
+
     # Send set of messages separated by "\r\n"
     # @param [Array<Hash>] particular message contents
     # @return [String] raw data for a Cube
@@ -291,5 +315,22 @@ module MaxCube
     require_relative 't_message'
     require_relative 'u_message'
     require_relative 'z_message'
+
+    private
+
+    def serialize_bounds(args, esize: 0, size: 0, ocount: 0)
+      icount = args.size - args.select { |a| a.is_a?(String) }.size
+      if esize.zero?
+        ocount = icount if ocount.zero?
+        subsize = size / ocount
+      else
+        size = icount * esize
+        ocount = size / esize
+        subsize = esize
+      end
+      subcount = icount / ocount
+
+      [ocount, subcount, subsize]
+    end
   end
 end

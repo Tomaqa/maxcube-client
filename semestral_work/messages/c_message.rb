@@ -29,11 +29,11 @@ module MaxCube
     end
 
     def parse_c_head(addr)
-      @length = read(1, 'C')
+      @length = read(1, true)
       # 'rf_address' should correspond with 'addr',
       # but it is not checked (yet)
-      rf_address = read(3)
-      device_type = device_type(read(1, 'C'))
+      rf_address = read(3, true)
+      device_type = device_type(read(1, true))
       hash = {
         address: addr,
         length: @length,
@@ -49,12 +49,13 @@ module MaxCube
       else
         # For other types, both 'room_id' and 'firmware_version'
         # are unpacked as numbers
-        hash[:room_id] = read(1, 'C')
-        hash[:firmware_version] = read(1, 'C')
+        # How should be 'firmware_version' interpreted ?
+        hash[:room_id] = read(1, true)
+        hash[:_firmware_version] = read(1, true)
       end
 
       hash.merge(
-        test_result: read(1, 'C'),
+        test_result: read(1, true),
         serial_number: read(10),
       )
     rescue IOError
@@ -94,38 +95,42 @@ module MaxCube
 
     def parse_c_cube
       hash = {
-        portal_enabled: !read(1, 'C').zero?,
+        portal_enabled: !read(1, true).zero?,
         unknown1: read(11),
       }
 
-      pushbutton_up_config = read(1, 'C')
+      pushbutton_up_config = read(1, true)
       hash[:unknown2] = read(32)
-      pushbutton_down_config = read(1, 'C')
+      pushbutton_down_config = read(1, true)
       parse_c_cube_button_mode(hash,
                                pushbutton_up_config,
                                pushbutton_down_config)
 
-      hash.merge(
+      # ! Exact decoding of time zones is not clear yet
+      hash.merge!(
         unknown3: read(21),
         portal_url: read(128),
-        timezone_winter: read(6),
-        timezone_winter_month: read(1, 'C'),
-        timezone_winter_day: DAYS_OF_WEEK[read(1, 'C')],
-        timezone_winter_offset: read(4),
-        timezone_daylight: read(6),
-        timezone_daylight_month: read(1, 'C'),
-        timezone_daylight_day: DAYS_OF_WEEK[read(1, 'C')],
-        timezone_daylight_offset: read(4),
-        unknown4: read(1),
+        # _timezone_winter: read(5),
+        # timezone_winter_month: read(1, true),
+        # timezone_winter_day: DAYS_OF_WEEK[read(1, true)],
+        # timezone_winter_hour: read(1, true),
+        # _timezone_winter_offset: read(4),
+        # _timezone_daylight: read(5),
+        # timezone_daylight_month: read(1, true),
+        # timezone_daylight_day: DAYS_OF_WEEK[read(1, true)],
+        # timezone_daylight_hour: read(1, true),
+        # _timezone_daylight_offset: read(4),
+        # unknown4: read(1),
+        unknown4: read,
       )
     end
 
     def parse_c_thermostat_1
       {
-        comfort_temperature: read(1, 'C').to_f / 2,
-        eco_temperature: read(1, 'C').to_f / 2,
-        max_setpoint_temperature: read(1, 'C').to_f / 2,
-        min_setpoint_temperature: read(1, 'C').to_f / 2,
+        comfort_temperature: read(1, true).to_f / 2,
+        eco_temperature: read(1, true).to_f / 2,
+        max_setpoint_temperature: read(1, true).to_f / 2,
+        min_setpoint_temperature: read(1, true).to_f / 2,
       }
     end
 
@@ -134,7 +139,7 @@ module MaxCube
       program.each_key do |day|
         setpoints = []
         13.times do
-          setpoint = read(2, 'n')
+          setpoint = read(2, true)
           temperature = ((setpoint & 0xfe00) >> 9).to_f / 2
           time_until = (setpoint & 0x01ff) * 5
           setpoints << {
@@ -150,24 +155,24 @@ module MaxCube
 
     def parse_c_radiator
       subhash = parse_c_thermostat_1.merge(
-        temperature_offset: read(1, 'C').to_f / 2 - 3.5,
-        window_open_temperature: read(1, 'C').to_f / 2,
-        window_open_duration: read(1, 'C') * 5,
+        temperature_offset: read(1, true).to_f / 2 - 3.5,
+        window_open_temperature: read(1, true).to_f / 2,
+        window_open_duration: read(1, true) * 5,
       )
 
-      boost = read(1, 'C')
+      boost = read(1, true)
       boost_duration = ((boost & 0xe0) >> 5) * 5
       boost_duration = 60 if boost_duration > 30
 
-      decalcification = read(1, 'C')
+      decalcification = read(1, true)
 
       subhash.merge!(
         boost_duration: boost_duration,
         valve_opening: (boost & 0x1f) * 5,
         decalcification_day: DAYS_OF_WEEK[(decalcification & 0xe0) >> 5],
         decalcification_hour: decalcification & 0x1f,
-        max_valve_setting: read(1, 'C') * (100.0 / 255),
-        valve_offset: read(1, 'C') * (100.0 / 255),
+        max_valve_setting: read(1, true) * (100.0 / 255),
+        valve_offset: read(1, true) * (100.0 / 255),
       )
 
       parse_c_program(subhash)

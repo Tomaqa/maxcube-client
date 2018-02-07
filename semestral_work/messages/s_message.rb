@@ -27,10 +27,29 @@ module MaxCube
     private
 
     module MessageS
-      COMMANDS = { set_temperature_mode: 0x40,
-                   set_program: 0x10,
-                   set_temperature: 0x11,
-                   config_valve: 0x12, }.freeze
+      COMMANDS = {
+        set_temperature_mode: 0x40,
+        set_program: 0x10,
+        set_temperature: 0x11,
+        config_valve: 0x12,
+        add_link_partner: 0x20,
+        remove_link_partner: 0x21,
+        set_group_address: 0x22,
+        unset_group_address: 0x23,
+        display_temperature: 0x82,
+      }.freeze
+
+      DEFAULT_RF_FLAGS = {
+        set_temperature_mode: 0x4,
+        set_program: 0x4,
+        set_temperature: 0x0,
+        config_valve: 0x4,
+        add_link_partner: 0x0,
+        remove_link_partner: 0x0,
+        set_group_address: 0x0,
+        unset_group_address: 0x0,
+        display_temperature: 0x0,
+      }.freeze
     end
 
     # Message to send command to Cube
@@ -64,7 +83,6 @@ module MaxCube
     end
 
     def serialize_s_head(hash)
-      rf_flags = hash[:rf_flags]
       command = hash[:command]
       command_id = MessageS::COMMANDS[command]
       unless command_id
@@ -72,12 +90,16 @@ module MaxCube
           .new(@msg_type, "unknown command symbol: #{command}")
       end
 
+      rf_flags = if hash.include?(:rf_flags)
+                   hash[:rf_flags]
+                 else
+                   MessageS::DEFAULT_RF_FLAGS[command]
+                 end
+
       rf_address_from, rf_address_to = serialize_s_head_rf_address(hash)
 
-      @io.write(hash[:unknown] <<
-                [rf_flags, command_id].pack('C2') <<
-                [rf_address_from].pack('N')[1..-1] <<
-                [rf_address_to].pack('N')[1..-1])
+      write(serialize(hash[:unknown], rf_flags, command_id, esize: 1) <<
+            serialize(rf_address_from, rf_address_to, esize: 3))
 
       command
     end
@@ -86,7 +108,7 @@ module MaxCube
       @mode = hash[:mode]
       temp_mode = (hash[:temperature] * 2).to_i |
                   device_mode_id(@mode) << 6
-      @io.write([hash[:room_id], temp_mode].pack('C2'))
+      write(hash[:room_id], temp_mode, esize: 1)
 
       return unless @mode == :vacation
 
@@ -102,24 +124,23 @@ module MaxCube
       minutes = datetime_until.min < 30 ? 0 : 1
       time_until = hours | minutes
 
-      @io.write([date_until].pack('n') << [time_until].pack('C'))
+      write(serialize(date_until, esize: 2) <<
+            serialize(time_until, esize: 1))
     end
 
     def serialize_s_set_program(hash)
       day_of_week = DAYS_OF_WEEK.index(hash[:day])
       day_of_week |= 0x8 if hash[:telegram_set]
-      @io.write([hash[:room_id], day_of_week].pack('C2'))
+      write(hash[:room_id], day_of_week, esize: 1)
 
       hash[:program].each do |p|
         temp_time = (p[:temperature] * 2).to_i << 9
         temp_time |= (p[:hours_until] * 60 + p[:minutes_until]) / 5
-        @io.write([temp_time].pack('n'))
+        write(temp_time, esize: 2)
       end
     end
 
     def serialize_s_set_temperature(hash)
-      @io.write([hash[:room_id]].pack('C'))
-
       keys = %i[comfort_temperature eco_temperature
                 max_setpoint_temperature min_setpoint_temperature
                 temperature_offset window_open_temperature].freeze
@@ -127,20 +148,57 @@ module MaxCube
       temperatures[-2] += 7
 
       open_duration = hash[:window_open_duration] / 5
-      @io.write(temperatures.map(&:to_i).pack('C*') << open_duration)
+      write(hash[:room_id], *temperatures.map(&:to_i), open_duration, esize: 1)
     end
 
     def serialize_s_config_valve(hash)
       boost_duration = [hash[:boost_duration] / 5, 7].min
-      valve_opening = hash[:valve_opening] / 5
+      valve_opening = hash[:valve_opening].round / 5
       boost = boost_duration << 5 | valve_opening
 
       decalcification_day = DAYS_OF_WEEK.index(hash[:decalcification_day])
       decalcification = decalcification_day << 5 | hash[:decalcification_hour]
 
-      @io.write([hash[:room_id], boost, decalcification].pack('C3'))
-      @io.write([hash[:max_valve_setting], hash[:valve_offset]]
-                  .map { |x| (x * 2.55).round }.pack('C2'))
+      percent = [hash[:max_valve_setting], hash[:valve_offset]]
+                .map { |x| (x * 2.55).round }
+
+      write(hash[:room_id], boost, decalcification, *percent, esize: 1)
+    end
+
+    def serialize_s_link_partner(hash)
+      partner_type = device_type_id(hash[:partner_type])
+      write(serialize(hash[:room_id], esize: 1) <<
+            serialize(hash[:partner_rf_address], esize: 3) <<
+            serialize(partner_type, esize: 1))
+    end
+
+    def serialize_s_add_link_partner(hash)
+      serialize_s_link_partner(hash)
+    end
+
+    def serialize_s_remove_link_partner(hash)
+      serialize_s_link_partner(hash)
+    end
+
+    def serialize_s_group_address(hash)
+      write(0, hash[:room_id], esize: 1)
+    end
+
+    def serialize_s_set_group_address(hash)
+      serialize_s_group_address(hash)
+    end
+
+    def serialize_s_unset_group_address(hash)
+      serialize_s_group_address(hash)
+    end
+
+    # Works only on wall thermostats
+    def serialize_s_display_temperature(hash)
+      display_settings = Hash.new(0)
+                             .merge(measured: 4, configured: 0)
+                             .freeze
+      display = display_settings[hash[:display_temperature]]
+      write(hash[:room_id], display, esize: 1)
     end
   end
 end
