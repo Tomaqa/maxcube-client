@@ -243,15 +243,45 @@ describe 'MessageParser' do
         let(:msgs) do
           [
             # cube data
+            'C:03f6c9,7QP2yQATAf9KRVEwNTQzNTQ1AQsABEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAsABEAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAAAAAAAGh0dHA6Ly93d3cubWF4LXBvcnRhbC5lbHYuZGU6ODAvY3ViZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAENFVAAACgADAAAOEENFU1QAAwACAAAcIA==',
+            'C:10b199,7RCxmQATAf9MRVExMTU0NzI3AAsABEAAAAAAAAAAAP///////////////////////////wsABEAAAAAAAAAAQf///////////////////////////2h0dHA6Ly9tYXguZXEtMy5kZTo4MC9jdWJlADAvbG9va3VwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAENFVAAACgADAAAOEENFU1QAAwACAAAcIA==',
             'C:03f25d,' + Base64.strict_encode64("\xed\x03\xf2\x5d\x00\x13\x01\x00\x4a\x45\x51\x30\x35\x34\x34\x39\x32\x33\x00\x0b\x00\x04\x40\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x0b\x00\x04\x40\x00\x00\x00\x00\x00\x00\x00\x41\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x68\x74\x74\x70\x3a\x2f\x2f\x6d\x61\x78\x2e\x65\x71\x2d\x33\x2e\x64\x65\x3a\x38\x30\x2f\x63\x75\x62\x65\x00\x30\x2f\x6c\x6f\x6f\x6b\x75\x70\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x43\x45\x54\x00\x00\x0a\x00\x03\x00\x00\x0e\x10\x43\x45\x53\x54\x00\x03\x00\x02\x00\x00\x1c\x20"),
             # radiator thermostat data
+            'C:0b04be,0gsEvgIBEP9LRVEwNTcxNjc0LCE9CQcYA1CH/wBETlxmWPxVFEUgRSBFIEUgRSBFIEUgRSBFIEROXGZY/FUURSBFIEUgRSBFIEUgRSBFIEUgRE5cZlj8VRRFIEUgRSBFIEUgRSBFIEUgRSBETlxmWPxVFEUgRSBFIEUgRSBFIEUgRSBFIEROXGZY/FUURSBFIEUgRSBFIEUgRSBFIEUgRE5cZlj8VRRFIEUgRSBFIEUgRSBFIEUgRSBETlxmWPxVFEUgRSBFIEUgRSBFIEUgRSBFIA==',
+            'C:08b6d2,0gi20gICEABLRVEwNjM0NjA3LiE9CQcYA1AM/wBETlxmWwhVFEUgRSBFIEUgRSBFIEUgRSBFIEROXGZbCFUURSBFIEUgRSBFIEUgRSBFIEUgRE5cZlsIVRRFIEUgRSBFIEUgRSBFIEUgRSBETlxmWwhVFEUgRSBFIEUgRSBFIEUgRSBFIEROXGZbCFUURSBFIEUgRSBFIEUgRSBFIEUgRE5cZlsIVRRFIEUgRSBFIEUgRSBFIEUgRSBETlxmWwhVFEUgRSBFIEUgRSBFIEUgRSBFIA==',
+            'C:122b65,0hIrZQIBEABNRVExNDcyOTk3Oyc9CQcYA5IM/wBESHkPRSBFIEUgRSBFIEUgRSBFIEUgRSBFIERIeQlFIEUgRSBFIEUgRSBFIEUgRSBFIEUgREJ4XkTJeRJFIEUgRSBFIEUgRSBFIEUgRSBEQnheRMl5EkUgRSBFIEUgRSBFIEUgRSBFIERCeF5EyXkSRSBFIEUgRSBFIEUgRSBFIEUgREJ4XkTJeRJFIEUgRSBFIEUgRSBFIEUgRSBEQnheRMl5EkUgRSBFIEUgRSBFIEUgRSBFIA==',
             'C:06c941,' + Base64.strict_encode64("\xd2\x06\xc9\x41\x01\x01\x18\xff\x4b\x45\x51\x30\x33\x35\x32\x32\x37\x36\x24\x20\x3d\x09\x07\x18\x03\xf4\x0c\xff\x00\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x06\x18\xf4"),
             # wall thermostat data
+            'C:121707,zhIXBwMBEP9NRVEwODUzNjAzKyE9CURIVQhFIEUgRSBFIEUgRSBFIEUgRSBFIEUgREhVCEUgRSBFIEUgRSBFIEUgRSBFIEUgRSBESFRsRMxVFEUgRSBFIEUgRSBFIEUgRSBFIERIVGxEzFUURSBFIEUgRSBFIEUgRSBFIEUgREhUbETMVRRFIEUgRSBFIEUgRSBFIEUgRSBESFRsRMxVFEUgRSBFIEUgRSBFIEUgRSBFIERIVGxEzFUURSBFIEUgRSBFIEUgRSBFIEUgBxgw',
             'C:0a12bd,' + Base64.strict_encode64("\xce\x0a\x12\xbd\x03\x01\x10\xff\x4b\x45\x51\x30\x37\x30\x34\x37\x35\x32\x24\x20\x3d\x09\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x41\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x45\x20\x06\x18\xf4"),
+            # eco button
+            'C:01b491,EQG0kQUAEg9KRVEwMzA1MjA1',
           ]
         end
         let(:ret) do
           [
+            { type: 'C', length: 237,
+              address: '03f6c9', rf_address: 0x03f6c9,
+              device_type: :cube,
+              firmware_version: '0113',
+              test_result: 255,
+              serial_number: 'JEQ0543545',
+              portal_enabled: true,
+              button_up_mode: :auto,
+              button_down_mode: :eco,
+              portal_url: "http://www.max-portal.elv.de:80/cube\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".b,
+            },
+            { type: 'C', length: 237,
+              address: '10b199', rf_address: 0x10B199,
+              device_type: :cube,
+              firmware_version: '0113',
+              test_result: 255,
+              serial_number: 'LEQ1154727',
+              portal_enabled: false,
+              button_up_mode: :auto,
+              button_down_mode: :eco,
+              portal_url: "http://max.eq-3.de:80/cube\x000/lookup\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".b,
+            },
             { type: 'C', length: 237,
               address: '03f25d', rf_address: 0x03f25d,
               device_type: :cube,
@@ -262,6 +292,66 @@ describe 'MessageParser' do
               button_up_mode: :auto,
               button_down_mode: :eco,
               portal_url: "http://max.eq-3.de:80/cube\x000/lookup\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".b,
+            },
+            { type: 'C', length: 210,
+              address: '0b04be', rf_address: 0x0b04be,
+              device_type: :radiator_thermostat_plus,
+              room_id: 1, _firmware_version: 16,
+              test_result: 255,
+              serial_number: 'KEQ0571674',
+              comfort_temperature: 22.0,
+              eco_temperature: 16.5,
+              max_setpoint_temperature: 30.5,
+              min_setpoint_temperature: 4.5,
+              temperature_offset: 0.0,
+              window_open_temperature: 12.0,
+              window_open_duration: 15,
+              boost_duration: 10,
+              valve_opening: 80,
+              decalcification_day: 'Wednesday',
+              decalcification_hour: 7,
+              max_valve_setting: 100.0,
+              valve_offset: 0.0,
+            },
+            { type: 'C', length: 210,
+              address: '08b6d2', rf_address: 0x08b6d2,
+              device_type: :radiator_thermostat_plus,
+              room_id: 2, _firmware_version: 16,
+              test_result: 0,
+              serial_number: 'KEQ0634607',
+              comfort_temperature: 23.0,
+              eco_temperature: 16.5,
+              max_setpoint_temperature: 30.5,
+              min_setpoint_temperature: 4.5,
+              temperature_offset: 0.0,
+              window_open_temperature: 12.0,
+              window_open_duration: 15,
+              boost_duration: 10,
+              valve_opening: 80,
+              decalcification_day: 'Saturday',
+              decalcification_hour: 12,
+              max_valve_setting: 100.0,
+              valve_offset: 0.0,
+            },
+            { type: 'C', length: 210,
+              address: '122b65', rf_address: 0x122b65,
+              device_type: :radiator_thermostat_plus,
+              room_id: 1, _firmware_version: 16,
+              test_result: 0,
+              serial_number: 'MEQ1472997',
+              comfort_temperature: 29.5,
+              eco_temperature: 19.5,
+              max_setpoint_temperature: 30.5,
+              min_setpoint_temperature: 4.5,
+              temperature_offset: 0.0,
+              window_open_temperature: 12.0,
+              window_open_duration: 15,
+              boost_duration: 20,
+              valve_opening: 90,
+              decalcification_day: 'Saturday',
+              decalcification_hour: 12,
+              max_valve_setting: 100.0,
+              valve_offset: 0.0,
             },
             { type: 'C', length: 210,
               address: '06c941', rf_address: 0x06c941,
@@ -284,6 +374,18 @@ describe 'MessageParser' do
               valve_offset: 0.0,
             },
             { type: 'C', length: 206,
+              address: '121707', rf_address: 0x121707,
+              device_type: :wall_thermostat,
+              room_id: 1, _firmware_version: 16,
+              test_result: 255,
+              serial_number: 'MEQ0853603',
+              comfort_temperature: 21.5,
+              eco_temperature: 16.5,
+              max_setpoint_temperature: 30.5,
+              min_setpoint_temperature: 4.5,
+              unknown: "\x07\x18\x30".b,
+            },
+            { type: 'C', length: 206,
               address: '0a12bd', rf_address: 0x0a12bd,
               device_type: :wall_thermostat,
               room_id: 1, _firmware_version: 16,
@@ -294,6 +396,13 @@ describe 'MessageParser' do
               max_setpoint_temperature: 30.5,
               min_setpoint_temperature: 4.5,
               unknown: "\x06\x18\xf4".b,
+            },
+            { type: 'C', length: 17,
+              address: '01b491', rf_address: 0x01b491,
+              device_type: :eco_switch,
+              room_id: 0, _firmware_version: 18,
+              test_result: 15,
+              serial_number: 'JEQ0305205',
             },
           ]
         end
@@ -383,6 +492,8 @@ describe 'MessageParser' do
             'H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000',
             'H:4KFK49VMD6,c233fe,211f,00000000,478819c0,16,3c,000a03,1024,03,00fd',
             'H:JEQ0544923,03f25d,0113,00000000,299ca43f,00,32,0d0c1d,1013,03,0000',
+            'H:JEQ0543545,03f6c9,0113,00000000,2663651e,00,32,0d0c0f,000c,03,0000',
+        
           ]
         end
         let(:ret) do
@@ -401,6 +512,11 @@ describe 'MessageParser' do
               firmware_version: '0113', unknown: '00000000',
               http_id: 0x299ca43f, duty_cycle: 0, free_memory_slots: 50,
               cube_datetime: DateTime.new(2013, 12, 29, 16, 19),
+              state_cube_time: 3, ntp_counter: 0 },
+            { type: 'H', serial_number: 'JEQ0543545', rf_address: 0x03f6c9,
+              firmware_version: '0113', unknown: '00000000',
+              http_id: 0x2663651e, duty_cycle: 0, free_memory_slots: 50,
+              cube_datetime: DateTime.new(2013, 12, 15, 0, 12),
               state_cube_time: 3, ntp_counter: 0 },
           ]
         end
@@ -457,6 +573,8 @@ describe 'MessageParser' do
             'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x12\x18\x18\xa8\xbd\xef\x04"),
             'L:' + Base64.strict_encode64("\x0b\x0f\xda\xed\x09\x12\x18\x18\xa8\xbd\xf0\x05"),
             'L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A',
+            'L:CwsEvvYSGAAiANsACwi20lwSGAAiAOEABgG0kVwSEF==',
+        
           ]
         end
         let(:ret) do
@@ -618,6 +736,61 @@ describe 'MessageParser' do
                 },
               ],
             },
+            { type: 'L', devices: [
+                {
+                  length: 11, rf_address: 0x0b04be, unknown: "\xf6".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_opening: 0, temperature: 17.0,
+                  actual_temperature: 21.9,
+                },
+                {
+                  length: 11, rf_address: 0x08b6d2, unknown: "\x5c".b,
+                  flags: {
+                    value: 0x1218,
+                    mode: :auto,
+                    dst_setting_active: true,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                  valve_opening: 0, temperature: 17.0,
+                  actual_temperature: 22.5,
+                },
+                {
+                  length: 6, rf_address: 0x01b491, unknown: "\x5c".b,
+                  flags: {
+                    value: 0x1210,
+                    mode: :auto,
+                    dst_setting_active: false,
+                    gateway_known: true,
+                    panel_locked: false,
+                    link_error: false,
+                    low_battery: false,
+                    status_initialized: true,
+                    is_answer: false,
+                    error: false,
+                    valid_info: true,
+                  },
+                },
+              ],
+            },
           ]
         end
         it 'returns proper hash' do
@@ -676,6 +849,7 @@ describe 'MessageParser' do
               '1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD' \
               'M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a' \
               'W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB',
+            'M:00,01,VgICAg1PYnl2YWNpIHBva29qCLbSAQdQcmVkc2luCwS+AwILBL5LRVEwNTcxNjc0C3RvcGVuaSB1IHdjAQIIttJLRVEwNjM0NjA3CVBvZCBva25lbQIFAbSRSkVRMDMwNTIwNQpFY28gU3dpdGNoAAE=',
           ]
         end
         let(:ret) do
@@ -703,6 +877,18 @@ describe 'MessageParser' do
                 { type: :radiator_thermostat_plus, rf_address: 0x0af30c, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3, },
                 { type: :radiator_thermostat_plus, rf_address: 0x0af379, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3, },
                 { type: :radiator_thermostat_plus, rf_address: 0x0af540, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4, },
+              ],
+            },
+            {
+              type: 'M', index: 0, count: 1, unknown1: "V\x02".b, unknown2: "\x01".b,
+              rooms_count: 2, rooms: [
+                { id: 2, name_length: 13, name: 'Obyvaci pokoj', rf_address: 0x08b6d2, },
+                { id: 1, name_length: 7, name: 'Predsin', rf_address: 0x0b04be, },
+              ],
+              devices_count: 3, devices: [
+                { type: :radiator_thermostat_plus, rf_address: 0x0b04be, serial_number: 'KEQ0571674', name_length: 11, name: 'topeni u wc', room_id: 1, },
+                { type: :radiator_thermostat_plus, rf_address: 0x08b6d2, serial_number: 'KEQ0634607', name_length: 9, name: 'Pod oknem', room_id: 2, },
+                { type: :eco_switch, rf_address: 0x01b491, serial_number: 'JEQ0305205', name_length: 10, name: 'Eco Switch', room_id: 0, },
               ],
             },
           ]
@@ -1107,6 +1293,19 @@ describe 'MessageSerializer' do
               command: :set_temperature_mode,
               rf_address: 0x0fdaed, room_id: 1,
               temperature: 19.0, mode: :boost, },
+            { type: 's', unknown: "\x00".b,
+              command: :set_temperature_mode,
+              rf_address: 0x122b65, room_id: 1,
+              temperature: 19.0, mode: :manual, },
+            { type: 's', unknown: "\x00".b,
+              command: :set_temperature_mode,
+              rf_address: 0x122b65, room_id: 1,
+              temperature: 0.0, mode: :auto, },
+            { type: 's', unknown: "\x00".b,
+              command: :set_temperature_mode,
+              rf_address: 0x122b65, room_id: 1,
+              temperature: 29.5, mode: :vacation,
+              datetime_until: DateTime.new(2015, 12, 15, 23, 00) },
           ]
         end
         let(:ret) do
@@ -1118,6 +1317,9 @@ describe 'MessageSerializer' do
             's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\xbd\x90\x04"),
             's:' + Base64.strict_encode64("\x00\x03\x40\x00\x00\x01\x17\x91\x01\x03\xb1\x1d\x90\x15"),
             's:' + Base64.strict_encode64("\x00\x00\x40\x00\x00\x00\x0f\xda\xed\x01\xe6"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\x66"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\x00"),
+            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\xbb\xcf\x0f\x2e"),
           ].map { |s| s << "\r\n" }
         end
         it 'returns proper string' do
@@ -1142,11 +1344,23 @@ describe 'MessageSerializer' do
                 { temperature: 19.0, hours_until: 24, minutes_until: 0, },
               ],
             },
+            { type: 's', unknown: "\x00".b,
+              command: :set_program,
+              rf_address: 0x122b65, room_id: 1, day: 'Tuesday',
+              program: [],
+            },
+            { type: 's', unknown: "\x00".b,
+              command: :set_program,
+              rf_address: 0x122b65, room_id: 1, day: 'Sunday',
+              program: [{ temperature: 16.0, hours_until: 6, minutes_until: 5, }],
+            },
           ]
         end
         let(:ret) do
           [
             's:AAQQAAAAD8OAAQJASUxuQMtNIE0gTSBNIA==',
+            's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x03"),
+            's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x01\x40\x49"),
           ].map { |s| s << "\r\n" }
         end
         it 'returns proper string' do
@@ -1169,11 +1383,23 @@ describe 'MessageSerializer' do
               window_open_temperature: 12.0,
               window_open_duration: 15,
             },
+            { type: 's', unknown: "\x00".b,
+              command: :set_temperature,
+              rf_address: 0x122b65, room_id: 1,
+              comfort_temperature: 1.0,
+              eco_temperature: 2.0,
+              max_setpoint_temperature: 4.0,
+              min_setpoint_temperature: 3.0,
+              temperature_offset: 5.0,
+              window_open_temperature: 6.0,
+              window_open_duration: 10,
+            },
           ]
         end
         let(:ret) do
           [
             's:AAARAAAAD8OAACshPQkHGAM=',
+            's:' + Base64.strict_encode64("\x00\x00\x11\x00\x00\x00\x12\x2b\x65\x01\x02\x04\x08\x06\x11\x0c\x02"),
           ].map { |s| s << "\r\n" }
         end
         it 'returns proper string' do
@@ -1195,11 +1421,22 @@ describe 'MessageSerializer' do
               max_valve_setting: 100.0,
               valve_offset: 0.0,
             },
+            { type: 's', unknown: "\x00".b,
+              command: :config_valve,
+              rf_address: 0x122b65, room_id: 1,
+              boost_duration: 10,
+              valve_opening: 80.0,
+              decalcification_day: 'Tuesday',
+              decalcification_hour: 2,
+              max_valve_setting: 100.0,
+              valve_offset: 0.0,
+            },
           ]
         end
         let(:ret) do
           [
             's:AAQSAAAAD8OAATIM/wA=',
+            's:' + Base64.strict_encode64("\x00\x04\x12\x00\x00\x00\x12\x2b\x65\x01\x50\x62\xff\x00"),
           ].map { |s| s << "\r\n" }
         end
         it 'returns proper string' do

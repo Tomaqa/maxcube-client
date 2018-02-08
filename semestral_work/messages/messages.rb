@@ -19,7 +19,7 @@ module MaxCube
     DEVICE_TYPE = %i[cube
                      radiator_thermostat radiator_thermostat_plus
                      wall_thermostat
-                     shutter_contact eco_button].freeze
+                     shutter_contact eco_switch].freeze
 
     DAYS_OF_WEEK = %w[Saturday Sunday Monday
                       Tuesday Wednesday Thursday Friday].freeze
