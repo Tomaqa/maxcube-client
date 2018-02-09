@@ -125,15 +125,15 @@ module MaxCube
            "                        [L response]\n" \
            "   c|config           Requests for configuration message\n" \
            "                        [C response]\n" \
-           '   n|pair             Sets device into pairing mode ' \
-                                    "(request for a new device)\n" \
+           "   n|pair             Sets device into pairing mode\n" \
+           "                        (request for a new device)\n" \
            "                        [N response]\n" \
            "   reset              Requests for factory reset (!)\n" \
            "                        [A response]\n" \
-           '   V|verbose          Verbose mode (incoming messages ' \
-                                    "are printed immediately)\n" \
-           '   Q|quiet            Quiet mode (incoming messages ' \
-                                    "are not printed)\n" \
+           "   V|verbose          Verbose mode (data from incoming messages\n" \
+           "                        are printed immediately)\n" \
+           "   Q|quiet            Quiet mode (data from incoming messages\n" \
+           "                        are not printed, use 'data' for that)\n" \
            "   q|quit             Shuts the client down gracefully\n" \
            "                        (SIGINT and EOF also work)\n" \
            "\n"
