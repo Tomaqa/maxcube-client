@@ -32,6 +32,7 @@ module MaxCube
         unknown
         rf_flags
         rf_address_from rf_address_to rf_address rf_address_range
+
         room_id mode temperature datetime_until
         room_id day telegram_set program
 
@@ -100,11 +101,11 @@ module MaxCube
                       else
                         hash[:rf_address]
                       end
-      [rf_address_from, rf_address_to]
+      to_ints(0, 'RF address range', rf_address_from, rf_address_to)
     end
 
     def serialize_s_head(hash)
-      command = hash[:command]
+      command = hash[:command].to_sym
       command_id = MessageS::COMMANDS[command]
       unless command_id
         raise InvalidMessageBody
@@ -112,7 +113,7 @@ module MaxCube
       end
 
       rf_flags = if hash.key?(:rf_flags)
-                   hash[:rf_flags]
+                   to_int(0, 'RF flags', hash[:rf_flags])
                  else
                    MessageS::DEFAULT_RF_FLAGS[command]
                  end
@@ -127,14 +128,14 @@ module MaxCube
     end
 
     def serialize_s_set_temperature_mode(hash)
-      @mode = hash[:mode]
-      temp_mode = (hash[:temperature] * 2).to_i |
+      @mode = hash[:mode].to_sym
+      temp_mode = (to_float('temperature', hash[:temperature]) * 2).to_i |
                   device_mode_id(@mode) << 6
-      write(hash[:room_id], temp_mode, esize: 1)
+      write(to_int(0, 'room ID', hash[:room_id]), temp_mode, esize: 1)
 
       return unless @mode == :vacation
 
-      datetime_until = hash[:datetime_until]
+      datetime_until = to_datetime('datetime until', hash[:datetime_until])
 
       year = datetime_until.year - 2000
       month = datetime_until.month
@@ -151,13 +152,15 @@ module MaxCube
     end
 
     def serialize_s_set_program(hash)
-      day_of_week = DAYS_OF_WEEK.index(hash[:day])
+      day_of_week = day_of_week_id(hash[:day])
       day_of_week |= 0x8 if hash[:telegram_set]
-      write(hash[:room_id], day_of_week, esize: 1)
+      write(to_int(0, 'room ID', hash[:room_id]), day_of_week, esize: 1)
 
-      hash[:program].each do |p|
-        temp_time = (p[:temperature] * 2).to_i << 9
-        temp_time |= (p[:hours_until] * 60 + p[:minutes_until]) / 5
+      hash[:program].each do |prog|
+        temp_time =
+          (to_float('temperature', prog[:temperature]) * 2).to_i << 9 |
+          (to_int(0, 'hours until', prog[:hours_until]) * 60 +
+           to_int(0, 'minutes until', prog[:minutes_until])) / 5
         write(temp_time, esize: 2)
       end
     end
@@ -166,31 +169,39 @@ module MaxCube
       keys = %i[comfort_temperature eco_temperature
                 max_setpoint_temperature min_setpoint_temperature
                 temperature_offset window_open_temperature].freeze
-      temperatures = hash.select { |k| keys.include?(k) }.map { |_, v| v * 2 }
+      temperatures = hash.select { |k| keys.include?(k) }
+                         .map { |k, v| to_float(k, v) * 2 }
       temperatures[-2] += 7
 
-      open_duration = hash[:window_open_duration] / 5
-      write(hash[:room_id], *temperatures.map(&:to_i), open_duration, esize: 1)
+      open_duration = to_int(0, 'window open duration',
+                             hash[:window_open_duration]) / 5
+      write(to_int(0, 'room ID', hash[:room_id]),
+            *temperatures.map(&:to_i), open_duration, esize: 1)
     end
 
     def serialize_s_config_valve(hash)
-      boost_duration = [hash[:boost_duration] / 5, 7].min
-      valve_opening = hash[:valve_opening].round / 5
+      boost_duration =
+        [7, to_int(0, 'boost duration', hash[:boost_duration]) / 5].min
+      valve_opening = to_float('valve opening', hash[:valve_opening]).round / 5
       boost = boost_duration << 5 | valve_opening
 
-      decalcification_day = DAYS_OF_WEEK.index(hash[:decalcification_day])
-      decalcification = decalcification_day << 5 | hash[:decalcification_hour]
+      decalcification_day = day_of_week_id(hash[:decalcification_day])
+      decalcification = decalcification_day << 5 |
+                        to_int(0, 'decalcification hour',
+                               hash[:decalcification_hour])
 
-      percent = [hash[:max_valve_setting], hash[:valve_offset]]
-                .map { |x| (x * 2.55).round }
+      percent = %i[max_valve_setting valve_offset]
+                .map { |k| (to_float(k, hash[k]) * 2.55).round }
 
-      write(hash[:room_id], boost, decalcification, *percent, esize: 1)
+      write(to_int(0, 'room ID', hash[:room_id]),
+            boost, decalcification, *percent, esize: 1)
     end
 
     def serialize_s_link_partner(hash)
       partner_type = device_type_id(hash[:partner_type])
-      write(serialize(hash[:room_id], esize: 1) <<
-            serialize(hash[:partner_rf_address], esize: 3) <<
+      write(serialize(to_int(0, 'room ID', hash[:room_id]), esize: 1) <<
+            serialize(to_int(0, 'partner RF address',
+                             hash[:partner_rf_address]), esize: 3) <<
             serialize(partner_type, esize: 1))
     end
 
@@ -203,7 +214,7 @@ module MaxCube
     end
 
     def serialize_s_group_address(hash)
-      write(0, hash[:room_id], esize: 1)
+      write(0, to_int(0, 'room ID', hash[:room_id]), esize: 1)
     end
 
     def serialize_s_set_group_address(hash)
@@ -219,8 +230,8 @@ module MaxCube
       display_settings = Hash.new(0)
                              .merge!(measured: 4, configured: 0)
                              .freeze
-      display = display_settings[hash[:display_temperature]]
-      write(hash[:room_id], display, esize: 1)
+      display = display_settings[hash.fetch(:display_temperature, 'x').to_sym]
+      write(to_int(0, 'room ID', hash[:room_id]), display, esize: 1)
     end
   end
 end

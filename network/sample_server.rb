@@ -47,43 +47,41 @@ module MaxCube
 
     def cmd(client, msg)
       type, body = msg.split(':')
-      case type
-      when 'a', 't', 'z'
-        send_msg(client, msg_a)
-      when 'c'
-        send_msg(client, msg_c)
-      when 'l'
-        send_msg(client, msg_l)
-      when 'n'
-        send_msg(client, msg_n)
-      when 'f'
-        send_msg(client, msg_f(body))
-      end
+      method_str = "msg_#{type}"
+      return unless respond_to?(method_str, true)
+      send_msg(client, method(method_str).call(body))
     end
 
-    def msg_a
+    def msg_a(_body = nil)
       'A:'
     end
 
-    def msg_c
+    alias msg_t msg_a
+    alias msg_z msg_a
+
+    def msg_c(_body = nil)
       'C:01b491,EQG0kQUAEg9KRVEwMzA1MjA1'
     end
 
-    def msg_h
+    def msg_h(_body = nil)
       'H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000'
     end
 
-    def msg_l
+    def msg_l(_body = nil)
       'L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A'
     end
 
-    def msg_n
+    def msg_n(_body = nil)
       'N:Aw4VzExFUTAwMTUzNDD/'
     end
 
-    def msg_f(body)
+    def msg_f(body = nil)
       @ntp_servers = body.split(',') if body
       'F:' + @ntp_servers.join(',')
+    end
+
+    def msg_s(_body = nil)
+      'S:00,0,31'
     end
 
     def close

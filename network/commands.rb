@@ -39,6 +39,10 @@ module MaxCube
       send_msg('c')
     end
 
+    def cmd_send(*args)
+      send_msg('s', *args, load_only: true)
+    end
+
     def cmd_pair(*args)
       send_msg('n', *args)
     end
@@ -110,8 +114,8 @@ module MaxCube
       hash = hash.first while hash.is_a?(Array)
       raise YAML::SyntaxError unless hash.is_a?(Hash)
       hash
-    rescue YAML::SyntaxError
-      puts "File '#{path}' does not contain a YAML hash"
+    rescue YAML::SyntaxError => e
+      puts "File '#{path}' does not contain proper YAML hash", e
     end
 
     def load_hash(path = nil)
@@ -135,7 +139,9 @@ module MaxCube
 
     def cmd_load(path = nil)
       hash = load_hash(path)
-      print_hash(hash) if assign_hash(hash)
+      return false unless assign_hash(hash)
+      print_hash(hash)
+      true
     end
 
     def cmd_persist
@@ -180,23 +186,23 @@ module MaxCube
                       'Requests for new list of devices', 'l', 'L') <<
            usage_line('config', '',
                       'Requests for configuration message', 'c', 'C') <<
+           usage_line('send', '{}',
+                      'Sends settings to connected devices',
+                      's', 'S') <<
            usage_line('pair', '{<timeout>}',
                       "Sets device into pairing mode with optional timeout\n" \
                       '(request for a new device)', 'n', 'N') <<
-           usage_line('url', '{<URL> <port>}',
-                      'Configures Cube\'s portal URL', 'u') <<
            usage_line('ntp', '{<NTP servers...>}',
                       'Requests for NTP servers and optionally updates them',
                       'f', 'F') <<
+           usage_line('url', '{<URL> <port>}',
+                      'Configures Cube\'s portal URL', 'u') <<
            usage_line('wake', '{<time> <scope> [<ID>]}',
                       'Wake-ups the Cube',
                       'z', 'A') <<
            usage_line('metadata', '{}',
                       'Serializes metadata for the Cube',
                       'm', 'M') <<
-           usage_line('send', '{}',
-                      'Sends settings to connected devices',
-                      's', 'S') <<
            usage_line('delete', '{<count> <force> <RF addresses...>}',
                       'Deletes one or more devices from the Cube (!)',
                       't', 'A') <<
@@ -210,7 +216,7 @@ module MaxCube
                       'into files') <<
            usage_line('load', '[<path>]',
                       "Loads first hash from YAML file to internal variable\n" \
-                      "-> to pass data with sent message\n" \
+                      "-> to pass data with outgoing message\n" \
                       "(loads previous valid hash if no file given)\n" \
                       "(command can be combined using '#{ARGS_FROM_HASH}'\n" \
                       " with other commands which have '{}' arguments)") <<

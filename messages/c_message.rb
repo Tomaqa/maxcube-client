@@ -169,7 +169,7 @@ module MaxCube
       subhash.merge!(
         boost_duration: boost_duration,
         valve_opening: (boost & 0x1f) * 5,
-        decalcification_day: DAYS_OF_WEEK[(decalcification & 0xe0) >> 5],
+        decalcification_day: day_of_week((decalcification & 0xe0) >> 5),
         decalcification_hour: decalcification & 0x1f,
         max_valve_setting: read(1, true) * (100.0 / 255),
         valve_offset: read(1, true) * (100.0 / 255),

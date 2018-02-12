@@ -1,6 +1,5 @@
-require 'base64'
-require 'date'
-require_relative '../messages/messages'
+require_relative '../messages/parser'
+require_relative '../messages/serializer'
 require_relative 'spec_helper'
 
 describe 'MessageParser' do
@@ -1295,21 +1294,12 @@ describe 'MessageSerializer' do
               ],
             },
             {
-              type: 'm', index: 0, unknown1: 'Vx', unknown2: "\x01".b,
+              type: 'm',
               rooms_count: 1, rooms: [
                 { id: '!'.unpack1('C'), name: 'XY', rf_address: 0x313233},
               ],
               devices_count: 1, devices: [
-                { type: 'shutter_contact', rf_address: 0x524641, serial_number: 'serial_num', name: 'NAME', room_id: '!'.unpack1('C') },
-              ],
-            },
-            {
-              type: 'm',
-              rooms_count: 1, rooms: [
-                { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233},
-              ],
-              devices_count: 1, devices: [
-                { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+                { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name: 'NAME', room_id: '!'.unpack1('C') },
               ],
             },
             {
@@ -1333,7 +1323,7 @@ describe 'MessageSerializer' do
         let(:ret) do
           [
             'm:00,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
-            'm:00,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
+            # 'm:00,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
             'm:00,' + Base64.strict_encode64("\x00\x00\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x00"),
             'm:00,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr' \
               '1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD' \
@@ -1388,19 +1378,77 @@ describe 'MessageSerializer' do
 
     # s:AARAAAAAB5EAAWY=
     describe 's message' do
+      context 'invalid hash head' do
+        let(:hashes) do
+          [
+            # invalid values
+            { type: 's', unknown: "\x00".b,
+              command: :set_temperature_mode,
+              rf_address_from: 'x', rf_address: '1', room_id: 1,
+              temperature: 19.0, mode: :manual, },
+            { type: 's', unknown: "\x00".b,
+              command: :set_temperature_mode,
+              rf_address_from: '0', rf_address: 'x', room_id: 1,
+              temperature: 19.0, mode: :manual, },
+            { type: 's', unknown: "\x00".b,
+              command: :set_temperature_modex,
+              rf_address_from: '0', rf_address: '1', room_id: 1,
+              temperature: 19.0, mode: :manual, },
+            { type: 's', rf_flags: 'x1',
+              command: :set_temperature_mode,
+              rf_address_to: 0x179101, room_id: 3,
+              temperature: 24.0, mode: :vacation, },
+          ]
+        end
+        it 'raises proper exception' do
+          hashes.each do |h|
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
+      end
       context 'set temperature and mode' do
+        context 'invalid hash body' do
+          let(:hashes) do
+            [
+              # invalid values
+              { type: 's', unknown: "\x00".b,
+                command: 'set_temperature_mode',
+                rf_address_range: 0..0x079100, room_id: 'x',
+                temperature: 19.0, mode: 'manual', },
+              { type: 's', unknown: "\x00".b,
+                command: 'set_temperature_mode',
+                rf_address_range: 0..0x079100, room_id: '1',
+                temperature: 'x', mode: 'manual', },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address_range: 4..0x079100, room_id: 1,
+                temperature: 19.0, mode: :vacation,
+                datetime_until: 'x' },
+            ]
+          end
+          it 'raises proper exception' do
+            hashes.each do |h|
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
         context 'valid hash' do
           let(:hashes) do
             [
               { type: 's', unknown: "\x00".b,
-                command: :set_temperature_mode,
+                command: 'set_temperature_mode',
                 rf_address_range: 0..0x079100, room_id: 1,
-                temperature: 19.0, mode: :manual, },
+                temperature: 19.0, mode: 'manual', },
               { type: 's', unknown: "\x00".b,
                 command: :set_temperature_mode,
                 rf_address_range: 4..0x079100, room_id: 1,
                 temperature: 19.0, mode: :vacation,
                 datetime_until: DateTime.new(2011, 8, 29, 2, 0) },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address_range: 4..0x079100, room_id: 1,
+                temperature: 19.0, mode: :vacation,
+                datetime_until: '2011-08-29 02:00' },
               { type: 's', unknown: "\x00".b,
                 command: :set_temperature_mode,
                 rf_address: 0x179101, room_id: 3,
@@ -1444,6 +1492,7 @@ describe 'MessageSerializer' do
             [
               's:AARAAAAAB5EAAWY=',
               's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x04\x07\x91\x00\x01\xa6\x9d\x0b\x04"),
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x04\x07\x91\x00\x01\xa6\x9d\x0b\x04"),
               's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xa6\xbd\x8f\x04"),
               's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xb0\xbd\x90\x05"),
               's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\xbd\x90\x04"),
@@ -1462,25 +1511,77 @@ describe 'MessageSerializer' do
         end
       end
       context 'set program' do
+        context 'invalid hash body' do
+          let(:hashes) do
+            [
+              # invalid values
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: 'x',
+                day: 'Tuesday', program: [],
+              },
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: '1',
+                day: 'TuesdayX', program: [],
+              },
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: '1',
+                day: '0', program: [],
+              },
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: '1',
+                day: '8', program: [],
+              },
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: 1, day: 'Sunday',
+                program: [{ temperature: 'x', hours_until: 6, minutes_until: 5, }],
+              },
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: 1, day: 'Sunday',
+                program: [{ temperature: 10, hours_until: 'x', minutes_until: 5, }],
+              },
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: 1, day: 'Sunday',
+                program: [{ temperature: 12, hours_until: 5, minutes_until: 'x', }],
+              },
+            ]
+          end
+          it 'raises proper exception' do
+            hashes.each do |h|
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
         context 'valid hash' do
           let(:hashes) do
             [
               { type: 's', unknown: "\x00".b,
                 command: :set_program,
-                rf_address: 0x0fc380, room_id: 1, day: 'Monday',
+                rf_address: 0x0fc380, room_id: 1, day: 'monday',
                 program: [
-                  { temperature: 16.0, hours_until: 6, minutes_until: 5, },
-                  { temperature: 19.0, hours_until: 9, minutes_until: 10, },
-                  { temperature: 16.0, hours_until: 16, minutes_until: 55, },
-                  { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                  { temperature: '16.0', hours_until: 6, minutes_until: 5, },
+                  { temperature: '19', hours_until: '9', minutes_until: '10', },
+                  { temperature: 16, hours_until: '16', minutes_until: 55, },
+                  { temperature: 19.0, hours_until: 24, minutes_until: '0', },
                   { temperature: 19.0, hours_until: 24, minutes_until: 0, },
                   { temperature: 19.0, hours_until: 24, minutes_until: 0, },
                   { temperature: 19.0, hours_until: 24, minutes_until: 0, },
                 ],
               },
-              { type: 's', unknown: "\x00".b,
+              { type: 's',
                 command: :set_program,
                 rf_address: 0x122b65, room_id: 1, day: 'Tuesday',
+                program: [],
+              },
+              { type: 's',
+                command: :set_program,
+                rf_address: 0x122b65, room_id: 1, day: '2',
                 program: [],
               },
               { type: 's', unknown: "\x00".b,
@@ -1494,6 +1595,7 @@ describe 'MessageSerializer' do
             [
               's:AAQQAAAAD8OAAQJASUxuQMtNIE0gTSBNIA==',
               's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x03"),
+              's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x03"),
               's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x01\x40\x49"),
             ].map { |s| s << "\r\n" }
           end
@@ -1505,6 +1607,62 @@ describe 'MessageSerializer' do
         end
       end
       context 'set temperature' do
+        context 'invalid hash body' do
+          let(:hashes) do
+            [
+              # invalid values
+              { type: 's',
+                command: :set_temperature,
+                rf_address: 0x0fc380, room_id: 'x',
+                comfort_temperature: 21.5,
+                eco_temperature: 16.5,
+                max_setpoint_temperature: 30.5,
+                min_setpoint_temperature: 4.5,
+                temperature_offset: 0.0,
+                window_open_temperature: 12.0,
+                window_open_duration: 15,
+              },
+              { type: 's',
+                command: :set_temperature,
+                rf_address: 0x0fc380, room_id: '0',
+                comfort_temperature: 'x',
+                eco_temperature: 16.5,
+                max_setpoint_temperature: 30.5,
+                min_setpoint_temperature: 4.5,
+                temperature_offset: 0.0,
+                window_open_temperature: 12.0,
+                window_open_duration: 15,
+              },
+              { type: 's',
+                command: :set_temperature,
+                rf_address: 0x0fc380, room_id: 0,
+                comfort_temperature: 21.5,
+                eco_temperature: 16.5,
+                max_setpoint_temperature: 30.5,
+                min_setpoint_temperature: 4.5,
+                temperature_offset: '0..0',
+                window_open_temperature: 12.0,
+                window_open_duration: 15,
+              },
+              { type: 's',
+                command: :set_temperature,
+                rf_address: 0x0fc380, room_id: 0,
+                comfort_temperature: 21.5,
+                eco_temperature: 16.5,
+                max_setpoint_temperature: 30.5,
+                min_setpoint_temperature: 4.5,
+                temperature_offset: 0.0,
+                window_open_temperature: 12.0,
+                window_open_duration: 'x',
+              },
+            ]
+          end
+          it 'raises proper exception' do
+            hashes.each do |h|
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
         context 'valid hash' do
           let(:hashes) do
             [
@@ -1515,16 +1673,16 @@ describe 'MessageSerializer' do
                 eco_temperature: 16.5,
                 max_setpoint_temperature: 30.5,
                 min_setpoint_temperature: 4.5,
-                temperature_offset: 0.0,
-                window_open_temperature: 12.0,
-                window_open_duration: 15,
+                temperature_offset: '0',
+                window_open_temperature: '12.0',
+                window_open_duration: '15',
               },
               { type: 's', unknown: "\x00".b,
                 command: :set_temperature,
-                rf_address: 0x122b65, room_id: 1,
+                rf_address: 0x122b65, room_id: '1',
                 comfort_temperature: 1.0,
                 eco_temperature: 2.0,
-                max_setpoint_temperature: 4.0,
+                max_setpoint_temperature: '4.0',
                 min_setpoint_temperature: 3.0,
                 temperature_offset: 5.0,
                 window_open_temperature: 6.0,
@@ -1546,17 +1704,99 @@ describe 'MessageSerializer' do
         end
       end
       context 'config valve' do
+        context 'invalid hash body' do
+          let(:hashes) do
+            [
+              # invalid values
+              { type: 's',
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: 'x',
+                boost_duration: '5',
+                valve_opening: '90.0',
+                decalcification_day: '6',
+                decalcification_hour: 12,
+                max_valve_setting: 100.0,
+                valve_offset: 0.0,
+              },
+              { type: 's',
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: '1',
+                boost_duration: 'x',
+                valve_opening: '90.0',
+                decalcification_day: '6',
+                decalcification_hour: 12,
+                max_valve_setting: 100.0,
+                valve_offset: 0.0,
+              },
+              { type: 's',
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: '1',
+                boost_duration: '5',
+                valve_opening: '90%',
+                decalcification_day: '6',
+                decalcification_hour: 12,
+                max_valve_setting: 100.0,
+                valve_offset: 0.0,
+              },
+              { type: 's',
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: '1',
+                boost_duration: '5',
+                valve_opening: '90.0',
+                decalcification_day: 'x',
+                decalcification_hour: 12,
+                max_valve_setting: 100.0,
+                valve_offset: 0.0,
+              },
+              { type: 's',
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: '1',
+                boost_duration: '5',
+                valve_opening: '90.0',
+                decalcification_day: '1',
+                decalcification_hour: 'x',
+                max_valve_setting: 100.0,
+                valve_offset: 0.0,
+              },
+              { type: 's',
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: '1',
+                boost_duration: '5',
+                valve_opening: '90.0',
+                decalcification_day: '1',
+                decalcification_hour: '1',
+                max_valve_setting: '100%',
+                valve_offset: 0.0,
+              },
+              { type: 's',
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: '1',
+                boost_duration: '5',
+                valve_opening: '90.0',
+                decalcification_day: '1',
+                decalcification_hour: '1',
+                max_valve_setting: '100',
+                valve_offset: '0%',
+              },
+            ]
+          end
+          it 'raises proper exception' do
+            hashes.each do |h|
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
         context 'valid hash' do
           let(:hashes) do
             [
               { type: 's', unknown: "\x00".b,
                 command: :config_valve,
                 rf_address: 0x0fc380, room_id: 1,
-                boost_duration: 5,
-                valve_opening: 90.0,
-                decalcification_day: 'Saturday',
+                boost_duration: '5',
+                valve_opening: '90.0',
+                decalcification_day: '6',
                 decalcification_hour: 12,
-                max_valve_setting: 100.0,
+                max_valve_setting: '100',
                 valve_offset: 0.0,
               },
               { type: 's', unknown: "\x00".b,
@@ -1567,7 +1807,7 @@ describe 'MessageSerializer' do
                 decalcification_day: 'Tuesday',
                 decalcification_hour: 2,
                 max_valve_setting: 100.0,
-                valve_offset: 0.0,
+                valve_offset: '0',
               },
             ]
           end
@@ -1585,14 +1825,44 @@ describe 'MessageSerializer' do
         end
       end
       context 'add/remove link partner' do
+        context 'invalid hash body' do
+          let(:hashes) do
+            [
+              # invalid values
+              { type: 's',
+                command: :add_link_partner,
+                rf_address: 0x0fc373, room_id: 'x',
+                partner_rf_address: 0x0fdaed,
+                partner_type: :radiator_thermostat,
+              },
+              { type: 's',
+                command: :add_link_partner,
+                rf_address: 0x0fc373, room_id: '1',
+                partner_rf_address: 'x0fdaed',
+                partner_type: :radiator_thermostat,
+              },
+              { type: 's',
+                command: :add_link_partner,
+                rf_address: 0x0fc373, room_id: '1',
+                partner_rf_address: '0x0fdaed',
+                partner_type: :radiator_thermostatx,
+              },
+            ]
+          end
+          it 'raises proper exception' do
+            hashes.each do |h|
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
         context 'valid hash' do
           let(:hashes) do
             [
-              { type: 's', unknown: "\x00".b,
+              { type: 's',
                 command: :add_link_partner,
-                rf_address: 0x0fc373, room_id: 0,
-                partner_rf_address: 0x0fdaed,
-                partner_type: :radiator_thermostat,
+                rf_address: 0x0fc373, room_id: '0',
+                partner_rf_address: '0x0fdaed',
+                partner_type: 'radiator_thermostat',
               },
               { type: 's', unknown: "\x00".b,
                 command: :remove_link_partner,
@@ -1616,12 +1886,28 @@ describe 'MessageSerializer' do
         end
       end
       context 'set/unset group address' do
+        context 'invalid hash body' do
+          let(:hashes) do
+            [
+              # invalid values
+              { type: 's',
+                command: :set_group_address,
+                rf_address: 0x0fc380, room_id: 'x',
+              },
+            ]
+          end
+          it 'raises proper exception' do
+            hashes.each do |h|
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
         context 'valid hash' do
           let(:hashes) do
             [
-              { type: 's', unknown: "\x00".b,
+              { type: 's',
                 command: :set_group_address,
-                rf_address: 0x0fc380, room_id: 1,
+                rf_address: 0x0fc380, room_id: '1',
               },
               { type: 's', unknown: "\x00".b,
                 command: :unset_group_address,
@@ -1643,28 +1929,51 @@ describe 'MessageSerializer' do
         end
       end
       context 'setting of current temperature display' do
+        context 'invalid hash body' do
+          let(:hashes) do
+            [
+              # invalid values
+              { type: 's',
+                command: :display_temperature,
+                rf_address: 0x123abc, room_id: 'x',
+                display_temperature: :measured,
+              },
+            ]
+          end
+          it 'raises proper exception' do
+            hashes.each do |h|
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
         context 'valid hash' do
           let(:hashes) do
             [
-              { type: 's', unknown: "\x00".b,
+              { type: 's',
                 command: :display_temperature,
-                rf_address: 0x123abc, room_id: 0,
+                rf_address: 0x123abc, room_id: '0',
                 display_temperature: :measured,
               },
               { type: 's', unknown: "\x00".b,
                 command: :display_temperature,
                 rf_address: 0x123abc, room_id: 0,
-                display_temperature: :configured,
+                display_temperature: 'configured',
               },
               { type: 's', unknown: "\x00".b,
                 command: :display_temperature,
                 rf_address: 0x123abc, room_id: 0,
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :display_temperature,
+                rf_address: 0x123abc, room_id: 0,
+                display_temperature: 'XXX',
               },
             ]
           end
           let(:ret) do
             [
               's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x04"),
+              's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
               's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
               's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
             ].map { |s| s << "\r\n" }
@@ -1687,6 +1996,10 @@ describe 'MessageSerializer' do
             { type: 't', count: 'x', force: 0, rf_addresses: [] },
             { type: 't', count: '1', force: 'x', rf_addresses: [] },
             { type: 't', count: '1', force: 'true', rf_addresses: ['x'] },
+            # count mismatch
+            { type: 't', count: 2, force: 0, rf_addresses: [1] },
+            # no devices
+            { type: 't', count: 0, force: 0, rf_addresses: [] },
           ]
         end
         it 'raises proper exception' do

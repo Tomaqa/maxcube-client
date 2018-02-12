@@ -1,4 +1,5 @@
-require_relative '../messages/messages'
+require_relative '../messages/parser'
+require_relative '../messages/serializer'
 require 'socket'
 require 'thread'
 
@@ -82,12 +83,12 @@ module MaxCube
       'dump' => %w[D],
       'list' => %w[l],
       'config' => %w[c],
+      'send' => %w[cmd s set],
       'pair' => %w[n],
-      'url' => %w[U u],
       'ntp' => %w[N f],
+      'url' => %w[U u],
       'wake' => %w[w z],
       'metadata' => %w[m meta],
-      'send' => %w[cmd s set],
       'delete' => %w[del],
       'reset' => %w[],
       'verbose' => %w[V],
@@ -117,7 +118,7 @@ module MaxCube
       return send("cmd_#{cmd}", *args) if COMMANDS.key?(cmd)
 
       keys = COMMANDS.find { |_, v| v.include?(cmd) }
-      return send("cmd_#{keys[0]}", *args) if keys
+      return send("cmd_#{keys.first}", *args) if keys
 
       puts "Unrecognized command: '#{cmd}'"
       cmd_usage
@@ -142,8 +143,7 @@ module MaxCube
     end
 
     def send_msg_hash_from_internal(*args, **_opts)
-      cmd_load(*args.drop(1))
-      return nil unless @hash_set
+      return nil unless cmd_load(*args.drop(1))
       @hash_set = false unless @persist
       @hash
     end
