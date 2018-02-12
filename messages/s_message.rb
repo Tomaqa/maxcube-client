@@ -27,6 +27,27 @@ module MaxCube
     private
 
     module MessageS
+      KEYS = %i[command].freeze
+      OPT_KEYS = %i[
+        unknown
+        rf_flags
+        rf_address_from rf_address_to rf_address rf_address_range
+        room_id mode temperature datetime_until
+        room_id day telegram_set program
+
+        room_id comfort_temperature eco_temperature
+        max_setpoint_temperature min_setpoint_temperature
+        temperature_offset window_open_temperature window_open_duration
+
+        room_id valve_opening boost_duration
+        decalcification_day decalcification_hour
+        max_valve_setting valve_offset
+
+        room_id partner_rf_address partner_type
+        room_id
+        room_id display_temperature
+      ].freeze
+
       COMMANDS = {
         set_temperature_mode: 0x40,
         set_program: 0x10,
@@ -98,7 +119,8 @@ module MaxCube
 
       rf_address_from, rf_address_to = serialize_s_head_rf_address(hash)
 
-      write(serialize(hash[:unknown], rf_flags, command_id, esize: 1) <<
+      unknown = hash.include?(:unknown) ? hash[:unknown] : "\x00"
+      write(serialize(unknown, rf_flags, command_id, esize: 1) <<
             serialize(rf_address_from, rf_address_to, esize: 3))
 
       command
@@ -195,7 +217,7 @@ module MaxCube
     # Works only on wall thermostats
     def serialize_s_display_temperature(hash)
       display_settings = Hash.new(0)
-                             .merge(measured: 4, configured: 0)
+                             .merge!(measured: 4, configured: 0)
                              .freeze
       display = display_settings[hash[:display_temperature]]
       write(hash[:room_id], display, esize: 1)

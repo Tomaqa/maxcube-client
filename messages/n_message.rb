@@ -26,6 +26,7 @@ module MaxCube
     private
 
     module MessageN
+      OPT_KEYS = %i[timeout].freeze
     end
 
     # Command to set the Cube into pairing mode

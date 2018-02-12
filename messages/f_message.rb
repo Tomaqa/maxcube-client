@@ -16,6 +16,7 @@ module MaxCube
     private
 
     module MessageF
+      OPT_KEYS = %i[ntp_servers].freeze
     end
 
     # Request for NTP servers message (F)

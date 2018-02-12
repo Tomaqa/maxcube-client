@@ -1,5 +1,5 @@
-inherit_from:
-  - ../.rubocop.yml
+AllCops:
+  TargetRubyVersion: 2.4
 
 Metrics/ClassLength:
   Enabled: false
@@ -8,4 +8,13 @@ Metrics/MethodLength:
   Enabled: false
 
 Metrics/AbcSize:
+  Enabled: false
+
+Style/TrailingCommaInLiteral:
+  Enabled: false
+
+Style/TrailingCommaInArguments:
+  Enabled: false
+
+Documentation:
   Enabled: false

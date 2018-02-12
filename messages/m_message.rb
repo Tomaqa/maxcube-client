@@ -101,6 +101,8 @@ module MaxCube
     private
 
     module MessageM
+      KEYS = %i[rooms_count rooms devices_count devices].freeze
+      OPT_KEYS = %i[index unknown1 unknown2].freeze
     end
 
     # Serialize metadata for Cube

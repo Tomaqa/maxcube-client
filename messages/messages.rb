@@ -34,15 +34,15 @@ module MaxCube
       end
     end
 
-    class InvalidMessageFormat < InvalidMessage
-      def initialize(info = 'invalid format')
-        super
-      end
-    end
-
     class InvalidMessageType < InvalidMessage
       def initialize(msg_type, info = 'invalid message type')
         super("#{info}: #{msg_type}")
+      end
+    end
+
+    class InvalidMessageFormat < InvalidMessage
+      def initialize(info = 'invalid format')
+        super
       end
     end
 
@@ -157,7 +157,6 @@ module MaxCube
     def decode(data)
       Base64.decode64(data)
     end
-
   end
 
   class MessageParser < MessageHandler
@@ -235,26 +234,56 @@ module MaxCube
   class MessageSerializer < MessageHandler
     MSG_TYPES = %w[u i s m n x g q e d B G J P O V W a r t l c v f z].freeze
 
+    def serialize_msg_type_keys(msg_type)
+      self.class.const_get("Message#{msg_type.upcase}::KEYS")
+    rescue NameError
+      []
+    end
+
+    def serialize_msg_type_optional_keys(msg_type)
+      self.class.const_get("Message#{msg_type.upcase}::OPT_KEYS")
+    rescue NameError
+      []
+    end
+
     def valid_serialize_msg_type(hash)
-      msg_type = hash[:type]
-      return msg_type if msg_type &&
-                         msg_type.length == 1 &&
-                         MSG_TYPES.include?(msg_type)
-      false
+      maybe_check_valid_serialize_msg_type(hash, false)
     end
 
     def check_serialize_msg_type(hash)
-      @msg_type = valid_serialize_msg_type(hash)
-      return if @msg_type
-      raise InvalidMessageType.new(hash[:type])
+      maybe_check_valid_serialize_msg_type(hash, true)
+    end
+
+    def valid_serialize_hash_keys(hash)
+      maybe_check_serialize_hash_keys(hash, false)
+    end
+
+    def check_serialize_hash_keys(hash)
+      maybe_check_serialize_hash_keys(hash, true)
+    end
+
+    def valid_serialize_hash_values(hash)
+      hash.none? { |_, v| v.nil? }
+    end
+
+    def check_serialize_hash_values(hash)
+      return if valid_serialize_hash_values(hash)
+      hash = hash.dup
+      hash.delete(:type)
+      raise InvalidMessageBody
+        .new(@msg_type, "invalid hash values: #{hash}")
     end
 
     def valid_serialize_hash(hash)
-      valid_serialize_msg_type(hash)
+      valid_serialize_msg_type(hash) &&
+        valid_serialize_hash_keys(hash) &&
+        valid_serialize_hash_values(hash)
     end
 
     def check_serialize_hash(hash)
       check_serialize_msg_type(hash)
+      check_serialize_hash_keys(hash)
+      check_serialize_hash_values(hash)
     end
 
     def serialize(*args, esize: 0, size: 0, ocount: 0)
@@ -318,8 +347,31 @@ module MaxCube
 
     private
 
+    def maybe_check_valid_serialize_msg_type(hash, check)
+      msg_type = hash[:type]
+      valid = msg_type&.length == 1 &&
+              MSG_TYPES.include?(msg_type)
+      return valid ? msg_type : false unless check
+      @msg_type = msg_type
+      raise InvalidMessageType.new(@msg_type) unless valid
+    end
+
+    def maybe_check_serialize_hash_keys(hash, check)
+      keys = serialize_msg_type_keys(@msg_type).dup
+      opt_keys = serialize_msg_type_optional_keys(@msg_type)
+
+      hash_keys = hash.keys - opt_keys - [:type]
+
+      valid = hash_keys.sort == keys.sort
+      return valid if !check || valid
+      raise InvalidMessageBody
+        .new(@msg_type, "invalid hash keys: #{hash_keys} " \
+             "(should be: #{keys})")
+    end
+
     def serialize_bounds(args, esize: 0, size: 0, ocount: 0)
-      icount = args.size - args.select { |a| a.is_a?(String) }.size
+      icount = args.size - args.count { |a| a.is_a?(String) }
+      return 0 if icount.zero?
       if esize.zero?
         ocount = icount if ocount.zero?
         subsize = size / ocount

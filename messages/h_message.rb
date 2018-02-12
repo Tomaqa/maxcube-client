@@ -61,6 +61,5 @@ module MaxCube
                         "#{date} #{time} " \
                         "-> #{year}-#{month}-#{day} #{hours}:#{minutes}")
     end
-
   end
 end

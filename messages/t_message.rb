@@ -4,6 +4,7 @@ module MaxCube
     private
 
     module MessageT
+      KEYS = %i[count force rf_addresses].freeze
     end
 
     # Command to delete one or more devices from the Cube

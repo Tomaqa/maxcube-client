@@ -54,7 +54,7 @@ module MaxCube
         hash[:_firmware_version] = read(1, true)
       end
 
-      hash.merge(
+      hash.merge!(
         test_result: read(1, true),
         serial_number: read(10),
       )
@@ -154,7 +154,7 @@ module MaxCube
     end
 
     def parse_c_radiator
-      subhash = parse_c_thermostat_1.merge(
+      subhash = parse_c_thermostat_1.merge!(
         temperature_offset: read(1, true).to_f / 2 - 3.5,
         window_open_temperature: read(1, true).to_f / 2,
         window_open_duration: read(1, true) * 5,

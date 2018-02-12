@@ -1020,55 +1020,73 @@ describe 'MessageSerializer' do
       end
     end
 
-    context 'invalid format' do
-      context 'of single hash' do
-        let(:hashes) do
-          [
-            {},
-            { type_: 'a', },
-            { _type: 'a', },
-          ]
-        end
-        it 'raises proper exception and #valid_serialize_hash is falsey' do
-          hashes.each do |h|
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
-            expect(serializer.valid_serialize_hash(h)).to be_falsey
-          end
-        end
-        it 'raises proper exception when passed as array of hashes' do
-          hashes.each do |h|
-            expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
-          end
-        end
-      end
-
-      context 'of array of hashes' do
-        let(:data) do
-          [
-            [{}, { type: 'a' }],
-            [{ type: 'a' }, {}],
-          ]
-        end
-        it 'raises proper exception' do
-          data.each do |d|
-            expect{ serializer.serialize_data(d) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
-          end
-        end
-      end
-    end
-
     context 'invalid message type' do
       let(:hashes) do
         [
+          {},
+          { type_: 'a', },
+          { _type: 'a', },
           { type: 'aa' },
           { type: 'X' },
           { type: 'A' },
         ]
       end
-      it 'raises proper exception and #valid_serialize_msg_type is falsey' do
+      it 'raises proper exception and #valid_serialize_msg_type and #valid_serialize_hash are falsey' do
         hashes.each do |h|
           expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
           expect(serializer.valid_serialize_msg_type(h)).to be_falsey
+          expect(serializer.valid_serialize_hash(h)).to be_falsey
+        end
+      end
+      it 'raises proper exception when passed as array of hashes' do
+        hashes.each do |h|
+          expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+        end
+      end
+    end
+
+    context 'invalid hash keys' do
+      let(:hashes) do
+        [
+          { type: 'm' },
+          { type: 'm', data: 'data' },
+          { type: 'm', data: 'data', rooms_count: 1, rooms: [],
+            devices_count: 1, devices: [], },
+          { type: 'a', data: 'data' },
+          { type: 'a', data: nil },
+        ]
+      end
+      it 'raises proper exception and #valid_serialize_hash_keys and #valid_serialize_hash are falsey' do
+        hashes.each do |h|
+          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          expect(serializer.valid_serialize_hash_keys(h)).to be_falsey
+          expect(serializer.valid_serialize_hash(h)).to be_falsey
+        end
+      end
+      it 'raises proper exception when passed as array of hashes' do
+        hashes.each do |h|
+          expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+        end
+      end
+    end
+
+    context 'invalid hash values' do
+      let(:hashes) do
+        [
+          { type: 'u', url: 'URL', port: nil },
+          { type: 'u', url: nil, port: 80 },
+        ]
+      end
+      it 'raises proper exception and #valid_serialize_hash_values and #valid_serialize_hash are falsey' do
+        hashes.each do |h|
+          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          expect(serializer.valid_serialize_hash_values(h)).to be_falsey
+          expect(serializer.valid_serialize_hash(h)).to be_falsey
+        end
+      end
+      it 'raises proper exception when passed as array of hashes' do
+        hashes.each do |h|
+          expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
         end
       end
     end
@@ -1088,7 +1106,7 @@ describe 'MessageSerializer' do
       end
     end
 
-  # Check whether output data is valid: length is not too long, format is OK, ..
+  # ! Check whether output data is valid: length is not too long, format is OK, ..
 
   end
 
@@ -1131,16 +1149,16 @@ describe 'MessageSerializer' do
       let(:types) { %w[a c l q] }
       let(:hashes) do
         [
-          {},
           { unknown: 'something' },
           { data: 'super interesting' },
         ]
       end
-      it 'ignores any additional content of hash' do
+      it 'hash does not contain any additional content' do
         types.each do |t|
+          expect(serializer.serialize_hash({ type: t })).to eq("#{t}:\r\n")
           hashes.each do |h|
             h[:type] = t
-            expect(serializer.serialize_hash(h)).to eq("#{t}:\r\n")
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
           end
         end
       end

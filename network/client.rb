@@ -1,7 +1,9 @@
 require_relative '../messages/messages'
 require 'socket'
 require 'thread'
+
 require 'pp'
+require 'yaml'
 
 module MaxCube
   class Client
@@ -11,10 +13,18 @@ module MaxCube
     def initialize
       @parser = MessageParser.new
       @serializer = MessageSerializer.new
-      @buffer = Queue.new
-      @hashes = []
+      @queue = Queue.new
+
+      @buffer = { recv: { hashes: [], data: [] },
+                  sent: { hashes: [], data: [] } }
+      @history = { recv: { hashes: [], data: [] },
+                   sent: { hashes: [], data: [] } }
+
+      @hash = {}
+      @hash_set = false
 
       @verbose = true
+      @persist = true
     end
 
     def connect(host = 'localhost', port = 2000)
@@ -27,10 +37,11 @@ module MaxCube
       puts "Welcome to interactive shell!\n" \
            "Type 'help' for list of commands.\n\n"
       STDIN.each do |line|
-        refresh_hashes
-        cmd(line)
+        refresh_buffer
+        command(line)
+        puts
       end
-      raise IOError
+      raise Interrupt
     rescue IOError, Interrupt
       puts "\nClosing shell ..."
       close
@@ -46,98 +57,125 @@ module MaxCube
     def receiver
       puts '<Starting receiver thread ...>'
       while (data = @socket.gets)
-        ary = @parser.parse_data(data)
-        ary.each { |a| pp a } if @verbose
-        @buffer << ary
+        hashes = @parser.parse_data(data)
+        if @verbose
+          hashes.each { |h| print_hash(h) }
+          puts
+        end
+        @queue << [data, hashes]
       end
       raise IOError
     rescue IOError
       STDIN.close
       puts '<Closing receiver thread ...>'
+    rescue MessageHandler::InvalidMessage => e
+      puts e.to_s.capitalize
     end
 
     private
 
-    def cmd(line)
-      words = line.chomp.split
-      cmd = words[0]
-      return unless cmd
+    COMMANDS = {
+      'usage' => %w[? h help],
+      'data' => %w[B buffer d],
+      'history' => %w[H hist],
+      'clear' => %w[C],
+      'dump' => %w[D],
+      'list' => %w[l],
+      'config' => %w[c],
+      'pair' => %w[n],
+      'url' => %w[U u],
+      'ntp' => %w[N f],
+      'wake' => %w[w z],
+      'delete' => %w[del],
+      'reset' => %w[],
+      'verbose' => %w[V],
+      'save' => %w[S],
+      'load' => %w[L],
+      'persist' => %w[P],
+      'quit' => %w[q],
+    }.freeze
 
-      case cmd
-      when '?', 'h', 'help', 'usage'
-        usage
-      when 'd', 'data'
-        list_hashes
-      when 'C', 'clear'
-        clear
-      when 'D', 'dump'
-        list_hashes
-        clear
-      when 'l', 'list'
-        send_msg('l')
-      when 'c', 'config'
-        send_msg('c')
-      when 'n', 'pair'
-        send_msg('n')
-      when 'reset'
-        send_msg('a')
-      when 'V', 'verbose'
-        @verbose = true
-      when 'Q', 'quiet'
-        @verbose = false
-      when 'q', 'quit'
-        raise Interrupt
-      else
-        puts "Unrecognized command: '#{cmd}'"
-        usage
+    def refresh_buffer
+      until @queue.empty?
+        data, hashes = @queue.pop
+        @buffer[:recv][:data] << data
+        @buffer[:recv][:hashes] << hashes
       end
     end
 
-    def send_msg(type, hash = {})
+    def buffer(dir_key, data_key, history = false)
+      return @buffer[dir_key][data_key] unless history
+      @history[dir_key][data_key] + @buffer[dir_key][data_key]
+    end
+
+    def command(line)
+      cmd, *args = line.chomp.split
+      return nil unless cmd
+
+      return send("cmd_#{cmd}", *args) if COMMANDS.key?(cmd)
+
+      keys = COMMANDS.find { |_, v| v.include?(cmd) }
+      return send("cmd_#{keys[0]}", *args) if keys
+
+      puts "Unrecognized command: '#{cmd}'"
+      cmd_usage
+    rescue ArgumentError
+      puts "Invalid arguments: #{args}"
+      cmd_usage
+    end
+
+    def send_msg_hash_keys_args(type, *args, **kwargs)
+      keys = @serializer.serialize_msg_type_keys(type) +
+             @serializer.serialize_msg_type_optional_keys(type)
+      if kwargs[:array]
+        hash_args = args.first(keys.size - 1)
+        ary_args = args.drop(keys.size - 1)
+        ary_args = nil if kwargs[:array_nonempty] && ary_args.empty?
+        args = hash_args << ary_args
+      end
+      return [keys, args] unless keys.size < args.size
+      puts "Additional arguments: #{args.last(args.size - keys.size)}"
+      nil
+    end
+
+    def send_msg_hash(type, *args, **kwargs)
+      return {} if args.empty?
+
+      from_hash = args == %w[-]
+      if from_hash
+        unless @hash_set
+          puts 'No internal hash loaded.' \
+               " Use 'load' command or pass proper arguments."
+          cmd_usage
+          return nil
+        end
+        @hash_set = false unless @persist
+        return @hash
+      end
+
+      keys, args = send_msg_hash_keys_args(type, *args, **kwargs)
+      return nil unless keys
+      keys.zip(args).to_h.reject { |_, v| v.nil? }
+    end
+
+    def send_msg(type, *args, **kwargs)
+      hash = send_msg_hash(type, *args, **kwargs)
+      return unless hash
       hash[:type] = type
       msg = @serializer.serialize_hash(hash)
+
+      @buffer[:sent][:data] << msg
+      @buffer[:sent][:hashes] << [hash]
       @socket.write(msg)
+    rescue MessageHandler::InvalidMessage => e
+      puts e.to_s.capitalize
     end
 
-    def clear
-      @hashes = []
+    def print_hash(hash)
+      puts hash.to_yaml
     end
 
-    def refresh_hashes
-      @hashes += @buffer.pop until @buffer.empty?
-    end
-
-    def list_hashes
-      @hashes.each do |h|
-        pp h
-      end
-      puts
-    end
-
-    def usage
-      puts "\nUSAGE: <command> [arguments]\n" \
-           "COMMADS:\n" \
-           "   ?|h|help|usage     Prints this message\n" \
-           "   d|data             Lists all received data (hashes)\n" \
-           "   C|clear            Clears collected data (hashes)\n" \
-           "   D|dump             Shortcut for 'data' + 'clear'\n" \
-           "   l|list             Requests for new list of devices\n" \
-           "                        [L response]\n" \
-           "   c|config           Requests for configuration message\n" \
-           "                        [C response]\n" \
-           "   n|pair             Sets device into pairing mode\n" \
-           "                        (request for a new device)\n" \
-           "                        [N response]\n" \
-           "   reset              Requests for factory reset (!)\n" \
-           "                        [A response]\n" \
-           "   V|verbose          Verbose mode (data from incoming messages\n" \
-           "                        are printed immediately)\n" \
-           "   Q|quiet            Quiet mode (data from incoming messages\n" \
-           "                        are not printed, use 'data' for that)\n" \
-           "   q|quit             Shuts the client down gracefully\n" \
-           "                        (SIGINT and EOF also work)\n" \
-           "\n"
-    end
+    require_relative 'commands'
   end
 end
 

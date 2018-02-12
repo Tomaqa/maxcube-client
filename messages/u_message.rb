@@ -4,6 +4,7 @@ module MaxCube
     private
 
     module MessageU
+      KEYS = %i[url port].freeze
     end
 
     # Command to configure Cube's portal URL

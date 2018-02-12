@@ -5,6 +5,8 @@ module MaxCube
     def initialize(port)
       @port = port
       @server = TCPServer.new(port)
+
+      @ntp_servers = %w[nl.pool.ntp.org ntp.homematic.com]
     end
 
     def run
@@ -15,14 +17,17 @@ module MaxCube
           send_msg(client, msg_h)
           send_msg(client, msg_l)
           loop do
-            msg = client.gets
-            if !msg || msg == "q:\r\n"
-              puts "Closing #{client.addr[3]}:#{client.addr[1]} ..."
-              client.close
-              Thread.stop
+            msgs = client.gets
+            raise IOError unless msgs
+            msgs.split("\r\n").each do |msg|
+              raise IOError if msg == 'q:'
+              puts "Income message: '#{msg}'"
+              cmd(client, msg)
             end
-            puts "Income message: '#{msg.chomp}'"
-            cmd(client, msg)
+          rescue IOError
+            puts "Closing #{client.addr[3]}:#{client.addr[1]} ..."
+            client.close
+            Thread.stop
           end
         end
       end
@@ -37,9 +42,9 @@ module MaxCube
     private
 
     def cmd(client, msg)
-      type, _body = msg.split(':')
+      type, body = msg.split(':')
       case type
-      when 'a'
+      when 'a', 't', 'z'
         send_msg(client, msg_a)
       when 'c'
         send_msg(client, msg_c)
@@ -47,6 +52,8 @@ module MaxCube
         send_msg(client, msg_l)
       when 'n'
         send_msg(client, msg_n)
+      when 'f'
+        send_msg(client, msg_f(body))
       end
     end
 
@@ -68,6 +75,11 @@ module MaxCube
 
     def msg_n
       'N:Aw4VzExFUTAwMTUzNDD/'
+    end
+
+    def msg_f(body)
+      @ntp_servers = body.split(',') if body
+      'F:' + @ntp_servers.join(',')
     end
 
     def close
