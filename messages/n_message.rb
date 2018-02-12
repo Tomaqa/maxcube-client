@@ -32,7 +32,8 @@ module MaxCube
     # Command to set the Cube into pairing mode
     # with optional +timeout+ in seconds
     def serialize_n(hash)
-      hash.include?(:timeout) ? format('%04x', hash[:timeout]) : ''
+      return '' unless hash.key?(:timeout)
+      format('%04x', to_int(0, 'timeout', hash[:timeout]))
     end
   end
 end

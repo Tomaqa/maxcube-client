@@ -30,8 +30,8 @@ module MaxCube
     def parse_m_split(body)
       index, count, enc_data = body.split(',')
       check_msg_part_lengths(MessageM::LENGTHS, index, count)
-      index, count = hex_to_i_check('message index, count',
-                                    index, count)
+      index, count = to_ints(16, 'message index, count',
+                             index, count)
       unless index < count
         raise InvalidMessageBody
           .new(@msg_type,
@@ -112,15 +112,15 @@ module MaxCube
     # ! Cube does not check data format,
     #   so things could break if invalid data is sent
     def serialize_m(hash)
-      index = hash.include?(:index) ? hash[:index] : 0
+      index = hash.key?(:index) ? to_int(0, 'index', hash[:index]) : 0
       head = format('%02x,', index)
 
       @io = StringIO.new('', 'wb')
-      write(hash.include?(:unknown1) ? hash[:unknown1] : "\x00\x00")
+      write(hash.key?(:unknown1) ? hash[:unknown1] : "\x00\x00")
 
       serialize_m_rooms(hash)
       serialize_m_devices(hash)
-      write(hash.include?(:unknown2) ? hash[:unknown2] : "\x00")
+      write(hash.key?(:unknown2) ? hash[:unknown2] : "\x00")
 
       head.b << encode(@io.string)
     end
@@ -128,22 +128,49 @@ module MaxCube
     ########################
 
     def serialize_m_rooms(hash)
-      write(hash[:rooms_count], esize: 1)
+      write(to_int(0, 'rooms count', hash[:rooms_count]), esize: 1)
       hash[:rooms].each do |room|
-        write(serialize(room[:id],
-                        room[:name_length], room[:name], esize: 1) <<
-              serialize(room[:rf_address], esize: 3))
+        name = room[:name]
+        if room.key?(:name_length)
+          name_length = to_int(0, 'name length', room[:name_length])
+          unless name_length == name.length
+            raise InvalidMessageBody
+              .new(@msg_type, 'room name length and length of name mismatch:' \
+                   " #{name_length} != #{name.length}")
+          end
+        else
+          name_length = name.length
+        end
+
+        id, rf_address = to_ints(0, 'room id, RF address',
+                                 room[:id], room[:rf_address])
+        write(serialize(id, name_length, name, esize: 1) <<
+              serialize(rf_address, esize: 3))
       end
     end
 
     def serialize_m_devices(hash)
-      write(hash[:devices_count], esize: 1)
+      write(to_int(0, 'devices count', hash[:devices_count]), esize: 1)
       hash[:devices].each do |device|
+        name = device[:name]
+        if device.key?(:name_length)
+          name_length = to_int(0, 'name length', device[:name_length])
+          unless name_length == name.length
+            raise InvalidMessageBody
+              .new(@msg_type, 'device name length and length of name mismatch:'\
+                   " #{name_length} != #{name.length}")
+          end
+        else
+          name_length = name.length
+        end
+
+        rf_address, room_id =
+          to_ints(0, 'device RF address, room ID',
+                  device[:rf_address], device[:room_id])
         write(serialize(device_type_id(device[:type]), esize: 1) <<
-              serialize(device[:rf_address], esize: 3) <<
+              serialize(rf_address, esize: 3) <<
               serialize(device[:serial_number],
-                        device[:name_length], device[:name],
-                        device[:room_id], esize: 1))
+                        name_length, name, room_id, esize: 1))
       end
     end
   end

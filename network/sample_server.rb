@@ -17,17 +17,7 @@ module MaxCube
           send_msg(client, msg_h)
           send_msg(client, msg_l)
           loop do
-            msgs = client.gets
-            raise IOError unless msgs
-            msgs.split("\r\n").each do |msg|
-              raise IOError if msg == 'q:'
-              puts "Income message: '#{msg}'"
-              cmd(client, msg)
-            end
-          rescue IOError
-            puts "Closing #{client.addr[3]}:#{client.addr[1]} ..."
-            client.close
-            Thread.stop
+            run_loop(client)
           end
         end
       end
@@ -40,6 +30,20 @@ module MaxCube
     end
 
     private
+
+    def run_loop(client)
+      msgs = client.gets
+      raise IOError unless msgs
+      msgs.split("\r\n").each do |msg|
+        raise IOError if msg == 'q:'
+        puts "Income message: '#{msg}'"
+        cmd(client, msg)
+      end
+    rescue IOError
+      puts "Closing #{client.addr[3]}:#{client.addr[1]} ..."
+      client.close
+      Thread.stop
+    end
 
     def cmd(client, msg)
       type, body = msg.split(':')

@@ -11,7 +11,7 @@ module MaxCube
     # Wakeup command
     # Acknowledgement (A) follows
     def serialize_z(hash)
-      time = format('%02x', hash[:time])
+      time = format('%02x', to_int(0, 'time', hash[:time]))
       scope = hash[:scope].to_sym
       scope = case scope
               when :group, :room
@@ -20,11 +20,12 @@ module MaxCube
                 'A'
               when :device
                 'D'
-              else raise InvalidMessageBody
-                .new(@msg_type, "invalid scope: #{scope}")
+              else
+                raise InvalidMessageBody.new(@msg_type,
+                                             "invalid scope: #{scope}")
               end
       args = [time, scope]
-      args << format('%02x', hash[:id]) if hash.include?(:id)
+      args << format('%02x', to_int(0, 'ID', hash[:id])) if hash.key?(:id)
       args.join(',')
     end
   end

@@ -1147,18 +1147,34 @@ describe 'MessageSerializer' do
 
     describe 'a, c, l, q messages' do
       let(:types) { %w[a c l q] }
-      let(:hashes) do
-        [
-          { unknown: 'something' },
-          { data: 'super interesting' },
-        ]
+      context 'invalid hash' do
+        let(:hashes) do
+          [
+            { unknown: 'something' },
+            { data: 'super interesting' },
+          ]
+        end
+        it 'raises proper exception' do
+          types.each do |t|
+            hashes.each do |h|
+              h[:type] = t
+              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            end
+          end
+        end
       end
-      it 'hash does not contain any additional content' do
-        types.each do |t|
-          expect(serializer.serialize_hash({ type: t })).to eq("#{t}:\r\n")
-          hashes.each do |h|
-            h[:type] = t
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+      context 'valid hash' do
+        let(:hashes) do
+          [
+            {},
+          ]
+        end
+        it 'returns proper string (without any additional content)' do
+          types.each do |t|
+            hashes.each do |h|
+              h[:type] = t
+              expect(serializer.serialize_hash(h)).to eq("#{t}:\r\n")
+            end
           end
         end
       end
@@ -1167,25 +1183,27 @@ describe 'MessageSerializer' do
     # f:
     # f:nl.pool.ntp.org,ntp.homematic.com
     describe 'f message' do
-      let(:hashes) do
-        [
-          { type: 'f', },
-          { type: 'f', ntp_servers: [], },
-          { type: 'f', ntp_servers: ['nl.pool.ntp.org'], },
-          { type: 'f', ntp_servers: ['nl.pool.ntp.org', 'ntp.homematic.com'], },
-        ]
-      end
-      let(:ret) do
-        [
-          'f:',
-          'f:',
-          'f:nl.pool.ntp.org',
-          'f:nl.pool.ntp.org,ntp.homematic.com',
-        ].map { |s| s << "\r\n" }
-      end
-      it 'returns proper string' do
-        hashes.each_with_index do |h, i|
-          expect(serializer.serialize_hash(h)).to eq(ret[i])
+      context 'valid hash' do
+        let(:hashes) do
+          [
+            { type: 'f', },
+            { type: 'f', ntp_servers: [], },
+            { type: 'f', ntp_servers: ['nl.pool.ntp.org'], },
+            { type: 'f', ntp_servers: ['nl.pool.ntp.org', 'ntp.homematic.com'], },
+          ]
+        end
+        let(:ret) do
+          [
+            'f:',
+            'f:',
+            'f:nl.pool.ntp.org',
+            'f:nl.pool.ntp.org,ntp.homematic.com',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
         end
       end
     end
@@ -1195,57 +1213,138 @@ describe 'MessageSerializer' do
     #   M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a
     #   W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB
     describe 'm message' do
-      let(:hashes) do
-        [
-          {
-            type: 'm', index: 0, unknown1: 'Vx', unknown2: "\x01".b,
-            rooms_count: 1, rooms: [
-              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233},
-            ],
-            devices_count: 1, devices: [
-              { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
-            ],
-          },
-          {
-            type: 'm',
-            rooms_count: 1, rooms: [
-              { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233},
-            ],
-            devices_count: 1, devices: [
-              { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
-            ],
-          },
-          {
-            type: 'm', index: 0, unknown1: "V\x02".b, unknown2: "\x01".b,
-            rooms_count: 4, rooms: [
-              { id: 1, name_length: 3, name: 'Bad', rf_address: 0x0aed69 },
-              { id: 2, name_length: 4, name: 'Buro', rf_address: 0x0af300 },
-              { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: 0x0af30c },
-              { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: 0x0af540 },
-            ],
-            devices_count: 5, devices: [
-              { type: :radiator_thermostat_plus, rf_address: 0x0aed69, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
-              { type: :radiator_thermostat_plus, rf_address: 0x0af300, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
-              { type: :radiator_thermostat_plus, rf_address: 0x0af30c, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
-              { type: :radiator_thermostat_plus, rf_address: 0x0af379, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
-              { type: :radiator_thermostat_plus, rf_address: 0x0af540, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
-            ],
-          },
-        ]
+      context 'invalid hash' do
+        let(:hashes) do
+          [
+            # invalid values
+            {
+              type: 'm', index: 'x', rooms_count: 1, devices_count: 1,
+              rooms: [{ id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: 'x', devices_count: 1,
+              rooms: [{ id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: 'x',
+              rooms: [{ id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!', name_length: '2', name: 'XY', rf_address: 0x313233}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!'.unpack1('C'), name_length: 'x', name: 'XY', rf_address: 0x313233}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!'.unpack1('C'), name_length: '2', name: 'XY', rf_address: 'x313233'}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!'.unpack1('C'), name_length: '2', name: 'XY', rf_address: '0x313233'}],
+              devices: [{ type: 'shutter_contact', rf_address: 'x524641', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!'.unpack1('C'), name_length: '2', name: 'XY', rf_address: '0x313233'}],
+              devices: [{ type: 'shutter_contact', rf_address: '0x524641', serial_number: 'serial_num', name_length: 'x', name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!'.unpack1('C'), name_length: '2', name: 'XY', rf_address: '0x313233'}],
+              devices: [{ type: 'shutter_contact', rf_address: '0x524641', serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!' }],
+            },
+
+            # name length mismatch
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!'.unpack1('C'), name_length: '3', name: 'XY', rf_address: '0x313233'}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+            {
+              type: 'm', rooms_count: '1', devices_count: '1',
+              rooms: [{ id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: '0x313233'}],
+              devices: [{ type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 3, name: 'NAME', room_id: '!'.unpack1('C') }],
+            },
+          ]
+        end
+        it 'raises proper exception' do
+          hashes.each do |h|
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
       end
-      let(:ret) do
-        [
-          'm:00,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
-          'm:00,' + Base64.strict_encode64("\x00\x00\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x00"),
-          'm:00,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr' \
-            '1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD' \
-            'M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a' \
-            'W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB',
-        ].map { |s| s << "\r\n" }
-      end
-      it 'returns proper string' do
-        hashes.each_with_index do |h, i|
-          expect(serializer.serialize_hash(h)).to eq(ret[i])
+      context 'valid hash' do
+        let(:hashes) do
+          [
+            {
+              type: 'm', index: 0, unknown1: 'Vx', unknown2: "\x01".b,
+              rooms_count: 1, rooms: [
+                { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233},
+              ],
+              devices_count: 1, devices: [
+                { type: 'shutter_contact', rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+              ],
+            },
+            {
+              type: 'm', index: 0, unknown1: 'Vx', unknown2: "\x01".b,
+              rooms_count: 1, rooms: [
+                { id: '!'.unpack1('C'), name: 'XY', rf_address: 0x313233},
+              ],
+              devices_count: 1, devices: [
+                { type: 'shutter_contact', rf_address: 0x524641, serial_number: 'serial_num', name: 'NAME', room_id: '!'.unpack1('C') },
+              ],
+            },
+            {
+              type: 'm',
+              rooms_count: 1, rooms: [
+                { id: '!'.unpack1('C'), name_length: 2, name: 'XY', rf_address: 0x313233},
+              ],
+              devices_count: 1, devices: [
+                { type: :shutter_contact, rf_address: 0x524641, serial_number: 'serial_num', name_length: 4, name: 'NAME', room_id: '!'.unpack1('C') },
+              ],
+            },
+            {
+              type: 'm', index: 0, unknown1: "V\x02".b, unknown2: "\x01".b,
+              rooms_count: 4, rooms: [
+                { id: 1, name_length: 3, name: 'Bad', rf_address: 0x0aed69 },
+                { id: 2, name_length: 4, name: 'Buro', rf_address: 0x0af300 },
+                { id: 3, name_length: 10, name: 'Wohnzimmer', rf_address: 0x0af30c },
+                { id: 4, name_length: 12, name: 'Schlafzimmer', rf_address: 0x0af540 },
+              ],
+              devices_count: 5, devices: [
+                { type: :radiator_thermostat_plus, rf_address: 0x0aed69, serial_number: 'KEQ0378040', name_length: 6, name: 'HT Bad', room_id: 1 },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af300, serial_number: 'KEQ0379544', name_length: 7, name: 'HT Buro', room_id: 2 },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af30c, serial_number: 'KEQ0379556', name_length: 25, name: 'HT Wohnzimmer Balkonseite', room_id: 3 },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af379, serial_number: 'KEQ0379665', name_length: 26, name: 'HT Wohnzimmer Fensterseite', room_id: 3 },
+                { type: :radiator_thermostat_plus, rf_address: 0x0af540, serial_number: 'KEQ0380120', name_length: 15, name: 'HT Schlafzimmer', room_id: 4},
+              ],
+            },
+          ]
+        end
+        let(:ret) do
+          [
+            'm:00,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
+            'm:00,' + Base64.strict_encode64("Vx\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x01"),
+            'm:00,' + Base64.strict_encode64("\x00\x00\x01!\x02XY123\x01\x04RFAserial_num\x04NAME!\x00"),
+            'm:00,VgIEAQNCYWQK7WkCBEJ1cm8K8wADCldvaG56aW1tZXIK8wwEDFNjaGxhZnppbW1lcgr' \
+              '1QAUCCu1pS0VRMDM3ODA0MAZIVCBCYWQBAgrzAEtFUTAzNzk1NDQHSFQgQnVybwICCvMMS0VRMD' \
+              'M3OTU1NhlIVCBXb2huemltbWVyIEJhbGtvbnNlaXRlAwIK83lLRVEwMzc5NjY1GkhUIFdvaG56a' \
+              'W1tZXIgRmVuc3RlcnNlaXRlAwIK9UBLRVEwMzgwMTIwD0hUIFNjaGxhZnppbW1lcgQB',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
         end
       end
     end
@@ -1253,21 +1352,36 @@ describe 'MessageSerializer' do
     # n:
     # n:003c
     describe 'n message' do
-      let(:hashes) do
-        [
-          { type: 'n', },
-          { type: 'n', timeout: 60 },
-        ]
+      context 'invalid hash' do
+        let(:hashes) do
+          [
+            # invalid values
+            { type: 'n', timeout: 'x' },
+          ]
+        end
+        it 'raises proper exception' do
+          hashes.each do |h|
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
       end
-      let(:ret) do
-        [
-          'n:',
-          'n:003c',
-        ].map { |s| s << "\r\n" }
-      end
-      it 'returns proper string' do
-        hashes.each_with_index do |h, i|
-          expect(serializer.serialize_hash(h)).to eq(ret[i])
+      context 'valid hash' do
+        let(:hashes) do
+          [
+            { type: 'n', },
+            { type: 'n', timeout: 60 },
+          ]
+        end
+        let(:ret) do
+          [
+            'n:',
+            'n:003c',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
         end
       end
     end
@@ -1275,276 +1389,290 @@ describe 'MessageSerializer' do
     # s:AARAAAAAB5EAAWY=
     describe 's message' do
       context 'set temperature and mode' do
-        let(:hashes) do
-          [
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature_mode,
-              rf_address_range: 0..0x079100, room_id: 1,
-              temperature: 19.0, mode: :manual, },
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature_mode,
-              rf_address_range: 4..0x079100, room_id: 1,
-              temperature: 19.0, mode: :vacation,
-              datetime_until: DateTime.new(2011, 8, 29, 2, 0) },
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature_mode,
-              rf_address: 0x179101, room_id: 3,
-              temperature: 19.0, mode: :vacation,
-              datetime_until: DateTime.new(2015, 11, 29, 2, 0) },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
-              command: :set_temperature_mode,
-              rf_address_to: 0x179101, room_id: 3,
-              temperature: 24.0, mode: :vacation,
-              datetime_until: DateTime.new(2016, 11, 29, 2, 30) },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x4,
-              command: :set_temperature_mode,
-              rf_address_from: 0x01, rf_address_to: 0x179101, room_id: 3,
-              temperature: 24.5, mode: :vacation,
-              datetime_until: DateTime.new(2016, 11, 29, 2, 29) },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x3,
-              command: :set_temperature_mode,
-              rf_address_from: 0x01, rf_address: 0x179101, room_id: 3,
-              temperature: 24.5, mode: :vacation,
-              datetime_until: DateTime.new(2016, 1, 29, 10, 59) },
-            { type: 's', unknown: "\x00".b, rf_flags: 0x0,
-              command: :set_temperature_mode,
-              rf_address: 0x0fdaed, room_id: 1,
-              temperature: 19.0, mode: :boost, },
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature_mode,
-              rf_address: 0x122b65, room_id: 1,
-              temperature: 19.0, mode: :manual, },
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature_mode,
-              rf_address: 0x122b65, room_id: 1,
-              temperature: 0.0, mode: :auto, },
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature_mode,
-              rf_address: 0x122b65, room_id: 1,
-              temperature: 29.5, mode: :vacation,
-              datetime_until: DateTime.new(2015, 12, 15, 23, 00) },
-          ]
-        end
-        let(:ret) do
-          [
-            's:AARAAAAAB5EAAWY=',
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x04\x07\x91\x00\x01\xa6\x9d\x0b\x04"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xa6\xbd\x8f\x04"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xb0\xbd\x90\x05"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\xbd\x90\x04"),
-            's:' + Base64.strict_encode64("\x00\x03\x40\x00\x00\x01\x17\x91\x01\x03\xb1\x1d\x90\x15"),
-            's:' + Base64.strict_encode64("\x00\x00\x40\x00\x00\x00\x0f\xda\xed\x01\xe6"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\x66"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\x00"),
-            's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\xbb\xcf\x0f\x2e"),
-          ].map { |s| s << "\r\n" }
-        end
-        it 'returns proper string' do
-          hashes.each_with_index do |h, i|
-            expect(serializer.serialize_hash(h)).to eq(ret[i])
+        context 'valid hash' do
+          let(:hashes) do
+            [
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address_range: 0..0x079100, room_id: 1,
+                temperature: 19.0, mode: :manual, },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address_range: 4..0x079100, room_id: 1,
+                temperature: 19.0, mode: :vacation,
+                datetime_until: DateTime.new(2011, 8, 29, 2, 0) },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address: 0x179101, room_id: 3,
+                temperature: 19.0, mode: :vacation,
+                datetime_until: DateTime.new(2015, 11, 29, 2, 0) },
+              { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+                command: :set_temperature_mode,
+                rf_address_to: 0x179101, room_id: 3,
+                temperature: 24.0, mode: :vacation,
+                datetime_until: DateTime.new(2016, 11, 29, 2, 30) },
+              { type: 's', unknown: "\x00".b, rf_flags: 0x4,
+                command: :set_temperature_mode,
+                rf_address_from: 0x01, rf_address_to: 0x179101, room_id: 3,
+                temperature: 24.5, mode: :vacation,
+                datetime_until: DateTime.new(2016, 11, 29, 2, 29) },
+              { type: 's', unknown: "\x00".b, rf_flags: 0x3,
+                command: :set_temperature_mode,
+                rf_address_from: 0x01, rf_address: 0x179101, room_id: 3,
+                temperature: 24.5, mode: :vacation,
+                datetime_until: DateTime.new(2016, 1, 29, 10, 59) },
+              { type: 's', unknown: "\x00".b, rf_flags: 0x0,
+                command: :set_temperature_mode,
+                rf_address: 0x0fdaed, room_id: 1,
+                temperature: 19.0, mode: :boost, },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address: 0x122b65, room_id: 1,
+                temperature: 19.0, mode: :manual, },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address: 0x122b65, room_id: 1,
+                temperature: 0.0, mode: :auto, },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature_mode,
+                rf_address: 0x122b65, room_id: 1,
+                temperature: 29.5, mode: :vacation,
+                datetime_until: DateTime.new(2015, 12, 15, 23, 00) },
+            ]
+          end
+          let(:ret) do
+            [
+              's:AARAAAAAB5EAAWY=',
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x04\x07\x91\x00\x01\xa6\x9d\x0b\x04"),
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xa6\xbd\x8f\x04"),
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x17\x91\x01\x03\xb0\xbd\x90\x05"),
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x01\x17\x91\x01\x03\xb1\xbd\x90\x04"),
+              's:' + Base64.strict_encode64("\x00\x03\x40\x00\x00\x01\x17\x91\x01\x03\xb1\x1d\x90\x15"),
+              's:' + Base64.strict_encode64("\x00\x00\x40\x00\x00\x00\x0f\xda\xed\x01\xe6"),
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\x66"),
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\x00"),
+              's:' + Base64.strict_encode64("\x00\x04\x40\x00\x00\x00\x12\x2b\x65\x01\xbb\xcf\x0f\x2e"),
+            ].map { |s| s << "\r\n" }
+          end
+          it 'returns proper string' do
+            hashes.each_with_index do |h, i|
+              expect(serializer.serialize_hash(h)).to eq(ret[i])
+            end
           end
         end
       end
       context 'set program' do
-        let(:hashes) do
-          [
-            { type: 's', unknown: "\x00".b,
-              command: :set_program,
-              rf_address: 0x0fc380, room_id: 1, day: 'Monday',
-              program: [
-                { temperature: 16.0, hours_until: 6, minutes_until: 5, },
-                { temperature: 19.0, hours_until: 9, minutes_until: 10, },
-                { temperature: 16.0, hours_until: 16, minutes_until: 55, },
-                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
-                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
-                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
-                { temperature: 19.0, hours_until: 24, minutes_until: 0, },
-              ],
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :set_program,
-              rf_address: 0x122b65, room_id: 1, day: 'Tuesday',
-              program: [],
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :set_program,
-              rf_address: 0x122b65, room_id: 1, day: 'Sunday',
-              program: [{ temperature: 16.0, hours_until: 6, minutes_until: 5, }],
-            },
-          ]
-        end
-        let(:ret) do
-          [
-            's:AAQQAAAAD8OAAQJASUxuQMtNIE0gTSBNIA==',
-            's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x03"),
-            's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x01\x40\x49"),
-          ].map { |s| s << "\r\n" }
-        end
-        it 'returns proper string' do
-          hashes.each_with_index do |h, i|
-            expect(serializer.serialize_hash(h)).to eq(ret[i])
+        context 'valid hash' do
+          let(:hashes) do
+            [
+              { type: 's', unknown: "\x00".b,
+                command: :set_program,
+                rf_address: 0x0fc380, room_id: 1, day: 'Monday',
+                program: [
+                  { temperature: 16.0, hours_until: 6, minutes_until: 5, },
+                  { temperature: 19.0, hours_until: 9, minutes_until: 10, },
+                  { temperature: 16.0, hours_until: 16, minutes_until: 55, },
+                  { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                  { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                  { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                  { temperature: 19.0, hours_until: 24, minutes_until: 0, },
+                ],
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :set_program,
+                rf_address: 0x122b65, room_id: 1, day: 'Tuesday',
+                program: [],
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :set_program,
+                rf_address: 0x122b65, room_id: 1, day: 'Sunday',
+                program: [{ temperature: 16.0, hours_until: 6, minutes_until: 5, }],
+              },
+            ]
+          end
+          let(:ret) do
+            [
+              's:AAQQAAAAD8OAAQJASUxuQMtNIE0gTSBNIA==',
+              's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x03"),
+              's:' + Base64.strict_encode64("\x00\x04\x10\x00\x00\x00\x12\x2b\x65\x01\x01\x40\x49"),
+            ].map { |s| s << "\r\n" }
+          end
+          it 'returns proper string' do
+            hashes.each_with_index do |h, i|
+              expect(serializer.serialize_hash(h)).to eq(ret[i])
+            end
           end
         end
       end
       context 'set temperature' do
-        let(:hashes) do
-          [
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature,
-              rf_address: 0x0fc380, room_id: 0,
-              comfort_temperature: 21.5,
-              eco_temperature: 16.5,
-              max_setpoint_temperature: 30.5,
-              min_setpoint_temperature: 4.5,
-              temperature_offset: 0.0,
-              window_open_temperature: 12.0,
-              window_open_duration: 15,
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :set_temperature,
-              rf_address: 0x122b65, room_id: 1,
-              comfort_temperature: 1.0,
-              eco_temperature: 2.0,
-              max_setpoint_temperature: 4.0,
-              min_setpoint_temperature: 3.0,
-              temperature_offset: 5.0,
-              window_open_temperature: 6.0,
-              window_open_duration: 10,
-            },
-          ]
-        end
-        let(:ret) do
-          [
-            's:AAARAAAAD8OAACshPQkHGAM=',
-            's:' + Base64.strict_encode64("\x00\x00\x11\x00\x00\x00\x12\x2b\x65\x01\x02\x04\x08\x06\x11\x0c\x02"),
-          ].map { |s| s << "\r\n" }
-        end
-        it 'returns proper string' do
-          hashes.each_with_index do |h, i|
-            expect(serializer.serialize_hash(h)).to eq(ret[i])
+        context 'valid hash' do
+          let(:hashes) do
+            [
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature,
+                rf_address: 0x0fc380, room_id: 0,
+                comfort_temperature: 21.5,
+                eco_temperature: 16.5,
+                max_setpoint_temperature: 30.5,
+                min_setpoint_temperature: 4.5,
+                temperature_offset: 0.0,
+                window_open_temperature: 12.0,
+                window_open_duration: 15,
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :set_temperature,
+                rf_address: 0x122b65, room_id: 1,
+                comfort_temperature: 1.0,
+                eco_temperature: 2.0,
+                max_setpoint_temperature: 4.0,
+                min_setpoint_temperature: 3.0,
+                temperature_offset: 5.0,
+                window_open_temperature: 6.0,
+                window_open_duration: 10,
+              },
+            ]
+          end
+          let(:ret) do
+            [
+              's:AAARAAAAD8OAACshPQkHGAM=',
+              's:' + Base64.strict_encode64("\x00\x00\x11\x00\x00\x00\x12\x2b\x65\x01\x02\x04\x08\x06\x11\x0c\x02"),
+            ].map { |s| s << "\r\n" }
+          end
+          it 'returns proper string' do
+            hashes.each_with_index do |h, i|
+              expect(serializer.serialize_hash(h)).to eq(ret[i])
+            end
           end
         end
       end
       context 'config valve' do
-        let(:hashes) do
-          [
-            { type: 's', unknown: "\x00".b,
-              command: :config_valve,
-              rf_address: 0x0fc380, room_id: 1,
-              boost_duration: 5,
-              valve_opening: 90.0,
-              decalcification_day: 'Saturday',
-              decalcification_hour: 12,
-              max_valve_setting: 100.0,
-              valve_offset: 0.0,
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :config_valve,
-              rf_address: 0x122b65, room_id: 1,
-              boost_duration: 10,
-              valve_opening: 80.0,
-              decalcification_day: 'Tuesday',
-              decalcification_hour: 2,
-              max_valve_setting: 100.0,
-              valve_offset: 0.0,
-            },
-          ]
-        end
-        let(:ret) do
-          [
-            's:AAQSAAAAD8OAATIM/wA=',
-            's:' + Base64.strict_encode64("\x00\x04\x12\x00\x00\x00\x12\x2b\x65\x01\x50\x62\xff\x00"),
-          ].map { |s| s << "\r\n" }
-        end
-        it 'returns proper string' do
-          hashes.each_with_index do |h, i|
-            expect(serializer.serialize_hash(h)).to eq(ret[i])
+        context 'valid hash' do
+          let(:hashes) do
+            [
+              { type: 's', unknown: "\x00".b,
+                command: :config_valve,
+                rf_address: 0x0fc380, room_id: 1,
+                boost_duration: 5,
+                valve_opening: 90.0,
+                decalcification_day: 'Saturday',
+                decalcification_hour: 12,
+                max_valve_setting: 100.0,
+                valve_offset: 0.0,
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :config_valve,
+                rf_address: 0x122b65, room_id: 1,
+                boost_duration: 10,
+                valve_opening: 80.0,
+                decalcification_day: 'Tuesday',
+                decalcification_hour: 2,
+                max_valve_setting: 100.0,
+                valve_offset: 0.0,
+              },
+            ]
+          end
+          let(:ret) do
+            [
+              's:AAQSAAAAD8OAATIM/wA=',
+              's:' + Base64.strict_encode64("\x00\x04\x12\x00\x00\x00\x12\x2b\x65\x01\x50\x62\xff\x00"),
+            ].map { |s| s << "\r\n" }
+          end
+          it 'returns proper string' do
+            hashes.each_with_index do |h, i|
+              expect(serializer.serialize_hash(h)).to eq(ret[i])
+            end
           end
         end
       end
       context 'add/remove link partner' do
-        let(:hashes) do
-          [
-            { type: 's', unknown: "\x00".b,
-              command: :add_link_partner,
-              rf_address: 0x0fc373, room_id: 0,
-              partner_rf_address: 0x0fdaed,
-              partner_type: :radiator_thermostat,
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :remove_link_partner,
-              rf_address: 0x0fc373, room_id: 0,
-              partner_rf_address: 0x0fdaed,
-              partner_type: :radiator_thermostat,
-            },
-          ]
-        end
-        let(:ret) do
-          [
-            's:AAAgAAAAD8NzAA/a7QE=',
-            's:AAAhAAAAD8NzAA/a7QE=',
-          ].map { |s| s << "\r\n" }
-        end
-        it 'returns proper string' do
-          hashes.each_with_index do |h, i|
-            expect(serializer.serialize_hash(h)).to eq(ret[i])
+        context 'valid hash' do
+          let(:hashes) do
+            [
+              { type: 's', unknown: "\x00".b,
+                command: :add_link_partner,
+                rf_address: 0x0fc373, room_id: 0,
+                partner_rf_address: 0x0fdaed,
+                partner_type: :radiator_thermostat,
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :remove_link_partner,
+                rf_address: 0x0fc373, room_id: 0,
+                partner_rf_address: 0x0fdaed,
+                partner_type: :radiator_thermostat,
+              },
+            ]
+          end
+          let(:ret) do
+            [
+              's:AAAgAAAAD8NzAA/a7QE=',
+              's:AAAhAAAAD8NzAA/a7QE=',
+            ].map { |s| s << "\r\n" }
+          end
+          it 'returns proper string' do
+            hashes.each_with_index do |h, i|
+              expect(serializer.serialize_hash(h)).to eq(ret[i])
+            end
           end
         end
       end
       context 'set/unset group address' do
-        let(:hashes) do
-          [
-            { type: 's', unknown: "\x00".b,
-              command: :set_group_address,
-              rf_address: 0x0fc380, room_id: 1,
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :unset_group_address,
-              rf_address: 0x0fc380, room_id: 1,
-            },
-          ]
-        end
-        let(:ret) do
-          [
-            's:AAAiAAAAD8OAAAE=',
-            's:AAAjAAAAD8OAAAE=',
-          ].map { |s| s << "\r\n" }
-        end
-        it 'returns proper string' do
-          hashes.each_with_index do |h, i|
-            expect(serializer.serialize_hash(h)).to eq(ret[i])
+        context 'valid hash' do
+          let(:hashes) do
+            [
+              { type: 's', unknown: "\x00".b,
+                command: :set_group_address,
+                rf_address: 0x0fc380, room_id: 1,
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :unset_group_address,
+                rf_address: 0x0fc380, room_id: 1,
+              },
+            ]
+          end
+          let(:ret) do
+            [
+              's:AAAiAAAAD8OAAAE=',
+              's:AAAjAAAAD8OAAAE=',
+            ].map { |s| s << "\r\n" }
+          end
+          it 'returns proper string' do
+            hashes.each_with_index do |h, i|
+              expect(serializer.serialize_hash(h)).to eq(ret[i])
+            end
           end
         end
       end
       context 'setting of current temperature display' do
-        let(:hashes) do
-          [
-            { type: 's', unknown: "\x00".b,
-              command: :display_temperature,
-              rf_address: 0x123abc, room_id: 0,
-              display_temperature: :measured,
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :display_temperature,
-              rf_address: 0x123abc, room_id: 0,
-              display_temperature: :configured,
-            },
-            { type: 's', unknown: "\x00".b,
-              command: :display_temperature,
-              rf_address: 0x123abc, room_id: 0,
-            },
-          ]
-        end
-        let(:ret) do
-          [
-            's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x04"),
-            's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
-            's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
-          ].map { |s| s << "\r\n" }
-        end
-        it 'returns proper string' do
-          hashes.each_with_index do |h, i|
-            expect(serializer.serialize_hash(h)).to eq(ret[i])
+        context 'valid hash' do
+          let(:hashes) do
+            [
+              { type: 's', unknown: "\x00".b,
+                command: :display_temperature,
+                rf_address: 0x123abc, room_id: 0,
+                display_temperature: :measured,
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :display_temperature,
+                rf_address: 0x123abc, room_id: 0,
+                display_temperature: :configured,
+              },
+              { type: 's', unknown: "\x00".b,
+                command: :display_temperature,
+                rf_address: 0x123abc, room_id: 0,
+              },
+            ]
+          end
+          let(:ret) do
+            [
+              's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x04"),
+              's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
+              's:' + Base64.strict_encode64("\x00\x00\x82\x00\x00\x00\x12\x3a\xbc\x00\x00"),
+            ].map { |s| s << "\r\n" }
+          end
+          it 'returns proper string' do
+            hashes.each_with_index do |h, i|
+              expect(serializer.serialize_hash(h)).to eq(ret[i])
+            end
           end
         end
       end
@@ -1552,63 +1680,116 @@ describe 'MessageSerializer' do
 
     # t:01,1,Dx1U
     describe 't message' do
-      let(:hashes) do
-        [
-          { type: 't', count: 1, force: true, rf_addresses: [0x0f1d54], },
-        ]
+      context 'invalid hash' do
+        let(:hashes) do
+          [
+            # invalid values
+            { type: 't', count: 'x', force: 0, rf_addresses: [] },
+            { type: 't', count: '1', force: 'x', rf_addresses: [] },
+            { type: 't', count: '1', force: 'true', rf_addresses: ['x'] },
+          ]
+        end
+        it 'raises proper exception' do
+          hashes.each do |h|
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
       end
-      let(:ret) do
-        [
-          't:01,1,Dx1U',
-        ].map { |s| s << "\r\n" }
-      end
-      it 'returns proper string' do
-        hashes.each_with_index do |h, i|
-          expect(serializer.serialize_hash(h)).to eq(ret[i])
+      context 'valid hash' do
+        let(:hashes) do
+          [
+            { type: 't', count: 1, force: true, rf_addresses: [0x0f1d54], },
+            { type: 't', count: 1, force: '0', rf_addresses: [0x0f1d54], },
+            { type: 't', count: 1, force: 'false', rf_addresses: [0x0f1d54], },
+          ]
+        end
+        let(:ret) do
+          [
+            't:01,1,Dx1U',
+            't:01,0,Dx1U',
+            't:01,0,Dx1U',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
         end
       end
     end
 
     # u:http://www.max-portal.elv.de:80
     describe 'u message' do
-      let(:hashes) do
-        [
-          { type: 'u', url: 'http://www.max-portal.elv.de', port: 80, },
-        ]
+      context 'invalid hash' do
+        let(:hashes) do
+          [
+            # invalid values
+            { type: 'u', url: 'URL', port: 'x' },
+          ]
+        end
+        it 'raises proper exception' do
+          hashes.each do |h|
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
       end
-      let(:ret) do
-        [
-          'u:http://www.max-portal.elv.de:80',
-        ].map { |s| s << "\r\n" }
-      end
-      it 'returns proper string' do
-        hashes.each_with_index do |h, i|
-          expect(serializer.serialize_hash(h)).to eq(ret[i])
+      context 'valid hash' do
+        let(:hashes) do
+          [
+            { type: 'u', url: 'http://www.max-portal.elv.de', port: 80, },
+          ]
+        end
+        let(:ret) do
+          [
+            'u:http://www.max-portal.elv.de:80',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
         end
       end
     end
 
     # z:1e,G,01
     describe 'z message' do
-      let(:hashes) do
-        [
-          { type: 'z', time: 30, scope: :group, id: 1, },
-          { type: 'z', time: 33, scope: :room, id: 2, },
-          { type: 'z', time: 24, scope: :all, },
-          { type: 'z', time: 1, scope: :device, },
-        ]
+      context 'invalid hash' do
+        let(:hashes) do
+          [
+            # invalid values
+            { type: 'z', time: 'x', scope: 'all' },
+            { type: 'z', time: 1, scope: 'all', id: 'x' },
+            { type: 'z', time: 1, scope: 'allx' },
+          ]
+        end
+        it 'raises proper exception' do
+          hashes.each do |h|
+            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          end
+        end
       end
-      let(:ret) do
-        [
-          'z:1e,G,01',
-          'z:21,G,02',
-          'z:18,A',
-          'z:01,D',
-        ].map { |s| s << "\r\n" }
-      end
-      it 'returns proper string' do
-        hashes.each_with_index do |h, i|
-          expect(serializer.serialize_hash(h)).to eq(ret[i])
+      context 'valid hash' do
+        let(:hashes) do
+          [
+            { type: 'z', time: 30, scope: :group, id: 1, },
+            { type: 'z', time: 33, scope: :room, id: 2, },
+            { type: 'z', time: 24, scope: :all, },
+            { type: 'z', time: 1, scope: :device, },
+          ]
+        end
+        let(:ret) do
+          [
+            'z:1e,G,01',
+            'z:21,G,02',
+            'z:18,A',
+            'z:01,D',
+          ].map { |s| s << "\r\n" }
+        end
+        it 'returns proper string' do
+          hashes.each_with_index do |h, i|
+            expect(serializer.serialize_hash(h)).to eq(ret[i])
+          end
         end
       end
     end

@@ -9,7 +9,7 @@ module MaxCube
 
     # Command to configure Cube's portal URL
     def serialize_u(hash)
-      "#{hash[:url]}:#{hash[:port]}"
+      "#{hash[:url]}:#{to_int(0, 'port', hash[:port])}"
     end
   end
 end

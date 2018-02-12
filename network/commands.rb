@@ -39,8 +39,8 @@ module MaxCube
       send_msg('c')
     end
 
-    def cmd_pair
-      send_msg('n')
+    def cmd_pair(*args)
+      send_msg('n', *args)
     end
 
     def cmd_url(*args)
@@ -53,6 +53,10 @@ module MaxCube
 
     def cmd_wake(*args)
       send_msg('z', *args)
+    end
+
+    def cmd_metadata(*args)
+      send_msg('m', *args, load_only: true)
     end
 
     def cmd_delete(*args)
@@ -97,33 +101,46 @@ module MaxCube
       puts "Received and sent raw data and hashes saved into '#{SAVE_DIR}'"
     end
 
-    def load_hash(path)
-      return @hash_set = true unless path
-
+    def parse_hash(path)
       unless File.file?(path) && File.readable?(path)
-        puts "File is not readable: '#{path}'"
-        return
+        return puts "File is not readable: '#{path}'"
       end
 
-      @hash = YAML.load_file(path)
-      @hash = @hash.first while @hash.is_a?(Array)
-      unless @hash.is_a?(Hash)
-        puts "YAML file '#{path}' does not contain a hash:\n#{@hash}"
-        @hash = {}
-        @hash_set = false
-        return
-      end
+      hash = YAML.load_file(path)
+      hash = hash.first while hash.is_a?(Array)
+      raise YAML::SyntaxError unless hash.is_a?(Hash)
+      hash
+    rescue YAML::SyntaxError
+      puts "File '#{path}' does not contain a YAML hash"
+    end
 
-      @hash_set = true
+    def load_hash(path = nil)
+      return parse_hash(path) if path
+      return @hash if @hash && @hash_set
+
+      if @hash
+        puts 'Internal hash is not set'
+      else
+        puts 'No internal hash loaded yet'
+        cmd_usage
+      end
+    end
+
+    def assign_hash(hash)
+      valid_hash = !hash.nil?
+      @hash = hash if valid_hash
+      @hash_set |= valid_hash
+      valid_hash
     end
 
     def cmd_load(path = nil)
-      load_hash(path)
-      print_hash(@hash)
+      hash = load_hash(path)
+      print_hash(hash) if assign_hash(hash)
     end
 
     def cmd_persist
       @persist = toggle('persist', @persist)
+      @hash_set = @persist if @hash
     end
 
     def cmd_quit
@@ -163,8 +180,8 @@ module MaxCube
                       'Requests for new list of devices', 'l', 'L') <<
            usage_line('config', '',
                       'Requests for configuration message', 'c', 'C') <<
-           usage_line('pair', '',
-                      "Sets device into pairing mode\n" \
+           usage_line('pair', '{<timeout>}',
+                      "Sets device into pairing mode with optional timeout\n" \
                       '(request for a new device)', 'n', 'N') <<
            usage_line('url', '{<URL> <port>}',
                       'Configures Cube\'s portal URL', 'u') <<
@@ -174,6 +191,12 @@ module MaxCube
            usage_line('wake', '{<time> <scope> [<ID>]}',
                       'Wake-ups the Cube',
                       'z', 'A') <<
+           usage_line('metadata', '{}',
+                      'Serializes metadata for the Cube',
+                      'm', 'M') <<
+           usage_line('send', '{}',
+                      'Sends settings to connected devices',
+                      's', 'S') <<
            usage_line('delete', '{<count> <force> <RF addresses...>}',
                       'Deletes one or more devices from the Cube (!)',
                       't', 'A') <<
@@ -187,8 +210,10 @@ module MaxCube
                       'into files') <<
            usage_line('load', '[<path>]',
                       "Loads first hash from YAML file to internal variable\n" \
-                      "- to pass data with sent message\n" \
-                      '(loads previous hash if no file given)') <<
+                      "-> to pass data with sent message\n" \
+                      "(loads previous valid hash if no file given)\n" \
+                      "(command can be combined using '#{ARGS_FROM_HASH}'\n" \
+                      " with other commands which have '{}' arguments)") <<
            usage_line('persist', '',
                       "Toggles persistent mode (whether is internal hash\n" \
                       'not invalidated after use)') <<
@@ -198,9 +223,13 @@ module MaxCube
            "\n[<arg>] means optional argument <arg>" \
            "\n[<args...>] means multiple arguments <args...> or none" \
            "\n  (<args...> requires at least one)" \
-           "\n{<arg>} means that either <arg> or '-' is expected" \
-           "\n  (when '-' is specified, internal hash is used" \
-           " - see 'load' command)"
+           "\n{<arg>} means that either <arg>" \
+           " or '#{ARGS_FROM_HASH}' is expected" \
+           "\n  (when '#{ARGS_FROM_HASH}' specified as first argument," \
+           ' internal hash is used' \
+           "\n   -> 'load' command is called with rest arguments)" \
+           "\n  ({} means that only internal hash can be used," \
+           "\n   '#{ARGS_FROM_HASH}' is not necessary in this case)"
     end
   end
 end

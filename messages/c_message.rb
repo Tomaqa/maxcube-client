@@ -24,7 +24,7 @@ module MaxCube
     def parse_c_split(body)
       addr, enc_data = body.split(',')
       check_msg_part_lengths(MessageC::LENGTHS, addr)
-      hex_to_i_check('device address', addr)
+      to_ints(16, 'device address', addr)
       [addr, enc_data]
     end
 

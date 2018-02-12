@@ -112,14 +112,41 @@ module MaxCube
 
     # Convert string of characters (not binary data!) to hex number
     # For binary data use #String.unpack
-    def hex_to_i_check(info, *args)
-      if args.all? { |x| x && !x[/\H/] && !x[/^$/] }
-        return args.map { |x| x.to_i(16) }
-      end
+    def to_ints(base, info, *args)
+      args.map { |x| Integer(x, base) }
+    rescue ArgumentError, TypeError
+      base_str = base.zero? ? '' : "(#{base})"
       raise InvalidMessageBody
         .new(@msg_type,
-             "invalid hex format of message parts #{args}" \
+             "invalid integer#{base_str} format of arguments #{args}" \
              " (#{info})")
+    end
+
+    def to_int(base, info, arg)
+      to_ints(base, info, arg)[0]
+    end
+
+    def to_bools(info, *args)
+      args.map do |arg|
+        if arg == !!arg
+          arg
+        elsif arg.nil?
+          false
+        elsif %w[true false].include?(arg)
+          arg == 'true'
+        else
+          !Integer(arg).zero?
+        end
+      end
+    rescue ArgumentError, TypeError
+      raise InvalidMessageBody
+        .new(@msg_type,
+             "invalid boolean format of arguments #{args}" \
+             " (#{info})")
+    end
+
+    def to_bool(info, arg)
+      to_bools(info, arg)[0]
     end
 
     def device_type(device_type_id)
@@ -130,7 +157,7 @@ module MaxCube
     end
 
     def device_type_id(device_type)
-      device_type_id = DEVICE_TYPE.index(device_type)
+      device_type_id = DEVICE_TYPE.index(device_type.to_sym)
       return device_type_id if device_type_id
       raise InvalidMessageBody
         .new(@msg_type, "unrecognized device type: #{device_type}")
@@ -144,7 +171,7 @@ module MaxCube
     end
 
     def device_mode_id(device_mode)
-      device_mode_id = DEVICE_MODE.index(device_mode)
+      device_mode_id = DEVICE_MODE.index(device_mode.to_sym)
       return device_mode_id if device_mode_id
       raise InvalidMessageBody
         .new(@msg_type, "unrecognized device mode: #{device_mode}")

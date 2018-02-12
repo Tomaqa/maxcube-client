@@ -20,7 +20,7 @@ module MaxCube
       @history = { recv: { hashes: [], data: [] },
                    sent: { hashes: [], data: [] } }
 
-      @hash = {}
+      @hash = nil
       @hash_set = false
 
       @verbose = true
@@ -86,6 +86,8 @@ module MaxCube
       'url' => %w[U u],
       'ntp' => %w[N f],
       'wake' => %w[w z],
+      'metadata' => %w[m meta],
+      'send' => %w[cmd s set],
       'delete' => %w[del],
       'reset' => %w[],
       'verbose' => %w[V],
@@ -124,44 +126,56 @@ module MaxCube
       cmd_usage
     end
 
-    def send_msg_hash_keys_args(type, *args, **kwargs)
+    def send_msg_hash_from_keys_args(type, *args, **opts)
       keys = @serializer.serialize_msg_type_keys(type) +
              @serializer.serialize_msg_type_optional_keys(type)
-      if kwargs[:array]
+      if opts[:array]
         hash_args = args.first(keys.size - 1)
         ary_args = args.drop(keys.size - 1)
-        ary_args = nil if kwargs[:array_nonempty] && ary_args.empty?
+        ary_args = nil if opts[:array_nonempty] && ary_args.empty?
         args = hash_args << ary_args
       end
-      return [keys, args] unless keys.size < args.size
-      puts "Additional arguments: #{args.last(args.size - keys.size)}"
-      nil
-    end
-
-    def send_msg_hash(type, *args, **kwargs)
-      return {} if args.empty?
-
-      from_hash = args == %w[-]
-      if from_hash
-        unless @hash_set
-          puts 'No internal hash loaded.' \
-               " Use 'load' command or pass proper arguments."
-          cmd_usage
-          return nil
-        end
-        @hash_set = false unless @persist
-        return @hash
+      if keys.size < args.size
+        return puts "Additional arguments: #{args.last(args.size - keys.size)}"
       end
-
-      keys, args = send_msg_hash_keys_args(type, *args, **kwargs)
-      return nil unless keys
       keys.zip(args).to_h.reject { |_, v| v.nil? }
     end
 
-    def send_msg(type, *args, **kwargs)
-      hash = send_msg_hash(type, *args, **kwargs)
+    def send_msg_hash_from_internal(*args, **_opts)
+      cmd_load(*args.drop(1))
+      return nil unless @hash_set
+      @hash_set = false unless @persist
+      @hash
+    end
+
+    ARGS_FROM_HASH = '-'.freeze
+
+    def args_from_hash?(args)
+      args.first == ARGS_FROM_HASH
+    end
+
+    def send_msg_hash(type, *args, **opts)
+      args.unshift(ARGS_FROM_HASH) if opts[:load_only] && !args_from_hash?(args)
+      return {} if args.empty?
+
+      return send_msg_hash_from_internal(*args, **opts) if args_from_hash?(args)
+
+      send_msg_hash_from_keys_args(type, *args, **opts)
+    end
+
+    def send_msg(type, *args, **opts)
+      hash = send_msg_hash(type, *args, **opts)
       return unless hash
-      hash[:type] = type
+
+      if hash.key?(:type)
+        unless type == hash[:type]
+          puts "\nInternal hash message type mismatch: '#{hash[:type]}'" \
+               " (should be '#{type}')"
+          return
+        end
+      else
+        hash[:type] = type
+      end
       msg = @serializer.serialize_hash(hash)
 
       @buffer[:sent][:data] << msg

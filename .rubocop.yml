@@ -16,5 +16,14 @@ Style/TrailingCommaInLiteral:
 Style/TrailingCommaInArguments:
   Enabled: false
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/RaiseArgs:
+  EnforcedStyle: compact
+
 Documentation:
   Enabled: false

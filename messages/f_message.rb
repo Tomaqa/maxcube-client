@@ -22,7 +22,7 @@ module MaxCube
     # Request for NTP servers message (F)
     # Optionally, updates can be done
     def serialize_f(hash)
-      hash.include?(:ntp_servers) ? hash[:ntp_servers].join(',') : ''
+      hash.key?(:ntp_servers) ? hash[:ntp_servers].join(',') : ''
     end
   end
 end

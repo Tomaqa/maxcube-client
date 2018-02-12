@@ -16,8 +16,8 @@ module MaxCube
     def parse_s(body)
       values = body.split(',')
       check_msg_part_lengths(MessageS::LENGTHS, *values)
-      values = hex_to_i_check('duty cycle, command result, free memory slots',
-                              *values)
+      values = to_ints(16, 'duty cycle, command result, free memory slots',
+                       *values)
       values[1] = values[1].zero?
       MessageS::KEYS.zip(values).to_h
     end
@@ -86,16 +86,16 @@ module MaxCube
     ########################
 
     def serialize_s_head_rf_address(hash)
-      rf_address_from = if hash.include?(:rf_address_from)
+      rf_address_from = if hash.key?(:rf_address_from)
                           hash[:rf_address_from]
-                        elsif hash.include?(:rf_address_range)
+                        elsif hash.key?(:rf_address_range)
                           hash[:rf_address_range].min
                         else
                           0
                         end
-      rf_address_to = if hash.include?(:rf_address_to)
+      rf_address_to = if hash.key?(:rf_address_to)
                         hash[:rf_address_to]
-                      elsif hash.include?(:rf_address_range)
+                      elsif hash.key?(:rf_address_range)
                         hash[:rf_address_range].max
                       else
                         hash[:rf_address]
@@ -111,7 +111,7 @@ module MaxCube
           .new(@msg_type, "unknown command symbol: #{command}")
       end
 
-      rf_flags = if hash.include?(:rf_flags)
+      rf_flags = if hash.key?(:rf_flags)
                    hash[:rf_flags]
                  else
                    MessageS::DEFAULT_RF_FLAGS[command]
@@ -119,7 +119,7 @@ module MaxCube
 
       rf_address_from, rf_address_to = serialize_s_head_rf_address(hash)
 
-      unknown = hash.include?(:unknown) ? hash[:unknown] : "\x00"
+      unknown = hash.key?(:unknown) ? hash[:unknown] : "\x00"
       write(serialize(unknown, rf_flags, command_id, esize: 1) <<
             serialize(rf_address_from, rf_address_to, esize: 3))
 
