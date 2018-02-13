@@ -73,15 +73,12 @@
 #   end
 # end
 
-require_relative 'tcp_messages'
-require_relative 'tcp_parser'
+require_relative 'handler'
 
 module MaxCube
-  class Messages
-    include TCP
-
+  module Messages
     module Parser
-      include TCP
+      include Handler
     end
   end
 end

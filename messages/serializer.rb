@@ -160,15 +160,12 @@
 #   end
 # end
 
-require_relative 'tcp_messages'
-require_relative 'tcp_serializer'
+require_relative 'handler'
 
 module MaxCube
-  class Messages
-    include TCP
-
+  module Messages
     module Serializer
-      include TCP
+      include Handler
     end
   end
 end

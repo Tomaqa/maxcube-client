@@ -1,24 +1,30 @@
 # require_relative '../messages/parser'
 # require_relative '../messages/serializer'
-require_relative '../messages/messages'
+# require_relative '../messages/messages'
+require_relative '../messages/tcp_parser'
+require_relative '../messages/tcp_serializer'
 require_relative 'spec_helper'
 
-include MaxCube
+# include MaxCube
+include MaxCube::Messages
+include MaxCube::Messages::Handler
+include MaxCube::Messages::TCP
 
 # InvalidMessageLength = MessageHandler::InvalidMessageLength
 # InvalidMessageType = MessageHandler::InvalidMessageType
 # InvalidMessageFormat = MessageHandler::InvalidMessageFormat
 # InvalidMessageBody = MessageHandler::InvalidMessageBody
 # MSG_MAX_LEN = MessageHandler::MSG_MAX_LEN
-InvalidMessageLength = Messages::InvalidMessageLength
-InvalidMessageType = Messages::InvalidMessageType
-InvalidMessageFormat = Messages::InvalidMessageFormat
-InvalidMessageBody = Messages::InvalidMessageBody
-MSG_MAX_LEN = Messages::MSG_MAX_LEN
+# InvalidMessageLength = Messages::InvalidMessageLength
+# InvalidMessageType = Messages::InvalidMessageType
+# InvalidMessageFormat = Messages::InvalidMessageFormat
+# InvalidMessageBody = Messages::InvalidMessageBody
+# MSG_MAX_LEN = Messages::MSG_MAX_LEN
 
 describe 'MessageParser' do
   # subject(:parser) { MessageParser.new }
-  subject(:parser) { Messages.new }
+  # subject(:parser) { Messages.new }
+  subject(:parser) { TCP::Parser.new }
 
   # Proper message examples:
   # A:\r\n
@@ -1013,7 +1019,8 @@ end
 
 describe 'MessageSerializer' do
   # subject(:serializer) { MessageSerializer.new }
-  subject(:serializer) { Messages.new }
+  # subject(:serializer) { Messages.new }
+  subject(:serializer) { TCP::Serializer.new }
 
   # Proper message examples:
   # a:\r\n

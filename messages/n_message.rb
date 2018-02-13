@@ -1,9 +1,11 @@
 
 module MaxCube
   # class MessageParser < MessageHandler
-  class Messages
-    module Parser
+  # class Messages
+  module Messages
       module TCP
+    # module Parser
+    class Parser
     private
 
     module MessageN
@@ -27,8 +29,9 @@ module MaxCube
 end
 
   # class MessageSerializer < MessageHandler
-  module Serializer
       module TCP
+  # module Serializer
+  class Serializer
     private
 
     module MessageN
