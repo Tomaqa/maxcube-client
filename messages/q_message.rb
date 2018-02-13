@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+  class Messages
+    module Serializer
+      module TCP
     private
 
     module MessageQ
@@ -12,4 +15,6 @@ module MaxCube
       ''
     end
   end
+end
+end
 end

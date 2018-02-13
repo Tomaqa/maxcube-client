@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+  class Messages
+    module Serializer
+      module TCP
     private
 
     module MessageT
@@ -31,4 +34,6 @@ module MaxCube
       [format('%02x', count), force, addrs].join(',')
     end
   end
+end
+end
 end

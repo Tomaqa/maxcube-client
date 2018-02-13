@@ -1,9 +1,24 @@
-require_relative '../messages/parser'
-require_relative '../messages/serializer'
+# require_relative '../messages/parser'
+# require_relative '../messages/serializer'
+require_relative '../messages/messages'
 require_relative 'spec_helper'
 
+include MaxCube
+
+# InvalidMessageLength = MessageHandler::InvalidMessageLength
+# InvalidMessageType = MessageHandler::InvalidMessageType
+# InvalidMessageFormat = MessageHandler::InvalidMessageFormat
+# InvalidMessageBody = MessageHandler::InvalidMessageBody
+# MSG_MAX_LEN = MessageHandler::MSG_MAX_LEN
+InvalidMessageLength = Messages::InvalidMessageLength
+InvalidMessageType = Messages::InvalidMessageType
+InvalidMessageFormat = Messages::InvalidMessageFormat
+InvalidMessageBody = Messages::InvalidMessageBody
+MSG_MAX_LEN = Messages::MSG_MAX_LEN
+
 describe 'MessageParser' do
-  subject(:parser) { MaxCube::MessageParser.new }
+  # subject(:parser) { MessageParser.new }
+  subject(:parser) { Messages.new }
 
   # Proper message examples:
   # A:\r\n
@@ -61,13 +76,13 @@ describe 'MessageParser' do
         end
         it 'raises proper exception and #valid_parse_msg is falsey' do
           msgs.each do |m|
-            expect { parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
+            expect { parser.parse_msg(m) }.to raise_error InvalidMessageFormat
             expect(parser.valid_parse_msg(m)).to be_falsey
           end
         end
         it 'raises proper exception when passed as raw data' do
           msgs.each do |m|
-            expect { parser.parse_data(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
+            expect { parser.parse_data(m) }.to raise_error InvalidMessageFormat
           end
         end
       end
@@ -89,7 +104,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           data.each do |d|
-            expect { parser.parse_data(d) }.to raise_error MaxCube::MessageHandler::InvalidMessageFormat
+            expect { parser.parse_data(d) }.to raise_error InvalidMessageFormat
           end
         end
       end
@@ -107,7 +122,7 @@ describe 'MessageParser' do
       end
       it 'raises proper exception and #valid_parse_msg_type is falsey' do
         msgs.each do |m|
-          expect { parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          expect { parser.parse_msg(m) }.to raise_error InvalidMessageType
           expect(parser.valid_parse_msg_type(m)).to be_falsey
         end
       end
@@ -140,12 +155,12 @@ describe 'MessageParser' do
         [
           'A',
           ':',
-          'A:' + 'x' * MaxCube::MessageHandler::MSG_MAX_LEN,
+          'A:' + 'x' * MSG_MAX_LEN,
         ]
       end
       it 'raises proper exception and #valid_msg_length is falsey' do
         msgs.each do |m|
-          expect { parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageLength
+          expect { parser.parse_msg(m) }.to raise_error InvalidMessageLength
           expect(parser.valid_msg_length(m)).to be_falsey
         end
       end
@@ -232,7 +247,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -270,7 +285,7 @@ describe 'MessageParser' do
               portal_url: "http://www.max-portal.elv.de:80/cube\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00".b,
             },
             { type: 'C', length: 237,
-              address: '10b199', rf_address: 0x10B199,
+              address: '10b199', rf_address: 0x10b199,
               device_type: :cube,
               firmware_version: '0113',
               test_result: 255,
@@ -479,7 +494,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -556,7 +571,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -834,7 +849,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -912,7 +927,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -959,7 +974,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_msg(m) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ parser.parse_msg(m) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -997,7 +1012,8 @@ describe 'MessageParser' do
 end
 
 describe 'MessageSerializer' do
-  subject(:serializer) { MaxCube::MessageSerializer.new }
+  # subject(:serializer) { MessageSerializer.new }
+  subject(:serializer) { Messages.new }
 
   # Proper message examples:
   # a:\r\n
@@ -1032,14 +1048,14 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception and #valid_serialize_msg_type and #valid_serialize_hash are falsey' do
         hashes.each do |h|
-          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageType
           expect(serializer.valid_serialize_msg_type(h)).to be_falsey
           expect(serializer.valid_serialize_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
         hashes.each do |h|
-          expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          expect{ serializer.serialize_data([h]) }.to raise_error InvalidMessageType
         end
       end
     end
@@ -1057,14 +1073,14 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception and #valid_serialize_hash_keys and #valid_serialize_hash are falsey' do
         hashes.each do |h|
-          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           expect(serializer.valid_serialize_hash_keys(h)).to be_falsey
           expect(serializer.valid_serialize_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
         hashes.each do |h|
-          expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          expect{ serializer.serialize_data([h]) }.to raise_error InvalidMessageBody
         end
       end
     end
@@ -1078,14 +1094,14 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception and #valid_serialize_hash_values and #valid_serialize_hash are falsey' do
         hashes.each do |h|
-          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           expect(serializer.valid_serialize_hash_values(h)).to be_falsey
           expect(serializer.valid_serialize_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
         hashes.each do |h|
-          expect{ serializer.serialize_data([h]) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+          expect{ serializer.serialize_data([h]) }.to raise_error InvalidMessageBody
         end
       end
     end
@@ -1100,7 +1116,7 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception' do
         hashes.each do |h|
-          expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageType
+          expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageType
         end
       end
     end
@@ -1157,7 +1173,7 @@ describe 'MessageSerializer' do
           types.each do |t|
             hashes.each do |h|
               h[:type] = t
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -1277,7 +1293,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -1351,7 +1367,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -1402,7 +1418,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -1428,7 +1444,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -1554,7 +1570,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -1659,7 +1675,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -1782,7 +1798,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -1851,7 +1867,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -1898,7 +1914,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -1942,7 +1958,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+              expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
             end
           end
         end
@@ -2004,7 +2020,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -2042,7 +2058,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           end
         end
       end
@@ -2078,7 +2094,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_hash(h) }.to raise_error MaxCube::MessageHandler::InvalidMessageBody
+            expect{ serializer.serialize_hash(h) }.to raise_error InvalidMessageBody
           end
         end
       end

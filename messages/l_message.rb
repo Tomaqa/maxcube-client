@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageParser < MessageHandler
+  # class MessageParser < MessageHandler
+  class Messages
+    module Parser
+      module TCP
     private
 
     module MessageL
@@ -112,8 +115,11 @@ module MaxCube
              'unexpected EOF reached at submessage 3rd part')
     end
   end
+end
 
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+    module Serializer
+      module TCP
     private
 
     module MessageL
@@ -125,4 +131,6 @@ module MaxCube
       ''
     end
   end
+end
+end
 end

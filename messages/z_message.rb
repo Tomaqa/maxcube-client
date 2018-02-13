@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+  class Messages
+    module Serializer
+      module TCP
     private
 
     module MessageZ
@@ -29,4 +32,6 @@ module MaxCube
       args.join(',')
     end
   end
+end
+end
 end

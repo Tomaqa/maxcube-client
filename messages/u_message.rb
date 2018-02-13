@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+  class Messages
+    module Serializer
+      module TCP
     private
 
     module MessageU
@@ -12,4 +15,6 @@ module MaxCube
       "#{hash[:url]}:#{to_int(0, 'port', hash[:port])}"
     end
   end
+end
+end
 end

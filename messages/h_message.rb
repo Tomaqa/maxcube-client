@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageParser < MessageHandler
+  # class MessageParser < MessageHandler
+  class Messages
+    module Parser
+      module TCP
     private
 
     module MessageH
@@ -62,4 +65,6 @@ module MaxCube
                         "-> #{year}-#{month}-#{day} #{hours}:#{minutes}")
     end
   end
+end
+end
 end

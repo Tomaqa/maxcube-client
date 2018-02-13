@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageParser < MessageHandler
+  # class MessageParser < MessageHandler
+  class Messages
+    module Parser
+      module TCP
     private
 
     module MessageN
@@ -21,8 +24,11 @@ module MaxCube
         .new(@msg_type, 'unexpected EOF reached')
     end
   end
+end
 
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+  module Serializer
+      module TCP
     private
 
     module MessageN
@@ -36,4 +42,6 @@ module MaxCube
       format('%04x', to_int(0, 'timeout', hash[:timeout]))
     end
   end
+end
+end
 end

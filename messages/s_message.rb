@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageParser < MessageHandler
+  # class MessageParser < MessageHandler
+  class Messages
+    module Parser
+      module TCP
     private
 
     module MessageS
@@ -22,8 +25,11 @@ module MaxCube
       MessageS::KEYS.zip(values).to_h
     end
   end
+end
 
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+  module Serializer
+      module TCP
     private
 
     module MessageS
@@ -234,4 +240,6 @@ module MaxCube
       write(to_int(0, 'room ID', hash[:room_id]), display, esize: 1)
     end
   end
+end
+end
 end

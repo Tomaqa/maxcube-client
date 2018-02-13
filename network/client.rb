@@ -34,6 +34,24 @@ module MaxCube
       shell
     end
 
+    def receiver
+      puts '<Starting receiver thread ...>'
+      while (data = @socket.gets)
+        hashes = @parser.parse_data(data)
+        if @verbose
+          hashes.each { |h| print_hash(h) }
+          puts
+        end
+        @queue << [data, hashes]
+      end
+      raise IOError
+    rescue IOError
+      STDIN.close
+      puts '<Closing receiver thread ...>'
+    rescue MessageHandler::InvalidMessage => e
+      puts e.to_s.capitalize
+    end
+
     def shell
       puts "Welcome to interactive shell!\n" \
            "Type 'help' for list of commands.\n\n"
@@ -53,24 +71,6 @@ module MaxCube
       send_msg('q')
       @socket.close
       @thread.join
-    end
-
-    def receiver
-      puts '<Starting receiver thread ...>'
-      while (data = @socket.gets)
-        hashes = @parser.parse_data(data)
-        if @verbose
-          hashes.each { |h| print_hash(h) }
-          puts
-        end
-        @queue << [data, hashes]
-      end
-      raise IOError
-    rescue IOError
-      STDIN.close
-      puts '<Closing receiver thread ...>'
-    rescue MessageHandler::InvalidMessage => e
-      puts e.to_s.capitalize
     end
 
     private

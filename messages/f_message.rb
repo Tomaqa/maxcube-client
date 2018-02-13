@@ -1,6 +1,9 @@
 
 module MaxCube
-  class MessageParser < MessageHandler
+  # class MessageParser < MessageHandler
+  class Messages
+    module Parser
+      module TCP
     private
 
     module MessageF
@@ -11,8 +14,11 @@ module MaxCube
       { ntp_servers: body.split(',') }
     end
   end
+end
 
-  class MessageSerializer < MessageHandler
+  # class MessageSerializer < MessageHandler
+  module Serializer
+      module TCP
     private
 
     module MessageF
@@ -25,4 +31,6 @@ module MaxCube
       hash.key?(:ntp_servers) ? hash[:ntp_servers].join(',') : ''
     end
   end
+end
+end
 end

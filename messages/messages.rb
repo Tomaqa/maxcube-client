@@ -2,18 +2,13 @@ require 'base64'
 require 'date'
 require 'stringio'
 
+require_relative 'parser'
+require_relative 'serializer'
+
 module MaxCube
-  # Structure of message:
-  # * Starts with single letter followed by ':'
-  # * Ends with "\r\n"
-  # Example (unencoded):
-  # X:message\r\n
-  # As all messages are being split by "\r\n",
-  # it does not occur in single message processing,
-  # only in raw data processing.
-  class MessageHandler
-    # Without "\r\n", with it it is 1900
-    MSG_MAX_LEN = 1898
+  class Messages
+    include Parser
+    include Serializer
 
     DEVICE_MODE = %i[auto manual vacation boost].freeze
     DEVICE_TYPE = %i[cube
@@ -52,43 +47,12 @@ module MaxCube
       end
     end
 
-    def valid_msg_length(msg)
-      msg.length.between?(2, MSG_MAX_LEN)
-    end
-
-    def check_msg_length(msg)
-      raise InvalidMessageLength unless valid_msg_length(msg)
-      msg
-    end
-
-    # Check single message validity, already without "\r\n" at the end
-    def valid_msg(msg)
-      valid_msg_length(msg) && msg =~ /\A[[:alpha:]]:[[:print:]]*\z/
-    end
-
-    def check_msg(msg)
-      check_msg_length(msg)
-      raise InvalidMessageFormat unless valid_msg(msg)
-      msg
-    end
-
     def valid_data_type(raw_data)
       raw_data.is_a?(String)
     end
 
     def check_data_type(raw_data)
       raise TypeError unless valid_data_type(raw_data)
-      raw_data
-    end
-
-    def valid_data(raw_data)
-      return true if raw_data.empty?
-      raw_data[0..1] != "\r\n" && raw_data.chars.last(2).join == "\r\n"
-    end
-
-    def check_data(raw_data)
-      # check_data_type(raw_data)
-      raise InvalidMessageFormat unless valid_data(raw_data)
       raw_data
     end
 
@@ -222,4 +186,3 @@ module MaxCube
     end
   end
 end
-
