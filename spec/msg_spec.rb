@@ -1,5 +1,5 @@
-require_relative '../messages/tcp/parser'
-require_relative '../messages/tcp/serializer'
+require 'maxcube/messages/tcp/parser'
+require 'maxcube/messages/tcp/serializer'
 require_relative 'spec_helper'
 
 include MaxCube

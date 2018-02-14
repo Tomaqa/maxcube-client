@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'maxcube/network/udp/sample_socket'
+
+unless ARGV.size <= 1
+  puts "Wrong number of arguments: #{ARGV.size} (expected: 0..1)"
+  puts "Usage: ruby #{__FILE__} [port]"
+  exit
+end
+
+socket = MaxCube::Network::UDP::SampleSocket.new(*ARGV)
+socket.run

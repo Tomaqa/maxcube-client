@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'maxcube/network/tcp/client'
+require 'maxcube/network/udp/client'
+require 'irb'
+
+IRB.start(__FILE__)

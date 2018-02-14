@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'maxcube/network/tcp/sample_server'
+
+unless ARGV.size <= 1
+  puts "Wrong number of arguments: #{ARGV.size} (expected: 0..1)"
+  puts "Usage: ruby #{__FILE__} [port]"
+  exit
+end
+
+server = MaxCube::Network::TCP::SampleServer.new(*ARGV)
+server.run
