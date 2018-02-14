@@ -1,0 +1,12 @@
+---
+:type: s
+:unknown: "\0"
+:command: :set_temperature_mode
+:rf_address_range: !ruby/range
+  begin: 4
+  end: 495872
+  excl: false
+:room_id: 1
+:temperature: 19.0
+:mode: :vacation
+:datetime_until: !ruby/object:DateTime 2011-08-29 02:00:00.000000000 Z

@@ -1,14 +1,14 @@
 require_relative 'handler'
 require_relative '../serializer'
 
-%w[a c f l m n q s t u z].each { |f| require_relative 'type/' << f }
-
 module MaxCube
   module Messages
     module TCP
       class Serializer
         include Handler
         include Messages::Serializer
+
+        %w[a c f l m n q s t u z].each { |f| require_relative 'type/' << f }
 
         MSG_TYPES = %w[u i s m n x g q e d B G J P O V W a r t l c v f z].freeze
 

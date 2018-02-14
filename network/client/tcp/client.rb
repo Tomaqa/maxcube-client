@@ -1,19 +1,23 @@
-require_relative '../messages/parser'
-require_relative '../messages/serializer'
 require 'socket'
 require 'thread'
 
+require 'pathname'
 require 'pp'
 require 'yaml'
 
+require_relative '../../../messages//tcp/parser'
+require_relative '../../../messages/tcp/serializer'
+
+require_relative 'commands'
+
 module MaxCube
-  class Client
-    attr_accessor :socket
-    attr_reader :parser, :serializer
+  class TCPClient
+    LOCALHOST = 'localhost'.freeze
+    PORT = 62_910
 
     def initialize
-      @parser = MessageParser.new
-      @serializer = MessageSerializer.new
+      @parser = Messages::TCP::Parser.new
+      @serializer = Messages::TCP::Serializer.new
       @queue = Queue.new
 
       @buffer = { recv: { hashes: [], data: [] },
@@ -24,11 +28,15 @@ module MaxCube
       @hash = nil
       @hash_set = false
 
+      @data_dir = Pathname.new('data')
+      @load_data_dir = @data_dir + 'load'
+      @save_data_dir = @data_dir + 'save'
+
       @verbose = true
       @persist = true
     end
 
-    def connect(host = 'localhost', port = 2000)
+    def connect(host = LOCALHOST, port = PORT)
       @socket = TCPSocket.new(host, port)
       @thread = Thread.new(self, &:receiver)
       shell
@@ -37,7 +45,7 @@ module MaxCube
     def receiver
       puts '<Starting receiver thread ...>'
       while (data = @socket.gets)
-        hashes = @parser.parse_data(data)
+        hashes = @parser.parse_tcp_data(data)
         if @verbose
           hashes.each { |h| print_hash(h) }
           puts
@@ -48,7 +56,7 @@ module MaxCube
     rescue IOError
       STDIN.close
       puts '<Closing receiver thread ...>'
-    rescue MessageHandler::InvalidMessage => e
+    rescue Messages::InvalidMessage => e
       puts e.to_s.capitalize
     end
 
@@ -128,9 +136,9 @@ module MaxCube
     end
 
     def send_msg_hash_from_keys_args(type, *args, **opts)
-      keys = @serializer.serialize_msg_type_keys(type) +
-             @serializer.serialize_msg_type_optional_keys(type)
-      if opts[:array]
+      keys = @serializer.msg_type_hash_keys(type) +
+             @serializer.msg_type_hash_opt_keys(type)
+      if opts[:last_array]
         hash_args = args.first(keys.size - 1)
         ary_args = args.drop(keys.size - 1)
         ary_args = nil if opts[:array_nonempty] && ary_args.empty?
@@ -176,30 +184,17 @@ module MaxCube
       else
         hash[:type] = type
       end
-      msg = @serializer.serialize_hash(hash)
+      msg = @serializer.serialize_tcp_hash(hash)
 
       @buffer[:sent][:data] << msg
       @buffer[:sent][:hashes] << [hash]
       @socket.write(msg)
-    rescue MessageHandler::InvalidMessage => e
+    rescue Messages::InvalidMessage => e
       puts e.to_s.capitalize
     end
 
     def print_hash(hash)
       puts hash.to_yaml
     end
-
-    require_relative 'commands'
   end
-end
-
-if $PROGRAM_NAME == __FILE__
-  unless ARGV.size <= 2
-    puts "Wrong number of arguments: #{ARGV.size} (expected: 0..2)"
-    puts "Usage: ruby #{__FILE__} [host] [port]"
-    exit
-  end
-
-  client = MaxCube::Client.new
-  client.connect(*ARGV)
 end

@@ -2,12 +2,10 @@ require_relative '../messages/tcp/parser'
 require_relative '../messages/tcp/serializer'
 require_relative 'spec_helper'
 
-include MaxCube::Messages
-include Handler
-include TCP
+include MaxCube
 
 describe 'MessageParser' do
-  subject(:parser) { Parser.new }
+  subject(:parser) { Messages::TCP::Parser.new }
 
   # Proper message examples:
   # A:\r\n
@@ -65,14 +63,14 @@ describe 'MessageParser' do
         end
         it 'raises proper exception and #valid_tcp_msg_format and #valid_tcp_msg are falsey' do
           msgs.each do |m|
-            expect { parser.parse_tcp_msg(m) }.to raise_error InvalidMessageFormat
+            expect { parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageFormat
             expect(parser.valid_tcp_msg_format(m)).to be_falsey
             expect(parser.valid_tcp_msg(m)).to be_falsey
           end
         end
         it 'raises proper exception when passed as raw data' do
           msgs.each do |m|
-            expect { parser.parse_tcp_data(m) }.to raise_error InvalidMessageFormat
+            expect { parser.parse_tcp_data(m) }.to raise_error Messages::InvalidMessageFormat
           end
         end
       end
@@ -94,7 +92,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           data.each do |d|
-            expect { parser.parse_tcp_data(d) }.to raise_error InvalidMessageFormat
+            expect { parser.parse_tcp_data(d) }.to raise_error Messages::InvalidMessageFormat
           end
         end
       end
@@ -112,7 +110,7 @@ describe 'MessageParser' do
       end
       it 'raises proper exception and #valid_msg_msg_type and #valid_tcp_msg are falsey' do
         msgs.each do |m|
-          expect { parser.parse_tcp_msg(m) }.to raise_error InvalidMessageType
+          expect { parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageType
           expect(parser.valid_msg_msg_type(m)).to be_falsey
           expect(parser.valid_tcp_msg(m)).to be_falsey
         end
@@ -146,12 +144,12 @@ describe 'MessageParser' do
         [
           'A',
           ':',
-          'A:' + 'x' * MSG_MAX_LEN,
+          'A:' + 'x' * Messages::TCP::MSG_MAX_LEN,
         ]
       end
       it 'raises proper exception and #valid_tcp_msg_length and #valid_tcp_msg are falsey' do
         msgs.each do |m|
-          expect { parser.parse_tcp_msg(m) }.to raise_error InvalidMessageLength
+          expect { parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageLength
           expect(parser.valid_tcp_msg_length(m)).to be_falsey
           expect(parser.valid_tcp_msg(m)).to be_falsey
         end
@@ -239,7 +237,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_tcp_msg(m) }.to raise_error InvalidMessageBody
+            expect{ parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -486,7 +484,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_tcp_msg(m) }.to raise_error InvalidMessageBody
+            expect{ parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -563,7 +561,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_tcp_msg(m) }.to raise_error InvalidMessageBody
+            expect{ parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -841,7 +839,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_tcp_msg(m) }.to raise_error InvalidMessageBody
+            expect{ parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -919,7 +917,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_tcp_msg(m) }.to raise_error InvalidMessageBody
+            expect{ parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -966,7 +964,7 @@ describe 'MessageParser' do
         end
         it 'raises proper exception' do
           msgs.each do |m|
-            expect{ parser.parse_tcp_msg(m) }.to raise_error InvalidMessageBody
+            expect{ parser.parse_tcp_msg(m) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -1004,7 +1002,7 @@ describe 'MessageParser' do
 end
 
 describe 'MessageSerializer' do
-  subject(:serializer) { Serializer.new }
+  subject(:serializer) { Messages::TCP::Serializer.new }
 
   # Proper message examples:
   # a:\r\n
@@ -1039,14 +1037,14 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception and #valid_hash_msg_type and #valid_tcp_hash are falsey' do
         hashes.each do |h|
-          expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageType
+          expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageType
           expect(serializer.valid_hash_msg_type(h)).to be_falsey
           expect(serializer.valid_tcp_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
         hashes.each do |h|
-          expect{ serializer.serialize_tcp_hashes([h]) }.to raise_error InvalidMessageType
+          expect{ serializer.serialize_tcp_hashes([h]) }.to raise_error Messages::InvalidMessageType
         end
       end
     end
@@ -1064,14 +1062,14 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception and #valid_hash_keys and #valid_tcp_hash are falsey' do
         hashes.each do |h|
-          expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+          expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           expect(serializer.valid_hash_keys(h)).to be_falsey
           expect(serializer.valid_tcp_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
         hashes.each do |h|
-          expect{ serializer.serialize_tcp_hashes([h]) }.to raise_error InvalidMessageBody
+          expect{ serializer.serialize_tcp_hashes([h]) }.to raise_error Messages::InvalidMessageBody
         end
       end
     end
@@ -1085,14 +1083,14 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception and #valid_hash_values and #valid_tcp_hash are falsey' do
         hashes.each do |h|
-          expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+          expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           expect(serializer.valid_hash_values(h)).to be_falsey
           expect(serializer.valid_tcp_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
         hashes.each do |h|
-          expect{ serializer.serialize_tcp_hashes([h]) }.to raise_error InvalidMessageBody
+          expect{ serializer.serialize_tcp_hashes([h]) }.to raise_error Messages::InvalidMessageBody
         end
       end
     end
@@ -1107,7 +1105,7 @@ describe 'MessageSerializer' do
       end
       it 'raises proper exception' do
         hashes.each do |h|
-          expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageType
+          expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageType
         end
       end
     end
@@ -1164,7 +1162,7 @@ describe 'MessageSerializer' do
           types.each do |t|
             hashes.each do |h|
               h[:type] = t
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -1284,7 +1282,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+            expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -1358,7 +1356,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+            expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -1409,7 +1407,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+            expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -1435,7 +1433,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -1561,7 +1559,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -1666,7 +1664,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -1789,7 +1787,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -1858,7 +1856,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -1905,7 +1903,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -1949,7 +1947,7 @@ describe 'MessageSerializer' do
           end
           it 'raises proper exception' do
             hashes.each do |h|
-              expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+              expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
             end
           end
         end
@@ -2011,7 +2009,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+            expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -2049,7 +2047,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+            expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end
@@ -2085,7 +2083,7 @@ describe 'MessageSerializer' do
         end
         it 'raises proper exception' do
           hashes.each do |h|
-            expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
+            expect{ serializer.serialize_tcp_hash(h) }.to raise_error Messages::InvalidMessageBody
           end
         end
       end

@@ -1,0 +1,11 @@
+---
+:type: s
+:command: :config_valve
+:rf_address: 1033088
+:room_id: 1
+:boost_duration: '5'
+:valve_opening: '90.0'
+:decalcification_day: '6'
+:decalcification_hour: 12
+:max_valve_setting: '100'
+:valve_offset: 0.0

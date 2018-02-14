@@ -1,0 +1,6 @@
+---
+:type: f
+:ntp_servers:
+- server1
+- server2
+

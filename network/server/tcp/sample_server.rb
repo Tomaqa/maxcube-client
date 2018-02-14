@@ -1,8 +1,10 @@
 require 'socket'
 
 module MaxCube
-  class SampleServer
-    def initialize(port)
+  class SampleTCPServer
+    PORT = 62_910
+
+    def initialize(port = PORT)
       @port = port
       @server = TCPServer.new(port)
 
@@ -91,7 +93,11 @@ module MaxCube
   end
 end
 
-PORT = 2000
+unless ARGV.size <= 1
+  puts "Wrong number of arguments: #{ARGV.size} (expected: 0..1)"
+  puts "Usage: ruby #{__FILE__} [port]"
+  exit
+end
 
-server = MaxCube::SampleServer.new(PORT)
+server = MaxCube::SampleTCPServer.new(*ARGV)
 server.run

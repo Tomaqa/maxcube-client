@@ -1,0 +1,20 @@
+---
+:type: m
+:index: 0
+:unknown1: Vx
+:unknown2: "\x01"
+:rooms_count: 1
+:rooms:
+- :id: 33
+  :name_length: 2
+  :name: XY
+  :rf_address: 3224115
+:devices_count: 1
+:devices:
+- :type: shutter_contact
+  :rf_address: 5391937
+  :serial_number: serial_num
+  :name_length: 4
+  :name: NAME
+  :room_id: 33
+

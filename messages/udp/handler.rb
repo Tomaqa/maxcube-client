@@ -1,7 +1,7 @@
+require 'ipaddr'
+
 require_relative 'udp'
 require_relative '../handler'
-
-require 'ipaddr'
 
 module MaxCube
   module Messages
@@ -26,6 +26,15 @@ module MaxCube
           check_udp_msg_prefix(msg)
           check_msg(msg)
           msg
+        end
+
+        def valid_udp_hash(hash)
+          valid_hash(hash)
+        end
+
+        def check_udp_hash(hash)
+          check_hash(hash)
+          hash
         end
       end
     end

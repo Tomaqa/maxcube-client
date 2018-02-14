@@ -1,14 +1,14 @@
 require_relative 'handler'
 require_relative '../parser'
 
-%w[a c f h l m n s].each { |f| require_relative 'type/' << f }
-
 module MaxCube
   module Messages
     module TCP
       class Parser
         include Handler
         include Messages::Parser
+
+        %w[a c f h l m n s].each { |f| require_relative 'type/' << f }
 
         MSG_TYPES = %w[H F L C M N A E D b g j p o v w S].freeze
 

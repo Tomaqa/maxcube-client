@@ -1,14 +1,16 @@
 require_relative 'handler'
 require_relative '../parser'
 
-%w[i n h].each { |f| require_relative 'type/' << f }
-
 module MaxCube
   module Messages
     module UDP
       class Parser
         include Handler
         include Messages::Parser
+
+        KEYS = %i[prefix serial_number id].freeze
+
+        %w[i n h].each { |f| require_relative 'type/' << f }
 
         MSG_TYPES = %w[I N h c].freeze
 

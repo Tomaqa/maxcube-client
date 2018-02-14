@@ -13,6 +13,32 @@ module MaxCube
 
     PACK_FORMAT = %w[x C n N N].freeze
 
+    class InvalidMessage < RuntimeError; end
+
+    class InvalidMessageLength < InvalidMessage
+      def initialize(info = 'invalid message length')
+        super
+      end
+    end
+
+    class InvalidMessageType < InvalidMessage
+      def initialize(msg_type, info = 'invalid message type')
+        super("#{info}: #{msg_type}")
+      end
+    end
+
+    class InvalidMessageFormat < InvalidMessage
+      def initialize(info = 'invalid format')
+        super
+      end
+    end
+
+    class InvalidMessageBody < InvalidMessage
+      def initialize(msg_type, info = 'invalid format')
+        super("message type #{msg_type}: #{info}")
+      end
+    end
+
     private
 
     def conv_args(type, info, *args, &block)

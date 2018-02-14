@@ -25,6 +25,9 @@ module MaxCube
         end
         hash[:data] = body
         nil
+      rescue IOError
+        raise InvalidMessageBody
+          .new(@msg_type, 'unexpected EOF reached')
       end
     end
   end

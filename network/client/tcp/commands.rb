@@ -1,6 +1,6 @@
 
 module MaxCube
-  class Client
+  class TCPClient
     private
 
     def list_hashes(history)
@@ -52,7 +52,7 @@ module MaxCube
     end
 
     def cmd_ntp(*args)
-      send_msg('f', *args, array: true)
+      send_msg('f', *args, last_array: true)
     end
 
     def cmd_wake(*args)
@@ -64,7 +64,7 @@ module MaxCube
     end
 
     def cmd_delete(*args)
-      send_msg('t', *args, array: true, array_nonempty: true)
+      send_msg('t', *args, last_array: true, array_nonempty: true)
     end
 
     def cmd_reset
@@ -80,8 +80,6 @@ module MaxCube
       @verbose = toggle('verbose', @verbose)
     end
 
-    SAVE_DIR = './data/'.freeze
-
     def cmd_save(what = nil)
       buffer = !what
       all = %w[a A all].include?(what)
@@ -90,23 +88,31 @@ module MaxCube
         return
       end
 
+      dir = @save_data_dir + Time.now.strftime('%Y%m%d-%H%M')
+      dir.mkpath
+
       %i[recv sent].each do |sym|
-        data_fn = SAVE_DIR + sym.to_s + '.data'
+        data_fn = dir + (sym.to_s << '.data')
         File.open(data_fn, 'w') do |f|
           f.puts(buffer(sym, :data, all).join)
         end
 
-        hashes_fn = SAVE_DIR + sym.to_s + '.yaml'
+        hashes_fn = dir + (sym.to_s << '.yaml')
         File.open(hashes_fn, 'w') do |f|
           buffer(sym, :hashes, all).to_yaml(f)
         end
       end
 
-      puts "Received and sent raw data and hashes saved into '#{SAVE_DIR}'"
+      which = buffer ? 'Buffered' : 'All'
+      puts "#{which} received and sent raw data and hashes saved into '#{dir}'"
+    rescue SystemCallError => e
+      puts "Files could not been saved:\n#{e}"
     end
 
     def parse_hash(path)
-      unless File.file?(path) && File.readable?(path)
+      path = @load_data_dir + path if path.relative?
+
+      unless path.file? && path.readable?
         return puts "File is not readable: '#{path}'"
       end
 
@@ -119,7 +125,7 @@ module MaxCube
     end
 
     def load_hash(path = nil)
-      return parse_hash(path) if path
+      return parse_hash(Pathname.new(path)) if path
       return @hash if @hash && @hash_set
 
       if @hash
@@ -213,10 +219,11 @@ module MaxCube
                       'printed immediately or is not printed)') <<
            usage_line('save', '[a|A|all]',
                       "Saves buffered [all] received and sent data\n" \
-                      'into files') <<
+                      "into files at '#{@save_data_dir}'") <<
            usage_line('load', '[<path>]',
                       "Loads first hash from YAML file to internal variable\n" \
                       "-> to pass data with outgoing message\n" \
+                      "If path is relative, it looks in '#{@load_data_dir}'\n" \
                       "(loads previous valid hash if no file given)\n" \
                       "(command can be combined using '#{ARGS_FROM_HASH}'\n" \
                       " with other commands which have '{}' arguments)") <<
