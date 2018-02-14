@@ -63,10 +63,11 @@ describe 'MessageParser' do
             "A:\n\r",
           ]
         end
-        it 'raises proper exception and #valid_tcp_parse_msg is falsey' do
+        it 'raises proper exception and #valid_tcp_msg_format and #valid_tcp_msg are falsey' do
           msgs.each do |m|
             expect { parser.parse_tcp_msg(m) }.to raise_error InvalidMessageFormat
-            expect(parser.valid_tcp_parse_msg(m)).to be_falsey
+            expect(parser.valid_tcp_msg_format(m)).to be_falsey
+            expect(parser.valid_tcp_msg(m)).to be_falsey
           end
         end
         it 'raises proper exception when passed as raw data' do
@@ -109,10 +110,11 @@ describe 'MessageParser' do
           'l:',
         ]
       end
-      it 'raises proper exception and #valid_tcp_parse_msg_type is falsey' do
+      it 'raises proper exception and #valid_msg_msg_type and #valid_tcp_msg are falsey' do
         msgs.each do |m|
           expect { parser.parse_tcp_msg(m) }.to raise_error InvalidMessageType
-          expect(parser.valid_tcp_parse_msg_type(m)).to be_falsey
+          expect(parser.valid_msg_msg_type(m)).to be_falsey
+          expect(parser.valid_tcp_msg(m)).to be_falsey
         end
       end
     end
@@ -147,10 +149,11 @@ describe 'MessageParser' do
           'A:' + 'x' * MSG_MAX_LEN,
         ]
       end
-      it 'raises proper exception and #valid_tcp_msg_length is falsey' do
+      it 'raises proper exception and #valid_tcp_msg_length and #valid_tcp_msg are falsey' do
         msgs.each do |m|
           expect { parser.parse_tcp_msg(m) }.to raise_error InvalidMessageLength
           expect(parser.valid_tcp_msg_length(m)).to be_falsey
+          expect(parser.valid_tcp_msg(m)).to be_falsey
         end
       end
     end
@@ -1034,11 +1037,11 @@ describe 'MessageSerializer' do
           { type: 'A' },
         ]
       end
-      it 'raises proper exception and #valid_tcp_serial_msg_type and #valid_tcp_serial_hash are falsey' do
+      it 'raises proper exception and #valid_hash_msg_type and #valid_tcp_hash are falsey' do
         hashes.each do |h|
           expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageType
-          expect(serializer.valid_tcp_serial_msg_type(h)).to be_falsey
-          expect(serializer.valid_tcp_serial_hash(h)).to be_falsey
+          expect(serializer.valid_hash_msg_type(h)).to be_falsey
+          expect(serializer.valid_tcp_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
@@ -1059,11 +1062,11 @@ describe 'MessageSerializer' do
           { type: 'a', data: nil },
         ]
       end
-      it 'raises proper exception and #valid_tcp_serial_hash_keys and #valid_tcp_serial_hash are falsey' do
+      it 'raises proper exception and #valid_hash_keys and #valid_tcp_hash are falsey' do
         hashes.each do |h|
           expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
-          expect(serializer.valid_tcp_serial_hash_keys(h)).to be_falsey
-          expect(serializer.valid_tcp_serial_hash(h)).to be_falsey
+          expect(serializer.valid_hash_keys(h)).to be_falsey
+          expect(serializer.valid_tcp_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do
@@ -1080,11 +1083,11 @@ describe 'MessageSerializer' do
           { type: 'u', url: nil, port: 80 },
         ]
       end
-      it 'raises proper exception and #valid_serial_hash_values and #valid_tcp_serial_hash are falsey' do
+      it 'raises proper exception and #valid_hash_values and #valid_tcp_hash are falsey' do
         hashes.each do |h|
           expect{ serializer.serialize_tcp_hash(h) }.to raise_error InvalidMessageBody
-          expect(serializer.valid_serial_hash_values(h)).to be_falsey
-          expect(serializer.valid_tcp_serial_hash(h)).to be_falsey
+          expect(serializer.valid_hash_values(h)).to be_falsey
+          expect(serializer.valid_tcp_hash(h)).to be_falsey
         end
       end
       it 'raises proper exception when passed as array of hashes' do

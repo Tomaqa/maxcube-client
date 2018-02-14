@@ -6,6 +6,23 @@ module MaxCube
         module MessageC
           private
 
+          KEYS = %i[length address rf_address device_type
+                    test_result serial_number].freeze
+          OPT_KEYS = %i[
+            firmware_version _firmware_version room_id
+
+            portal_enabled button_up_mode button_down_mode portal_url
+
+            comfort_temperature eco_temperature
+            max_setpoint_temperature min_setpoint_temperature
+            temperature_offset window_open_temperature window_open_duration
+            boost_duration valve_opening
+            decalcification_day decalcification_hour
+            max_valve_setting valve_offset
+
+            unknown unknown1 unknown2 unknown3 unknown4 weekly_program
+          ].freeze
+
           LENGTHS = [6].freeze
 
           # Configuration message
@@ -24,7 +41,7 @@ module MaxCube
 
           def parse_tcp_c_split(body)
             addr, enc_data = body.split(',')
-            check_msg_part_lengths(MessageC::LENGTHS, addr)
+            check_msg_part_lengths(LENGTHS, addr)
             to_ints(16, 'device address', addr)
             [addr, enc_data]
           end

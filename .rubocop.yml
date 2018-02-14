@@ -1,11 +1,14 @@
 AllCops:
   TargetRubyVersion: 2.4
 
+Metrics/ModuleLength:
+  Max: 200
+
 Metrics/ClassLength:
-  Enabled: false
+  Max: 200
 
 Metrics/MethodLength:
-  Enabled: false
+  Max: 30
 
 Metrics/AbcSize:
   Enabled: false

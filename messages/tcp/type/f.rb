@@ -6,6 +6,8 @@ module MaxCube
         module MessageF
           private
 
+          KEYS = %i[ntp_servers].freeze
+
           # NTP server message
           def parse_tcp_f(body)
             { ntp_servers: body.split(',') }

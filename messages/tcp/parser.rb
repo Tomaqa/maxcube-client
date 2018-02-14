@@ -21,29 +21,6 @@ module MaxCube
         include MessageN
         include MessageS
 
-        def valid_tcp_parse_msg_type(msg)
-          msg_type = msg.chr
-          return msg_type if MSG_TYPES.include?(msg_type)
-          false
-        end
-
-        def check_tcp_parse_msg_type(msg)
-          @msg_type = valid_tcp_parse_msg_type(msg)
-          return if @msg_type
-          raise InvalidMessageType.new(msg.chr)
-        end
-
-        # Check single message validity, which is already without "\r\n"
-        def valid_tcp_parse_msg(msg)
-          valid_tcp_msg(msg) && valid_tcp_parse_msg_type(msg)
-        end
-
-        def check_tcp_parse_msg(msg)
-          check_tcp_msg(msg)
-          check_tcp_parse_msg_type(msg)
-          msg
-        end
-
         # Process set of messages - raw data separated by "\r\n"
         # @param [String, #read] raw data from a Cube
         # @return [Array<Hash>] particular message contents
@@ -57,13 +34,11 @@ module MaxCube
         # @return [Hash] particular message parts separated into hash,
         #                which should be human readable
         def parse_tcp_msg(msg)
-          check_tcp_parse_msg(msg)
+          check_tcp_msg(msg)
           body = msg.split(':')[1] || ''
           hash = { type: @msg_type }
-
-          method_str = "parse_tcp_#{@msg_type.downcase}"
-          return hash.merge!(data: body) unless respond_to?(method_str, true)
-          hash.merge!(send(method_str, body))
+          return hash unless parse_msg_body(body, hash, 'tcp')
+          check_tcp_hash(hash)
         end
       end
     end

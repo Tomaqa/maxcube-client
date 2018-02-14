@@ -1,8 +1,6 @@
 require_relative 'handler'
 require_relative '../serializer'
 
-# %w[i n h].each { |f| require_relative 'type/' << f }
-
 module MaxCube
   module Messages
     module UDP
@@ -12,14 +10,19 @@ module MaxCube
 
         MSG_TYPES = %w[I N h c R].freeze
 
-        # include MessageA
-
         MSG_PREFIX = (UDP::MSG_PREFIX + "*\x00").freeze
 
         def serialize_udp_hash(hash)
-          type = hash[:type]
+          check_udp_hash(hash)
           serial_number = hash[:serial_number] || '*' * 10
-          MSG_PREFIX + serial_number << type
+          msg = MSG_PREFIX + serial_number << @msg_type
+          check_udp_msg(msg)
+        end
+
+        private
+
+        def msg_msg_type(msg)
+          msg[18]
         end
       end
     end

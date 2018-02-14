@@ -6,10 +6,12 @@ module MaxCube
         module MessageI
           private
 
-          def parse_udp_i
+          KEYS = %i[rf_address firmware_version].freeze
+
+          def parse_udp_i(_body)
             {
               rf_address: read(3, true),
-              firmware_version: read(2),
+              firmware_version: read(2, 'H*'),
             }
           end
         end

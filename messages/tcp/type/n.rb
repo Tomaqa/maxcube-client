@@ -6,6 +6,8 @@ module MaxCube
         module MessageN
           private
 
+          KEYS = %i[device_type rf_address serial_number unknown].freeze
+
           # New device (pairing) message
           def parse_tcp_n(body)
             @io = StringIO.new(decode(body), 'rb')

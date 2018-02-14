@@ -8,6 +8,8 @@ module MaxCube
 
           LENGTHS = [6, 11, 12].freeze
 
+          KEYS = %i[devices].freeze
+
           # Device list message
           def parse_tcp_l(body)
             @io = StringIO.new(decode(body), 'rb')
@@ -29,11 +31,10 @@ module MaxCube
 
           def parse_tcp_l_submsg_1
             @length = read(1, true)
-            unless MessageL::LENGTHS.include?(@length)
+            unless LENGTHS.include?(@length)
               raise InvalidMessageBody
-                .new(@msg_type,
-                     "invalid length of submessage (#{@length}):" \
-                     " should be in #{MessageL::LENGTHS}")
+                .new(@msg_type, "invalid length of submessage (#{@length}):" \
+                                " should be in #{LENGTHS}")
             end
             subhash = {
               length: @length,
@@ -59,8 +60,7 @@ module MaxCube
             subhash
           rescue IOError
             raise InvalidMessageBody
-              .new(@msg_type,
-                   'unexpected EOF reached at submessage 1st part')
+              .new(@msg_type, 'unexpected EOF reached at submessage 1st part')
           end
 
           def parse_tcp_l_submsg_2(subhash)

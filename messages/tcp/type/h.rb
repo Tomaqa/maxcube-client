@@ -7,6 +7,7 @@ module MaxCube
           private
 
           LENGTHS = [10, 6, 4, 8, 8, 2, 2, 6, 4, 2, 4].freeze
+
           KEYS = %i[
             serial_number
             rf_address
@@ -23,7 +24,7 @@ module MaxCube
           # Hello message
           def parse_tcp_h(body)
             values = body.split(',')
-            check_msg_part_lengths(MessageH::LENGTHS, *values)
+            check_msg_part_lengths(LENGTHS, *values)
             values[1], _, values[4], values[5], values[6], _, _,
               values[9], values[10] =
               to_ints(16, 'RF address, ' \
@@ -40,7 +41,7 @@ module MaxCube
 
             parse_tcp_h_cube_datetime(values)
 
-            MessageH::KEYS.zip(values).to_h
+            KEYS.zip(values).to_h
           end
 
           ########################

@@ -17,6 +17,15 @@ module MaxCube
         unpack = PACK_FORMAT[count] unless unpack.is_a?(String)
         str.unpack1(unpack)
       end
+
+      def parse_msg_body(body, hash, parser_type_str)
+        method_str = "parse_#{parser_type_str}_#{@msg_type.downcase}"
+        if respond_to?(method_str, true)
+          return hash.merge!(send(method_str, body))
+        end
+        hash[:data] = body
+        nil
+      end
     end
   end
 end

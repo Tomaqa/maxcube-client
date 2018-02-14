@@ -19,6 +19,19 @@ module MaxCube
         MSG_PREFIX = (UDP::MSG_PREFIX + 'Ap').freeze
 
         def parse_udp_msg(msg)
+          check_udp_msg(msg)
+          hash = parse_udp_msg_head(msg)
+          return hash unless parse_msg_body(@io.string, hash, 'udp')
+          check_udp_hash(hash)
+        end
+
+        private
+
+        def msg_msg_type(msg)
+          msg[19]
+        end
+
+        def parse_udp_msg_head(msg)
           @io = StringIO.new(msg, 'rb')
           hash = {
             prefix: read(8),
@@ -26,10 +39,8 @@ module MaxCube
             id: read(1, true),
             type: read(1),
           }
-          msg_type = hash[:type]
-          method_str = "parse_udp_#{msg_type.downcase}"
-          return hash.merge!(send(method_str)) if respond_to?(method_str)
-          # bitka
+          @io.string = @io.read
+          hash
         end
       end
     end

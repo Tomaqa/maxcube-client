@@ -5,18 +5,6 @@ module MaxCube
     module Serializer
       include Handler
 
-      def valid_serial_hash_values(hash)
-        hash.none? { |_, v| v.nil? }
-      end
-
-      def check_serial_hash_values(hash)
-        return if valid_serial_hash_values(hash)
-        hash = hash.dup
-        hash.delete(:type)
-        raise InvalidMessageBody
-          .new(@msg_type, "invalid hash values: #{hash}")
-      end
-
       def serialize(*args, esize: 0, size: 0, ocount: 0)
         return args.join if size.zero? && esize.zero?
 
@@ -39,6 +27,14 @@ module MaxCube
 
       def write(*args, esize: 0, size: 0, ocount: 0)
         @io.write(serialize(*args, esize: esize, size: size, ocount: ocount))
+      end
+
+      def serialize_hash_body(hash, serializer_type_str)
+        method_str = "serialize_#{serializer_type_str}_#{@msg_type.downcase}"
+        return send(method_str, hash) if respond_to?(method_str, true)
+        raise InvalidMessageType
+          .new(@msg_type, 'serialization of message type' \
+                          ' is not implemented (yet)')
       end
 
       private

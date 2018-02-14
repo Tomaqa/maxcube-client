@@ -7,6 +7,7 @@ module MaxCube
           private
 
           LENGTHS = [2, 1, 2].freeze
+
           KEYS = %i[
             duty_cycle
             command_processed
@@ -16,11 +17,11 @@ module MaxCube
           # Send command message (response)
           def parse_tcp_s(body)
             values = body.split(',')
-            check_msg_part_lengths(MessageS::LENGTHS, *values)
+            check_msg_part_lengths(LENGTHS, *values)
             values = to_ints(16, 'duty cycle, command result,' \
                                  ' free memory slots', *values)
             values[1] = values[1].zero?
-            MessageS::KEYS.zip(values).to_h
+            KEYS.zip(values).to_h
           end
         end
       end
@@ -107,7 +108,7 @@ module MaxCube
 
           def serialize_tcp_s_head(hash)
             command = hash[:command].to_sym
-            command_id = MessageS::COMMANDS[command]
+            command_id = COMMANDS[command]
             unless command_id
               raise InvalidMessageBody
                 .new(@msg_type, "unknown command symbol: #{command}")
@@ -116,7 +117,7 @@ module MaxCube
             rf_flags = if hash.key?(:rf_flags)
                          to_int(0, 'RF flags', hash[:rf_flags])
                        else
-                         MessageS::DEFAULT_RF_FLAGS[command]
+                         DEFAULT_RF_FLAGS[command]
                        end
 
             rf_address_from, rf_address_to =

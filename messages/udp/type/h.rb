@@ -6,7 +6,9 @@ module MaxCube
         module MessageH
           private
 
-          def parse_udp_h
+          KEYS = %i[port url path].freeze
+
+          def parse_udp_h(_body)
             port = read(2, true)
             url, path = read.split(',')
             {

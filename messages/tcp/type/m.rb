@@ -8,6 +8,9 @@ module MaxCube
 
           LENGTHS = [2, 2].freeze
 
+          KEYS = %i[index count unknown1 unknown2
+                    rooms_count rooms devices_count devices].freeze
+
           # Metadata message
           def parse_tcp_m(body)
             index, count, enc_data = parse_tcp_m_split(body)
@@ -31,7 +34,7 @@ module MaxCube
 
           def parse_tcp_m_split(body)
             index, count, enc_data = body.split(',')
-            check_msg_part_lengths(MessageM::LENGTHS, index, count)
+            check_msg_part_lengths(LENGTHS, index, count)
             index, count = to_ints(16, 'message index, count',
                                    index, count)
             unless index < count
