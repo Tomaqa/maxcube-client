@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "maxcube/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "ruby-maxcube-client"
+  spec.name          = "maxcube-client"
   spec.version       = MaxCube::VERSION
   spec.authors       = ["Tomáš Kolárik"]
   spec.email         = ["tomaqa@gmail.com"]
