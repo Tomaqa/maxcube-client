@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: MaxCube::Messages::TCP::Handler
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "MaxCube::Messages::TCP::Handler";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (H)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../MaxCube.html" title="MaxCube (module)">MaxCube</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Messages.html" title="MaxCube::Messages (module)">Messages</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../TCP.html" title="MaxCube::Messages::TCP (module)">TCP</a></span></span>
+     &raquo; 
+    <span class="title">Handler</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: MaxCube::Messages::TCP::Handler
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="../Handler.html" title="MaxCube::Messages::Handler (module)">Handler</a></span></dd>
+  </dl>
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="Parser.html" title="MaxCube::Messages::TCP::Parser (class)">Parser</a></span>, <span class='object_link'><a href="Serializer.html" title="MaxCube::Messages::TCP::Serializer (class)">Serializer</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/maxcube/messages/tcp/handler.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Extends <span class='object_link'><a href="../Handler.html" title="MaxCube::Messages::Handler (module)">Handler</a></span> of routines connected to TCP Cube messages.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+  <h2>Constant Summary</h2>
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="../Handler.html" title="MaxCube::Messages::Handler (module)">Handler</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Handler.html#PACK_FORMAT-constant" title="MaxCube::Messages::Handler::PACK_FORMAT (constant)">Handler::PACK_FORMAT</a></span></p>
+
+  
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="../../Messages.html" title="MaxCube::Messages (module)">MaxCube::Messages</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../../Messages.html#DAYS_OF_WEEK-constant" title="MaxCube::Messages::DAYS_OF_WEEK (constant)">DAYS_OF_WEEK</a></span>, <span class='object_link'><a href="../../Messages.html#DEVICE_MODE-constant" title="MaxCube::Messages::DEVICE_MODE (constant)">DEVICE_MODE</a></span>, <span class='object_link'><a href="../../Messages.html#DEVICE_TYPE-constant" title="MaxCube::Messages::DEVICE_TYPE (constant)">DEVICE_TYPE</a></span></p>
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#check_tcp_data-instance_method" title="#check_tcp_data (instance method)">#<strong>check_tcp_data</strong>(raw_data)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>As <span class='object_link'><a href="#valid_tcp_data-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_data (method)">#valid_tcp_data</a></span>, but raises exception if raw data is not valid.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#check_tcp_hash-instance_method" title="#check_tcp_hash (instance method)">#<strong>check_tcp_hash</strong>(hash)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>As <span class='object_link'><a href="#valid_tcp_hash-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_hash (method)">#valid_tcp_hash</a></span>, but raises exception if hash is not valid.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#check_tcp_msg-instance_method" title="#check_tcp_msg (instance method)">#<strong>check_tcp_msg</strong>(msg)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>As <span class='object_link'><a href="#valid_tcp_msg-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg (method)">#valid_tcp_msg</a></span>, but raises exception if message is not valid.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#check_tcp_msg_format-instance_method" title="#check_tcp_msg_format (instance method)">#<strong>check_tcp_msg_format</strong>(msg)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>As <span class='object_link'><a href="#valid_tcp_msg_format-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg_format (method)">#valid_tcp_msg_format</a></span>, but raises exception if message format is not
+valid.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#check_tcp_msg_length-instance_method" title="#check_tcp_msg_length (instance method)">#<strong>check_tcp_msg_length</strong>(msg)  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>As <span class='object_link'><a href="#valid_tcp_msg_length-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg_length (method)">#valid_tcp_msg_length</a></span>, but raises exception if message length is not
+valid.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="private ">
+  <span class="summary_signature">
+    
+      <a href="#msg_msg_type-instance_method" title="#msg_msg_type (instance method)">#<strong>msg_msg_type</strong>(msg)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  <span class="note title private">private</span>
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Tells how to get message type from a message.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valid_tcp_data-instance_method" title="#valid_tcp_data (instance method)">#<strong>valid_tcp_data</strong>(raw_data)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Validates whether input raw data containing multiple separated TCP Cube
+messages is valid.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valid_tcp_hash-instance_method" title="#valid_tcp_hash (instance method)">#<strong>valid_tcp_hash</strong>(hash)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Validates whether given hash with message contents is valid for TCP Cube
+messaging purposes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valid_tcp_msg-instance_method" title="#valid_tcp_msg (instance method)">#<strong>valid_tcp_msg</strong>(msg)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Validates whether given message is a valid TCP Cube message.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valid_tcp_msg_format-instance_method" title="#valid_tcp_msg_format (instance method)">#<strong>valid_tcp_msg_format</strong>(msg)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Validates whether message satisfies TCP Cube format (see <span class='object_link'><a href="../TCP.html" title="MaxCube::Messages::TCP (module)">MaxCube::Messages::TCP</a></span>).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valid_tcp_msg_length-instance_method" title="#valid_tcp_msg_length (instance method)">#<strong>valid_tcp_msg_length</strong>(msg)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Validates whether message satisfies <span class='object_link'><a href="../TCP.html#MSG_MAX_LEN-constant" title="MaxCube::Messages::TCP::MSG_MAX_LEN (constant)">MSG_MAX_LEN</a></span>.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Handler.html" title="MaxCube::Messages::Handler (module)">Handler</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Handler.html#check_data_type-instance_method" title="MaxCube::Messages::Handler#check_data_type (method)">#check_data_type</a></span>, <span class='object_link'><a href="../Handler.html#check_hash-instance_method" title="MaxCube::Messages::Handler#check_hash (method)">#check_hash</a></span>, <span class='object_link'><a href="../Handler.html#check_hash_keys-instance_method" title="MaxCube::Messages::Handler#check_hash_keys (method)">#check_hash_keys</a></span>, <span class='object_link'><a href="../Handler.html#check_hash_msg_type-instance_method" title="MaxCube::Messages::Handler#check_hash_msg_type (method)">#check_hash_msg_type</a></span>, <span class='object_link'><a href="../Handler.html#check_hash_values-instance_method" title="MaxCube::Messages::Handler#check_hash_values (method)">#check_hash_values</a></span>, <span class='object_link'><a href="../Handler.html#check_msg-instance_method" title="MaxCube::Messages::Handler#check_msg (method)">#check_msg</a></span>, <span class='object_link'><a href="../Handler.html#check_msg_msg_type-instance_method" title="MaxCube::Messages::Handler#check_msg_msg_type (method)">#check_msg_msg_type</a></span>, <span class='object_link'><a href="../Handler.html#check_msg_part_lengths-instance_method" title="MaxCube::Messages::Handler#check_msg_part_lengths (method)">#check_msg_part_lengths</a></span>, <span class='object_link'><a href="../Handler.html#check_msg_type-instance_method" title="MaxCube::Messages::Handler#check_msg_type (method)">#check_msg_type</a></span>, <span class='object_link'><a href="../Handler.html#decode-instance_method" title="MaxCube::Messages::Handler#decode (method)">#decode</a></span>, <span class='object_link'><a href="../Handler.html#encode-instance_method" title="MaxCube::Messages::Handler#encode (method)">#encode</a></span>, <span class='object_link'><a href="../Handler.html#maybe_check_valid_hash_keys-instance_method" title="MaxCube::Messages::Handler#maybe_check_valid_hash_keys (method)">#maybe_check_valid_hash_keys</a></span>, <span class='object_link'><a href="../Handler.html#maybe_check_valid_msg_type-instance_method" title="MaxCube::Messages::Handler#maybe_check_valid_msg_type (method)">#maybe_check_valid_msg_type</a></span>, <span class='object_link'><a href="../Handler.html#msg_type_hash_keys-instance_method" title="MaxCube::Messages::Handler#msg_type_hash_keys (method)">#msg_type_hash_keys</a></span>, <span class='object_link'><a href="../Handler.html#msg_type_hash_opt_keys-instance_method" title="MaxCube::Messages::Handler#msg_type_hash_opt_keys (method)">#msg_type_hash_opt_keys</a></span>, <span class='object_link'><a href="../Handler.html#msg_type_which_hash_keys-instance_method" title="MaxCube::Messages::Handler#msg_type_which_hash_keys (method)">#msg_type_which_hash_keys</a></span>, <span class='object_link'><a href="../Handler.html#msg_types-instance_method" title="MaxCube::Messages::Handler#msg_types (method)">#msg_types</a></span>, <span class='object_link'><a href="../Handler.html#valid_data_type-instance_method" title="MaxCube::Messages::Handler#valid_data_type (method)">#valid_data_type</a></span>, <span class='object_link'><a href="../Handler.html#valid_hash-instance_method" title="MaxCube::Messages::Handler#valid_hash (method)">#valid_hash</a></span>, <span class='object_link'><a href="../Handler.html#valid_hash_keys-instance_method" title="MaxCube::Messages::Handler#valid_hash_keys (method)">#valid_hash_keys</a></span>, <span class='object_link'><a href="../Handler.html#valid_hash_msg_type-instance_method" title="MaxCube::Messages::Handler#valid_hash_msg_type (method)">#valid_hash_msg_type</a></span>, <span class='object_link'><a href="../Handler.html#valid_hash_values-instance_method" title="MaxCube::Messages::Handler#valid_hash_values (method)">#valid_hash_values</a></span>, <span class='object_link'><a href="../Handler.html#valid_msg-instance_method" title="MaxCube::Messages::Handler#valid_msg (method)">#valid_msg</a></span>, <span class='object_link'><a href="../Handler.html#valid_msg_msg_type-instance_method" title="MaxCube::Messages::Handler#valid_msg_msg_type (method)">#valid_msg_msg_type</a></span>, <span class='object_link'><a href="../Handler.html#valid_msg_part_lengths-instance_method" title="MaxCube::Messages::Handler#valid_msg_part_lengths (method)">#valid_msg_part_lengths</a></span>, <span class='object_link'><a href="../Handler.html#valid_msg_type-instance_method" title="MaxCube::Messages::Handler#valid_msg_type (method)">#valid_msg_type</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../../Messages.html" title="MaxCube::Messages (module)">MaxCube::Messages</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../../Messages.html#ary_elem-instance_method" title="MaxCube::Messages#ary_elem (method)">#ary_elem</a></span>, <span class='object_link'><a href="../../Messages.html#ary_elem_id-instance_method" title="MaxCube::Messages#ary_elem_id (method)">#ary_elem_id</a></span>, <span class='object_link'><a href="../../Messages.html#conv_args-instance_method" title="MaxCube::Messages#conv_args (method)">#conv_args</a></span>, <span class='object_link'><a href="../../Messages.html#day_of_week-instance_method" title="MaxCube::Messages#day_of_week (method)">#day_of_week</a></span>, <span class='object_link'><a href="../../Messages.html#day_of_week_id-instance_method" title="MaxCube::Messages#day_of_week_id (method)">#day_of_week_id</a></span>, <span class='object_link'><a href="../../Messages.html#device_mode-instance_method" title="MaxCube::Messages#device_mode (method)">#device_mode</a></span>, <span class='object_link'><a href="../../Messages.html#device_mode_id-instance_method" title="MaxCube::Messages#device_mode_id (method)">#device_mode_id</a></span>, <span class='object_link'><a href="../../Messages.html#device_type-instance_method" title="MaxCube::Messages#device_type (method)">#device_type</a></span>, <span class='object_link'><a href="../../Messages.html#device_type_id-instance_method" title="MaxCube::Messages#device_type_id (method)">#device_type_id</a></span>, <span class='object_link'><a href="../../Messages.html#to_bool-instance_method" title="MaxCube::Messages#to_bool (method)">#to_bool</a></span>, <span class='object_link'><a href="../../Messages.html#to_bools-instance_method" title="MaxCube::Messages#to_bools (method)">#to_bools</a></span>, <span class='object_link'><a href="../../Messages.html#to_datetime-instance_method" title="MaxCube::Messages#to_datetime (method)">#to_datetime</a></span>, <span class='object_link'><a href="../../Messages.html#to_datetimes-instance_method" title="MaxCube::Messages#to_datetimes (method)">#to_datetimes</a></span>, <span class='object_link'><a href="../../Messages.html#to_float-instance_method" title="MaxCube::Messages#to_float (method)">#to_float</a></span>, <span class='object_link'><a href="../../Messages.html#to_floats-instance_method" title="MaxCube::Messages#to_floats (method)">#to_floats</a></span>, <span class='object_link'><a href="../../Messages.html#to_int-instance_method" title="MaxCube::Messages#to_int (method)">#to_int</a></span>, <span class='object_link'><a href="../../Messages.html#to_ints-instance_method" title="MaxCube::Messages#to_ints (method)">#to_ints</a></span></p>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="check_tcp_data-instance_method">
+  
+    #<strong>check_tcp_data</strong>(raw_data)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>As <span class='object_link'><a href="#valid_tcp_data-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_data (method)">#valid_tcp_data</a></span>, but raises exception if raw data is not valid.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>raw_data</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input data with multiple separated messages.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input data.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../InvalidMessageFormat.html" title="MaxCube::Messages::InvalidMessageFormat (class)">InvalidMessageFormat</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if input data is not valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_tcp_data'>check_tcp_data</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_data'>raw_data</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../InvalidMessageFormat.html" title="MaxCube::Messages::InvalidMessageFormat (class)">InvalidMessageFormat</a></span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_valid_tcp_data'>valid_tcp_data</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_data'>raw_data</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raw_data'>raw_data</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="check_tcp_hash-instance_method">
+  
+    #<strong>check_tcp_hash</strong>(hash)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>As <span class='object_link'><a href="#valid_tcp_hash-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_hash (method)">#valid_tcp_hash</a></span>, but raises exception if hash is not valid. It only
+calls <span class='object_link'><a href="../Handler.html#check_hash-instance_method" title="MaxCube::Messages::Handler#check_hash (method)">Handler#check_hash</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>hash</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input hash.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input hash.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+81
+82
+83
+84</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 81</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_tcp_hash'>check_tcp_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_check_hash'>check_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_hash'>hash</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="check_tcp_msg-instance_method">
+  
+    #<strong>check_tcp_msg</strong>(msg)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>As <span class='object_link'><a href="#valid_tcp_msg-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg (method)">#valid_tcp_msg</a></span>, but raises exception if message is not valid. It calls
+<span class='object_link'><a href="#check_tcp_msg_length-instance_method" title="MaxCube::Messages::TCP::Handler#check_tcp_msg_length (method)">#check_tcp_msg_length</a></span>, <span class='object_link'><a href="#check_tcp_msg_format-instance_method" title="MaxCube::Messages::TCP::Handler#check_tcp_msg_format (method)">#check_tcp_msg_format</a></span> and <span class='object_link'><a href="../Handler.html#check_msg-instance_method" title="MaxCube::Messages::Handler#check_msg (method)">Handler#check_msg</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+61
+62
+63
+64
+65
+66</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 61</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_tcp_msg'>check_tcp_msg</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_check_tcp_msg_length'>check_tcp_msg_length</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_check_tcp_msg_format'>check_tcp_msg_format</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_check_msg'>check_msg</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_msg'>msg</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="check_tcp_msg_format-instance_method">
+  
+    #<strong>check_tcp_msg_format</strong>(msg)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>As <span class='object_link'><a href="#valid_tcp_msg_format-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg_format (method)">#valid_tcp_msg_format</a></span>, but raises exception if message format is not
+valid.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../InvalidMessageFormat.html" title="MaxCube::Messages::InvalidMessageFormat (class)">InvalidMessageFormat</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if message format is not valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+40
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 40</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_tcp_msg_format'>check_tcp_msg_format</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../InvalidMessageFormat.html" title="MaxCube::Messages::InvalidMessageFormat (class)">InvalidMessageFormat</a></span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_valid_tcp_msg_format'>valid_tcp_msg_format</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_msg'>msg</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="check_tcp_msg_length-instance_method">
+  
+    #<strong>check_tcp_msg_length</strong>(msg)  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>As <span class='object_link'><a href="#valid_tcp_msg_length-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg_length (method)">#valid_tcp_msg_length</a></span>, but raises exception if message length is not
+valid.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>message length.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../InvalidMessageLength.html" title="MaxCube::Messages::InvalidMessageLength (class)">InvalidMessageLength</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if message length is not valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25
+26</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 23</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_tcp_msg_length'>check_tcp_msg_length</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../InvalidMessageLength.html" title="MaxCube::Messages::InvalidMessageLength (class)">InvalidMessageLength</a></span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_valid_tcp_msg_length'>valid_tcp_msg_length</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_msg'>msg</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="msg_msg_type-instance_method">
+  
+    #<strong>msg_msg_type</strong>(msg)  &#x21d2; <tt>String</tt>  <span class="extras">(private)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Tells how to get message type from a message.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>message type.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+112
+113
+114</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 112</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_msg_msg_type'>msg_msg_type</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_msg'>msg</span><span class='period'>.</span><span class='id identifier rubyid_chr'>chr</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valid_tcp_data-instance_method">
+  
+    #<strong>valid_tcp_data</strong>(raw_data)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Validates whether input raw data containing multiple separated TCP Cube
+messages is valid. It only checks <tt>\r\n</tt> stuff. It does not validate data
+type (<span class='object_link'><a href="../Handler.html#valid_data_type-instance_method" title="MaxCube::Messages::Handler#valid_data_type (method)">Handler#valid_data_type</a></span>), yet? It does not validate particular messages.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>raw_data</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input data with multiple separated messages.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether input data is valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+93
+94
+95
+96</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 93</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valid_tcp_data'>valid_tcp_data</span><span class='lparen'>(</span><span class='id identifier rubyid_raw_data'>raw_data</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_raw_data'>raw_data</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='id identifier rubyid_raw_data'>raw_data</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\r\n</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_raw_data'>raw_data</span><span class='period'>.</span><span class='id identifier rubyid_chars'>chars</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\r\n</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valid_tcp_hash-instance_method">
+  
+    #<strong>valid_tcp_hash</strong>(hash)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Validates whether given hash with message contents is valid for TCP Cube
+messaging purposes. It only calls <span class='object_link'><a href="../Handler.html#valid_hash-instance_method" title="MaxCube::Messages::Handler#valid_hash (method)">Handler#valid_hash</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>hash</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input hash.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether hash is valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valid_tcp_hash'>valid_tcp_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_valid_hash'>valid_hash</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valid_tcp_msg-instance_method">
+  
+    #<strong>valid_tcp_msg</strong>(msg)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Validates whether given message is a valid TCP Cube message. It calls
+<span class='object_link'><a href="#valid_tcp_msg_length-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg_length (method)">#valid_tcp_msg_length</a></span>, <span class='object_link'><a href="#valid_tcp_msg_format-instance_method" title="MaxCube::Messages::TCP::Handler#valid_tcp_msg_format (method)">#valid_tcp_msg_format</a></span> and <span class='object_link'><a href="../Handler.html#valid_msg-instance_method" title="MaxCube::Messages::Handler#valid_msg (method)">Handler#valid_msg</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether message is valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52
+53
+54</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valid_tcp_msg'>valid_tcp_msg</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_valid_tcp_msg_length'>valid_tcp_msg_length</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
+    <span class='id identifier rubyid_valid_tcp_msg_format'>valid_tcp_msg_format</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
+    <span class='id identifier rubyid_valid_msg'>valid_msg</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valid_tcp_msg_format-instance_method">
+  
+    #<strong>valid_tcp_msg_format</strong>(msg)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Validates whether message satisfies TCP Cube format (see <span class='object_link'><a href="../TCP.html" title="MaxCube::Messages::TCP (module)">MaxCube::Messages::TCP</a></span>).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether message format is valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valid_tcp_msg_format'>valid_tcp_msg_format</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_msg'>msg</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A[[:alpha:]]:[[:print:]]*\z</span><span class='regexp_end'>/</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valid_tcp_msg_length-instance_method">
+  
+    #<strong>valid_tcp_msg_length</strong>(msg)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Validates whether message satisfies <span class='object_link'><a href="../TCP.html#MSG_MAX_LEN-constant" title="MaxCube::Messages::TCP::MSG_MAX_LEN (constant)">MSG_MAX_LEN</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>input message.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>whether message length is valid.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+14
+15
+16</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/handler.rb', line 14</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valid_tcp_msg_length'>valid_tcp_msg_length</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_msg'>msg</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='period'>.</span><span class='id identifier rubyid_between?'>between?</span><span class='lparen'>(</span><span class='int'>2</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="../TCP.html#MSG_MAX_LEN-constant" title="MaxCube::Messages::TCP::MSG_MAX_LEN (constant)">MSG_MAX_LEN</a></span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Feb 15 23:56:13 2018 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.5.0).
+</div>
+
+    </div>
+  </body>
+</html>

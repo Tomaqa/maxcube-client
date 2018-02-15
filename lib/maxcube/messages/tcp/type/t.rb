@@ -3,15 +3,16 @@ module MaxCube
   module Messages
     module TCP
       class Serializer
+        # Command to delete one or more devices from the Cube.
+        # Acknowledgement (A) follows.
         module MessageT
           private
 
-          # +count+ argument would cause ambuigity if it was optional
-          #   due to +rf_addresses+ has variable size
+          # Mandatory hash keys.
+          # +count+ key would cause ambuigity if it was optional
+          # due to +rf_addresses+ has variable size.
           KEYS = %i[count force rf_addresses].freeze
 
-          # Command to delete one or more devices from the Cube
-          # Acknowledgement (A) follows
           def serialize_tcp_t(hash)
             force = to_bool('force mode', hash[:force]) ? '1' : '0'
             rf_addresses = to_ints(0, 'RF addresses', *hash[:rf_addresses])

@@ -3,11 +3,13 @@ module MaxCube
   module Messages
     module TCP
       class Parser
+        # Hello message
         module MessageH
           private
 
           LENGTHS = [10, 6, 4, 8, 8, 2, 2, 6, 4, 2, 4].freeze
 
+          # Mandatory hash keys.
           KEYS = %i[
             serial_number
             rf_address
@@ -21,7 +23,6 @@ module MaxCube
             ntp_counter
           ].freeze
 
-          # Hello message
           def parse_tcp_h(body)
             values = body.split(',')
             check_msg_part_lengths(LENGTHS, *values)
@@ -55,7 +56,7 @@ module MaxCube
             hours = time[0..1].to_i(16)
             minutes = time[2..3].to_i(16)
 
-            values[7] = DateTime.new(year, month, day, hours, minutes)
+            values[7] = Time.new(year, month, day, hours, minutes)
             values.delete_at(8)
           rescue ArgumentError
             raise InvalidMessageBody

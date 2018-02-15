@@ -3,9 +3,11 @@ module MaxCube
   module Messages
     module UDP
       class Parser
+        # Get URL information message.
         module MessageH
           private
 
+          # Mandatory keys.
           KEYS = (Parser::KEYS + %i[port url path]).freeze
 
           def parse_udp_h(_body)

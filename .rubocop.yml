@@ -27,6 +27,3 @@ Style/DoubleNegation:
 
 Style/RaiseArgs:
   EnforcedStyle: compact
-
-Documentation:
-  Enabled: false

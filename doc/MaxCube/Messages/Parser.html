@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: MaxCube::Messages::Parser
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "MaxCube::Messages::Parser";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../MaxCube.html" title="MaxCube (module)">MaxCube</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Messages.html" title="MaxCube::Messages (module)">Messages</a></span></span>
+     &raquo; 
+    <span class="title">Parser</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: MaxCube::Messages::Parser
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Handler.html" title="MaxCube::Messages::Handler (module)">Handler</a></span></dd>
+  </dl>
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="TCP/Parser.html" title="MaxCube::Messages::TCP::Parser (class)">TCP::Parser</a></span>, <span class='object_link'><a href="UDP/Parser.html" title="MaxCube::Messages::UDP::Parser (class)">UDP::Parser</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/maxcube/messages/parser.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>This module provides methods connected to message parsing only (i.e.
+direction Cube -&gt; client).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+  <h2>Constant Summary</h2>
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="Handler.html" title="MaxCube::Messages::Handler (module)">Handler</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Handler.html#PACK_FORMAT-constant" title="MaxCube::Messages::Handler::PACK_FORMAT (constant)">Handler::PACK_FORMAT</a></span></p>
+
+  
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="../Messages.html" title="MaxCube::Messages (module)">MaxCube::Messages</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Messages.html#DAYS_OF_WEEK-constant" title="MaxCube::Messages::DAYS_OF_WEEK (constant)">DAYS_OF_WEEK</a></span>, <span class='object_link'><a href="../Messages.html#DEVICE_MODE-constant" title="MaxCube::Messages::DEVICE_MODE (constant)">DEVICE_MODE</a></span>, <span class='object_link'><a href="../Messages.html#DEVICE_TYPE-constant" title="MaxCube::Messages::DEVICE_TYPE (constant)">DEVICE_TYPE</a></span></p>
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parse_msg_body-instance_method" title="#parse_msg_body (instance method)">#<strong>parse_msg_body</strong>(body, hash, parser_type)  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Parses message body, i.e.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#read-instance_method" title="#read (instance method)">#<strong>read</strong>(count = 0, unpack = false)  &#x21d2; String, Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>This method should be used each time any <code>IO</code> is read, which is
+very useful for parsing purposes.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Handler.html" title="MaxCube::Messages::Handler (module)">Handler</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Handler.html#check_data_type-instance_method" title="MaxCube::Messages::Handler#check_data_type (method)">#check_data_type</a></span>, <span class='object_link'><a href="Handler.html#check_hash-instance_method" title="MaxCube::Messages::Handler#check_hash (method)">#check_hash</a></span>, <span class='object_link'><a href="Handler.html#check_hash_keys-instance_method" title="MaxCube::Messages::Handler#check_hash_keys (method)">#check_hash_keys</a></span>, <span class='object_link'><a href="Handler.html#check_hash_msg_type-instance_method" title="MaxCube::Messages::Handler#check_hash_msg_type (method)">#check_hash_msg_type</a></span>, <span class='object_link'><a href="Handler.html#check_hash_values-instance_method" title="MaxCube::Messages::Handler#check_hash_values (method)">#check_hash_values</a></span>, <span class='object_link'><a href="Handler.html#check_msg-instance_method" title="MaxCube::Messages::Handler#check_msg (method)">#check_msg</a></span>, <span class='object_link'><a href="Handler.html#check_msg_msg_type-instance_method" title="MaxCube::Messages::Handler#check_msg_msg_type (method)">#check_msg_msg_type</a></span>, <span class='object_link'><a href="Handler.html#check_msg_part_lengths-instance_method" title="MaxCube::Messages::Handler#check_msg_part_lengths (method)">#check_msg_part_lengths</a></span>, <span class='object_link'><a href="Handler.html#check_msg_type-instance_method" title="MaxCube::Messages::Handler#check_msg_type (method)">#check_msg_type</a></span>, <span class='object_link'><a href="Handler.html#decode-instance_method" title="MaxCube::Messages::Handler#decode (method)">#decode</a></span>, <span class='object_link'><a href="Handler.html#encode-instance_method" title="MaxCube::Messages::Handler#encode (method)">#encode</a></span>, <span class='object_link'><a href="Handler.html#maybe_check_valid_hash_keys-instance_method" title="MaxCube::Messages::Handler#maybe_check_valid_hash_keys (method)">#maybe_check_valid_hash_keys</a></span>, <span class='object_link'><a href="Handler.html#maybe_check_valid_msg_type-instance_method" title="MaxCube::Messages::Handler#maybe_check_valid_msg_type (method)">#maybe_check_valid_msg_type</a></span>, <span class='object_link'><a href="Handler.html#msg_type_hash_keys-instance_method" title="MaxCube::Messages::Handler#msg_type_hash_keys (method)">#msg_type_hash_keys</a></span>, <span class='object_link'><a href="Handler.html#msg_type_hash_opt_keys-instance_method" title="MaxCube::Messages::Handler#msg_type_hash_opt_keys (method)">#msg_type_hash_opt_keys</a></span>, <span class='object_link'><a href="Handler.html#msg_type_which_hash_keys-instance_method" title="MaxCube::Messages::Handler#msg_type_which_hash_keys (method)">#msg_type_which_hash_keys</a></span>, <span class='object_link'><a href="Handler.html#msg_types-instance_method" title="MaxCube::Messages::Handler#msg_types (method)">#msg_types</a></span>, <span class='object_link'><a href="Handler.html#valid_data_type-instance_method" title="MaxCube::Messages::Handler#valid_data_type (method)">#valid_data_type</a></span>, <span class='object_link'><a href="Handler.html#valid_hash-instance_method" title="MaxCube::Messages::Handler#valid_hash (method)">#valid_hash</a></span>, <span class='object_link'><a href="Handler.html#valid_hash_keys-instance_method" title="MaxCube::Messages::Handler#valid_hash_keys (method)">#valid_hash_keys</a></span>, <span class='object_link'><a href="Handler.html#valid_hash_msg_type-instance_method" title="MaxCube::Messages::Handler#valid_hash_msg_type (method)">#valid_hash_msg_type</a></span>, <span class='object_link'><a href="Handler.html#valid_hash_values-instance_method" title="MaxCube::Messages::Handler#valid_hash_values (method)">#valid_hash_values</a></span>, <span class='object_link'><a href="Handler.html#valid_msg-instance_method" title="MaxCube::Messages::Handler#valid_msg (method)">#valid_msg</a></span>, <span class='object_link'><a href="Handler.html#valid_msg_msg_type-instance_method" title="MaxCube::Messages::Handler#valid_msg_msg_type (method)">#valid_msg_msg_type</a></span>, <span class='object_link'><a href="Handler.html#valid_msg_part_lengths-instance_method" title="MaxCube::Messages::Handler#valid_msg_part_lengths (method)">#valid_msg_part_lengths</a></span>, <span class='object_link'><a href="Handler.html#valid_msg_type-instance_method" title="MaxCube::Messages::Handler#valid_msg_type (method)">#valid_msg_type</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Messages.html" title="MaxCube::Messages (module)">MaxCube::Messages</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Messages.html#ary_elem-instance_method" title="MaxCube::Messages#ary_elem (method)">#ary_elem</a></span>, <span class='object_link'><a href="../Messages.html#ary_elem_id-instance_method" title="MaxCube::Messages#ary_elem_id (method)">#ary_elem_id</a></span>, <span class='object_link'><a href="../Messages.html#conv_args-instance_method" title="MaxCube::Messages#conv_args (method)">#conv_args</a></span>, <span class='object_link'><a href="../Messages.html#day_of_week-instance_method" title="MaxCube::Messages#day_of_week (method)">#day_of_week</a></span>, <span class='object_link'><a href="../Messages.html#day_of_week_id-instance_method" title="MaxCube::Messages#day_of_week_id (method)">#day_of_week_id</a></span>, <span class='object_link'><a href="../Messages.html#device_mode-instance_method" title="MaxCube::Messages#device_mode (method)">#device_mode</a></span>, <span class='object_link'><a href="../Messages.html#device_mode_id-instance_method" title="MaxCube::Messages#device_mode_id (method)">#device_mode_id</a></span>, <span class='object_link'><a href="../Messages.html#device_type-instance_method" title="MaxCube::Messages#device_type (method)">#device_type</a></span>, <span class='object_link'><a href="../Messages.html#device_type_id-instance_method" title="MaxCube::Messages#device_type_id (method)">#device_type_id</a></span>, <span class='object_link'><a href="../Messages.html#to_bool-instance_method" title="MaxCube::Messages#to_bool (method)">#to_bool</a></span>, <span class='object_link'><a href="../Messages.html#to_bools-instance_method" title="MaxCube::Messages#to_bools (method)">#to_bools</a></span>, <span class='object_link'><a href="../Messages.html#to_datetime-instance_method" title="MaxCube::Messages#to_datetime (method)">#to_datetime</a></span>, <span class='object_link'><a href="../Messages.html#to_datetimes-instance_method" title="MaxCube::Messages#to_datetimes (method)">#to_datetimes</a></span>, <span class='object_link'><a href="../Messages.html#to_float-instance_method" title="MaxCube::Messages#to_float (method)">#to_float</a></span>, <span class='object_link'><a href="../Messages.html#to_floats-instance_method" title="MaxCube::Messages#to_floats (method)">#to_floats</a></span>, <span class='object_link'><a href="../Messages.html#to_int-instance_method" title="MaxCube::Messages#to_int (method)">#to_int</a></span>, <span class='object_link'><a href="../Messages.html#to_ints-instance_method" title="MaxCube::Messages#to_ints (method)">#to_ints</a></span></p>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="parse_msg_body-instance_method">
+  
+    #<strong>parse_msg_body</strong>(body, hash, parser_type)  &#x21d2; <tt>Hash</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Parses message body, i.e. at least message type is already decoded. It
+dynamically calls method corresponding to message and parser type. If
+message type is not implemented yet, read data is stored as is. It
+transforms unhandled <code>IOError</code> exceptions (probably raised from
+<span class='object_link'><a href="#read-instance_method" title="MaxCube::Messages::Parser#read (method)">#read</a></span>) to <span class='object_link'><a href="InvalidMessageBody.html" title="MaxCube::Messages::InvalidMessageBody (class)">InvalidMessageBody</a></span>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>body</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>message body to be parsed.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>hash</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>hash to store parsed data into. It should already contain contents of
+message head. Hash will be modified.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>parser_type</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>parser type contained in method identifiers.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>resulting hash, or <code>nil</code> in case the message type is not
+implemented yet.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="InvalidMessageBody.html" title="MaxCube::Messages::InvalidMessageBody (class)">InvalidMessageBody</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if <code>IOError</code> catched.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/parser.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_parse_msg_body'>parse_msg_body</span><span class='lparen'>(</span><span class='id identifier rubyid_body'>body</span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='comma'>,</span> <span class='id identifier rubyid_parser_type'>parser_type</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_method_str'>method_str</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>parse_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_parser_type'>parser_type</span><span class='embexpr_end'>}</span><span class='tstring_content'>_</span><span class='embexpr_beg'>#{</span><span class='ivar'>@msg_type</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_str'>method_str</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_hash'>hash</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_method_str'>method_str</span><span class='comma'>,</span> <span class='id identifier rubyid_body'>body</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:data</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_body'>body</span>
+  <span class='kw'>nil</span>
+<span class='kw'>rescue</span> <span class='const'>IOError</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="InvalidMessageBody.html" title="MaxCube::Messages::InvalidMessageBody (class)">InvalidMessageBody</a></span></span>
+    <span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@msg_type</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unexpected EOF reached</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="read-instance_method">
+  
+    #<strong>read</strong>(count = 0, unpack = false)  &#x21d2; <tt>String</tt>, <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>This method should be used each time any <code>IO</code> is read, which is
+very useful for parsing purposes. It contains optional implicit conversion
+of binary string data of certain length into integers (using <span class='object_link'><a href="Handler.html#PACK_FORMAT-constant" title="MaxCube::Messages::Handler::PACK_FORMAT (constant)">Handler::PACK_FORMAT</a></span>)
+or into any other explicit format that String#unpack understands. In
+addition, it checks whether the read operation succeeded and raises an
+exception if not (this is useful when parsing a message of a specified
+format).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>count</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>0</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>number of bytes to read. 0 causes to read until EOF.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>unpack</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>, <tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if <code>true</code> it does implicit conversion to integer; if String, the
+format is passed to String#unpack as is.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>read data; its type depends on <code>unpack</code>.</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>IOError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if reading failed (incl. that nothing was read).</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/parser.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_count'>count</span> <span class='op'>=</span> <span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_unpack'>unpack</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_count'>count</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span>
+          <span class='ivar'>@io</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span>
+        <span class='kw'>else</span>
+          <span class='id identifier rubyid_raise'>raise</span> <span class='const'>IOError</span> <span class='kw'>if</span> <span class='ivar'>@io</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>-</span> <span class='ivar'>@io</span><span class='period'>.</span><span class='id identifier rubyid_pos'>pos</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_count'>count</span>
+          <span class='ivar'>@io</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_count'>count</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_str'>str</span> <span class='kw'>unless</span> <span class='id identifier rubyid_unpack'>unpack</span>
+  <span class='id identifier rubyid_str'>str</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\x00</span><span class='tstring_end'>&quot;</span></span><span class='period'>.</span><span class='id identifier rubyid_b'>b</span> <span class='op'>+</span> <span class='id identifier rubyid_str'>str</span> <span class='kw'>if</span> <span class='id identifier rubyid_count'>count</span> <span class='op'>==</span> <span class='int'>3</span>
+  <span class='id identifier rubyid_unpack'>unpack</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Handler.html#PACK_FORMAT-constant" title="MaxCube::Messages::Handler::PACK_FORMAT (constant)">PACK_FORMAT</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_count'>count</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_unpack'>unpack</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>String</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_str'>str</span><span class='period'>.</span><span class='id identifier rubyid_unpack1'>unpack1</span><span class='lparen'>(</span><span class='id identifier rubyid_unpack'>unpack</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Feb 15 23:56:13 2018 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.5.0).
+</div>
+
+    </div>
+  </body>
+</html>

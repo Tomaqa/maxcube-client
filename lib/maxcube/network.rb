@@ -1,5 +1,4 @@
 require 'socket'
-require 'thread'
 
 require 'yaml'
 

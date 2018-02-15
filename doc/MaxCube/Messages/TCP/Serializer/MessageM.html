@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: MaxCube::Messages::TCP::Serializer::MessageM
+  
+    &mdash; Documentation by YARD 0.9.12
+  
+</title>
+
+  <link rel="stylesheet" href="../../../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "MaxCube::Messages::TCP::Serializer::MessageM";
+  relpath = '../../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../../_index.html">Index (M)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../../MaxCube.html" title="MaxCube (module)">MaxCube</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../../Messages.html" title="MaxCube::Messages (module)">Messages</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../TCP.html" title="MaxCube::Messages::TCP (module)">TCP</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Serializer.html" title="MaxCube::Messages::TCP::Serializer (class)">Serializer</a></span></span>
+     &raquo; 
+    <span class="title">MessageM</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: MaxCube::Messages::TCP::Serializer::MessageM
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/maxcube/messages/tcp/type/m.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Serializes metadata for Cube. Message body has the same format as response
+(M) -&gt; reverse operations. Cube does not check data format, so things
+could break if invalid data is sent.</p>
+
+<p>! I couldn&#39;t verify the assumption that bodies should be the same.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  <h2>Constant Summary</h2>
+  <dl class="constants">
+    
+      <dt id="KEYS-constant" class="">KEYS =
+        <div class="docstring">
+  <div class="discussion">
+    
+<p>Mandatory hash keys.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+      </dt>
+      <dd><pre class="code"><span class='qsymbols_beg'>%i[</span><span class='tstring_content'>rooms_count</span><span class='words_sep'> </span><span class='tstring_content'>rooms</span><span class='words_sep'> </span><span class='tstring_content'>devices_count</span><span class='words_sep'> </span><span class='tstring_content'>devices</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+    
+      <dt id="OPT_KEYS-constant" class="">OPT_KEYS =
+        <div class="docstring">
+  <div class="discussion">
+    
+<p>Optional hash keys.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+      </dt>
+      <dd><pre class="code"><span class='qsymbols_beg'>%i[</span><span class='tstring_content'>index</span><span class='words_sep'> </span><span class='tstring_content'>unknown1</span><span class='words_sep'> </span><span class='tstring_content'>unknown2</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+    
+  </dl>
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="private ">
+  <span class="summary_signature">
+    
+      <a href="#serialize_tcp_m-instance_method" title="#serialize_tcp_m (instance method)">#<strong>serialize_tcp_m</strong>(hash)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  <span class="note title private">private</span>
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="private ">
+  <span class="summary_signature">
+    
+      <a href="#serialize_tcp_m_devices-instance_method" title="#serialize_tcp_m_devices (instance method)">#<strong>serialize_tcp_m_devices</strong>(hash)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  <span class="note title private">private</span>
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="private ">
+  <span class="summary_signature">
+    
+      <a href="#serialize_tcp_m_rooms-instance_method" title="#serialize_tcp_m_rooms (instance method)">#<strong>serialize_tcp_m_rooms</strong>(hash)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  <span class="note title private">private</span>
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="serialize_tcp_m-instance_method">
+  
+    #<strong>serialize_tcp_m</strong>(hash)  &#x21d2; <tt>Object</tt>  <span class="extras">(private)</span>
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/type/m.rb', line 123</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_serialize_tcp_m'>serialize_tcp_m</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_index'>index</span> <span class='op'>=</span> <span class='id identifier rubyid_hash'>hash</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:index</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_to_int'>to_int</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>index</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_head'>head</span> <span class='op'>=</span> <span class='id identifier rubyid_format'>format</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%02x,</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
+
+  <span class='ivar'>@io</span> <span class='op'>=</span> <span class='const'>StringIO</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>wb</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:unknown1</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:unknown1</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\x00\x00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_serialize_tcp_m_rooms'>serialize_tcp_m_rooms</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_serialize_tcp_m_devices'>serialize_tcp_m_devices</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:unknown2</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:unknown2</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\x00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_head'>head</span><span class='period'>.</span><span class='id identifier rubyid_b'>b</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_encode'>encode</span><span class='lparen'>(</span><span class='ivar'>@io</span><span class='period'>.</span><span class='id identifier rubyid_string'>string</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="serialize_tcp_m_devices-instance_method">
+  
+    #<strong>serialize_tcp_m_devices</strong>(hash)  &#x21d2; <tt>Object</tt>  <span class="extras">(private)</span>
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/type/m.rb', line 161</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_serialize_tcp_m_devices'>serialize_tcp_m_devices</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_to_int'>to_int</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>devices count</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:devices_count</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>esize:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:devices</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_device'>device</span><span class='op'>|</span>
+    <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_device'>device</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_device'>device</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:name_length</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_name_length'>name_length</span> <span class='op'>=</span> <span class='id identifier rubyid_to_int'>to_int</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>name length</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_device'>device</span><span class='lbracket'>[</span><span class='symbol'>:name_length</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+      <span class='kw'>unless</span> <span class='id identifier rubyid_name_length'>name_length</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../InvalidMessageBody.html" title="MaxCube::Messages::InvalidMessageBody (class)">InvalidMessageBody</a></span></span>
+          <span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@msg_type</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>device name length and length of name</span><span class='tstring_end'>&#39;</span></span> \
+               <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> mismatch: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name_length'>name_length</span><span class='embexpr_end'>}</span><span class='tstring_content'> != </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_name_length'>name_length</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_rf_address'>rf_address</span><span class='comma'>,</span> <span class='id identifier rubyid_room_id'>room_id</span> <span class='op'>=</span>
+      <span class='id identifier rubyid_to_ints'>to_ints</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>device RF address, room ID</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+              <span class='id identifier rubyid_device'>device</span><span class='lbracket'>[</span><span class='symbol'>:rf_address</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_device'>device</span><span class='lbracket'>[</span><span class='symbol'>:room_id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_serialize'>serialize</span><span class='lparen'>(</span><span class='id identifier rubyid_device_type_id'>device_type_id</span><span class='lparen'>(</span><span class='id identifier rubyid_device'>device</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>esize:</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='op'>&lt;&lt;</span>
+          <span class='id identifier rubyid_serialize'>serialize</span><span class='lparen'>(</span><span class='id identifier rubyid_rf_address'>rf_address</span><span class='comma'>,</span> <span class='label'>esize:</span> <span class='int'>3</span><span class='rparen'>)</span> <span class='op'>&lt;&lt;</span>
+          <span class='id identifier rubyid_serialize'>serialize</span><span class='lparen'>(</span><span class='id identifier rubyid_device'>device</span><span class='lbracket'>[</span><span class='symbol'>:serial_number</span><span class='rbracket'>]</span><span class='comma'>,</span>
+                    <span class='id identifier rubyid_name_length'>name_length</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_room_id'>room_id</span><span class='comma'>,</span> <span class='label'>esize:</span> <span class='int'>1</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="serialize_tcp_m_rooms-instance_method">
+  
+    #<strong>serialize_tcp_m_rooms</strong>(hash)  &#x21d2; <tt>Object</tt>  <span class="extras">(private)</span>
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages/tcp/type/m.rb', line 139</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_serialize_tcp_m_rooms'>serialize_tcp_m_rooms</span><span class='lparen'>(</span><span class='id identifier rubyid_hash'>hash</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_to_int'>to_int</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>rooms count</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:rooms_count</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>esize:</span> <span class='int'>1</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_hash'>hash</span><span class='lbracket'>[</span><span class='symbol'>:rooms</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_room'>room</span><span class='op'>|</span>
+    <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_room'>room</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_room'>room</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='symbol'>:name_length</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_name_length'>name_length</span> <span class='op'>=</span> <span class='id identifier rubyid_to_int'>to_int</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>name length</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_room'>room</span><span class='lbracket'>[</span><span class='symbol'>:name_length</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+      <span class='kw'>unless</span> <span class='id identifier rubyid_name_length'>name_length</span> <span class='op'>==</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../InvalidMessageBody.html" title="MaxCube::Messages::InvalidMessageBody (class)">InvalidMessageBody</a></span></span>
+          <span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='ivar'>@msg_type</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>room name length and length of name</span><span class='tstring_end'>&#39;</span></span> \
+               <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> mismatch: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name_length'>name_length</span><span class='embexpr_end'>}</span><span class='tstring_content'> != </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_name_length'>name_length</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_rf_address'>rf_address</span> <span class='op'>=</span> <span class='id identifier rubyid_to_ints'>to_ints</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>room id, RF address</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+                             <span class='id identifier rubyid_room'>room</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_room'>room</span><span class='lbracket'>[</span><span class='symbol'>:rf_address</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_serialize'>serialize</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_name_length'>name_length</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>esize:</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='op'>&lt;&lt;</span>
+          <span class='id identifier rubyid_serialize'>serialize</span><span class='lparen'>(</span><span class='id identifier rubyid_rf_address'>rf_address</span><span class='comma'>,</span> <span class='label'>esize:</span> <span class='int'>3</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Thu Feb 15 23:56:13 2018 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.12 (ruby-2.5.0).
+</div>
+
+    </div>
+  </body>
+</html>

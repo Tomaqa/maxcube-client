@@ -1,5 +1,11 @@
 # eQ3/ELV Max! Cube TCP client
 
+## Download
+
+Ruby [gem](https://rubygems.org/maxcube-client)
+
+[GitHub](https://github.com/Tomaqa/maxcube-client) repository
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -18,10 +24,11 @@ Or install it yourself as:
 
 ## Usage
 
-Run `bin/maxcube-client help` and follow instructions. This script starts either TCP or UDP client. UDP client is used only for device discovering purposes yet.
+Run `bin/maxcube-client help` and follow instructions. This script starts either TCP or UDP client. UDP client is used only for device discovery purposes yet.
+
 You can also run `bin/console`, if you want to to handle objects yourself.
 
-Yet there are sample servers: `bin/sample_server` (TCP) and `bin/sample_socket` (UDP), but only with very basic functions. However, they can be used to try simple connection with client.
+Yet there are sample servers: `bin/sample_server` (TCP) and `bin/sample_socket` (UDP), but only with very basic features. However, they can be used to try simple connection with client.
 
 ## Development
 

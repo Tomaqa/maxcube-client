@@ -3,15 +3,16 @@ module MaxCube
   module Messages
     module TCP
       class Parser
+        # Metadata message.
         module MessageM
           private
 
           LENGTHS = [2, 2].freeze
 
+          # Mandatory hash keys.
           KEYS = %i[index count unknown1 unknown2
                     rooms_count rooms devices_count devices].freeze
 
-          # Metadata message
           def parse_tcp_m(body)
             index, count, enc_data = parse_tcp_m_split(body)
 
@@ -104,18 +105,21 @@ module MaxCube
       end
 
       class Serializer
+        # Serializes metadata for Cube.
+        # Message body has the same format as response (M)
+        # -> reverse operations.
+        # Cube does not check data format,
+        # so things could break if invalid data is sent.
+        #
+        # ! I couldn't verify the assumption that bodies should be the same.
         module MessageM
           private
 
+          # Mandatory hash keys.
           KEYS = %i[rooms_count rooms devices_count devices].freeze
+          # Optional hash keys.
           OPT_KEYS = %i[index unknown1 unknown2].freeze
 
-          # Serialize metadata for Cube
-          # Message body has the same format as response (M)
-          # -> reverse operations
-          # ! I couldn't verify the assumption that bodies should be the same
-          # ! Cube does not check data format,
-          #   so things could break if invalid data is sent
           def serialize_tcp_m(hash)
             index = hash.key?(:index) ? to_int(0, 'index', hash[:index]) : 0
             head = format('%02x,', index)

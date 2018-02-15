@@ -3,14 +3,15 @@ module MaxCube
   module Messages
     module TCP
       class Parser
+        # Device list message.
         module MessageL
           private
 
           LENGTHS = [6, 11, 12].freeze
 
+          # Mandatory hash keys.
           KEYS = %i[devices].freeze
 
-          # Device list message
           def parse_tcp_l(body)
             @io = StringIO.new(decode(body), 'rb')
 
@@ -22,7 +23,7 @@ module MaxCube
               parse_tcp_l_submsg_3(subhash, temperature_msb) if @length > 11
 
               hash[:devices] << subhash
-            end # until
+            end
 
             hash
           end
@@ -82,11 +83,11 @@ module MaxCube
             # Sometimes when device is in 'auto' mode,
             # this field can contain 'actual_temperature' instead
             # (but never if it is already contained in next byte)
-            # !It seems that 'datetime' is used for 'vacation' mode,
+            # !It seems that 'date' is used for 'vacation' mode,
             # but it is not sure ...
             begin
-              subhash[:datetime_until] = DateTime.new(year, month, day,
-                                                      hours, minutes)
+              subhash[:datetime_until] = Time.new(year, month, day,
+                                                  hours, minutes)
             rescue ArgumentError
               if @mode != :auto || @length > 11
                 raise InvalidMessageBody
@@ -116,11 +117,11 @@ module MaxCube
       end
 
       class Serializer
+        # Command to resend device list (L).
+        # Does not contain any data.
         module MessageL
           private
 
-          # Command to resend device list (L)
-          # Does not contain any data
           def serialize_tcp_l(_hash)
             ''
           end

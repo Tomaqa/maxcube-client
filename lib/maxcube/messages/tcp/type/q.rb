@@ -3,11 +3,11 @@ module MaxCube
   module Messages
     module TCP
       class Serializer
+        # Quit message - terminates connection.
+        # Does not contain any data.
         module MessageQ
           private
 
-          # Quit message - terminates connection
-          # Does not contain any data
           def serialize_tcp_q(_hash)
             ''
           end

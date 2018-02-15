@@ -3,11 +3,14 @@ module MaxCube
   module Messages
     module TCP
       class Parser
+        # Configuration message.
         module MessageC
           private
 
+          # Mandatory hash keys.
           KEYS = %i[length address rf_address device_type
                     test_result serial_number].freeze
+          # Optional hash keys.
           OPT_KEYS = %i[
             firmware_version _firmware_version room_id
 
@@ -25,7 +28,6 @@ module MaxCube
 
           LENGTHS = [6].freeze
 
-          # Configuration message
           def parse_tcp_c(body)
             addr, enc_data = parse_tcp_c_split(body)
 
@@ -233,11 +235,11 @@ module MaxCube
       end
 
       class Serializer
+        # Request for configuration message (C).
+        # Does not contain any data.
         module MessageC
           private
 
-          # Request for configuration message (C)
-          # Does not contain any data
           def serialize_tcp_c(_hash)
             ''
           end

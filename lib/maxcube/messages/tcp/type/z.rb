@@ -3,14 +3,16 @@ module MaxCube
   module Messages
     module TCP
       class Serializer
+        # Wakeup command.
+        # Acknowledgement (A) follows.
         module MessageZ
           private
 
+          # Mandatory hash keys.
           KEYS = %i[time scope].freeze
+          # Optional hash keys.
           OPT_KEYS = %i[id].freeze
 
-          # Wakeup command
-          # Acknowledgement (A) follows
           def serialize_tcp_z(hash)
             time = format('%02x', to_int(0, 'time', hash[:time]))
             scope = hash[:scope].to_sym

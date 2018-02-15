@@ -3,18 +3,19 @@ module MaxCube
   module Messages
     module TCP
       class Parser
+        # Response to send command message.
         module MessageS
           private
 
           LENGTHS = [2, 1, 2].freeze
 
+          # Mandatory hash keys.
           KEYS = %i[
             duty_cycle
             command_processed
             free_memory_slots
           ].freeze
 
-          # Send command message (response)
           def parse_tcp_s(body)
             values = body.split(',')
             check_msg_part_lengths(LENGTHS, *values)
@@ -27,10 +28,13 @@ module MaxCube
       end
 
       class Serializer
+        # Message to send command to Cube.
         module MessageS
           private
 
+          # Mandatory hash keys.
           KEYS = %i[command].freeze
+          # Optional hash keys.
           OPT_KEYS = %i[
             unknown
             rf_flags
@@ -76,7 +80,6 @@ module MaxCube
             display_temperature: 0x0,
           }.freeze
 
-          # Message to send command to Cube
           def serialize_tcp_s(hash)
             @io = StringIO.new('', 'wb')
 

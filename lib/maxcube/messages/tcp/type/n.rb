@@ -3,12 +3,13 @@ module MaxCube
   module Messages
     module TCP
       class Parser
+        # New device (pairing) message.
         module MessageN
           private
 
+          # Mandatory hash keys.
           KEYS = %i[device_type rf_address serial_number unknown].freeze
 
-          # New device (pairing) message
           def parse_tcp_n(body)
             @io = StringIO.new(decode(body), 'rb')
 
@@ -26,13 +27,14 @@ module MaxCube
       end
 
       class Serializer
+        # Command to set the Cube into pairing mode
+        # with optional +timeout+ in seconds.
         module MessageN
           private
 
+          # Optional hash keys.
           OPT_KEYS = %i[timeout].freeze
 
-          # Command to set the Cube into pairing mode
-          # with optional +timeout+ in seconds
           def serialize_tcp_n(hash)
             return '' unless hash.key?(:timeout)
             format('%04x', to_int(0, 'timeout', hash[:timeout]))
