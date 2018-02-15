@@ -18,7 +18,10 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Run `bin/maxcube-client help` and follow instructions. This script starts either TCP or UDP client. UDP client is used only for device discovering purposes yet.
+You can also run `bin/console`, if you want to to handle objects yourself.
+
+Yet there are sample servers: `bin/sample_server` (TCP) and `bin/sample_socket` (UDP), but only with very basic functions. However, they can be used to try simple connection with client.
 
 ## Development
 

@@ -1,10 +1,9 @@
 require 'socket'
 require 'thread'
-require 'ipaddr'
-require 'pathname'
 
-require 'pp'
 require 'yaml'
+
+require 'maxcube'
 
 module MaxCube
   module Network

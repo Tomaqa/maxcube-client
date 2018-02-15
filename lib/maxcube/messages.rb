@@ -1,5 +1,4 @@
-require 'date'
-require 'ipaddr'
+require 'maxcube'
 
 module MaxCube
   module Messages

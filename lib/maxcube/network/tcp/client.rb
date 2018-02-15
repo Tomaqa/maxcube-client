@@ -18,7 +18,7 @@ module MaxCube
           @hash = nil
           @hash_set = false
 
-          @data_dir = Pathname.new('../data')
+          @data_dir = Pathname.new(MaxCube.data_dir)
           @load_data_dir = @data_dir + 'load'
           @save_data_dir = @data_dir + 'save'
 

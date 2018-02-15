@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["tomaqa@gmail.com"]
 
   spec.summary       = %q{Terminal client for eQ3/ELV MAX! Cube devices written in Ruby.}
-  spec.homepage      = "https://github.com/Tomaqa/ruby-maxcube-client"
+  spec.homepage      = "https://github.com/Tomaqa/maxcube-client"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
