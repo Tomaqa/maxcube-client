@@ -1,5 +1,9 @@
 # eQ3/ELV Max! Cube TCP client
 
+## Announcement
+
+This software still has not been tested against real Cube gateway, simply because the developer does not have one. Owners of these devices are welcome to use this software, and asked to report discovered bugs to GitHub.
+
 ## Download
 
 Ruby [gem](https://rubygems.org/gems/maxcube-client)
