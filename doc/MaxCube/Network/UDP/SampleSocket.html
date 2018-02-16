@@ -99,7 +99,18 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Simple UDP &#39;server&#39; for Cube protocol testing purposes.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -326,17 +337,17 @@
       <pre class="lines">
 
 
-7
 8
 9
 10
 11
 12
 13
-14</pre>
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 7</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 8</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_port'>port</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../UDP.html#PORT-constant" title="MaxCube::Network::UDP::PORT (constant)">PORT</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@port</span> <span class='op'>=</span> <span class='id identifier rubyid_port'>port</span>
@@ -373,13 +384,13 @@
       <pre class="lines">
 
 
-58
 59
 60
-61</pre>
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 59</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_close'>close</span>
   <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\nClosing socket ...</span><span class='tstring_end'>&quot;</span></span>
@@ -405,17 +416,17 @@
       <pre class="lines">
 
 
-35
 36
 37
 38
 39
 40
 41
-42</pre>
+42
+43</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 36</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cmd'>cmd</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='id identifier rubyid_addr'>addr</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='ivar'>@serializer</span><span class='period'>.</span><span class='id identifier rubyid_check_msg_msg_type'>check_msg_msg_type</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
@@ -445,12 +456,12 @@
       <pre class="lines">
 
 
-54
 55
-56</pre>
+56
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_h'>msg_h</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>eQ3MaxApKEQ0565026&gt;h\x00Pmax.eq-3.de,/cube</span><span class='tstring_end'>&quot;</span></span>
@@ -475,12 +486,12 @@
       <pre class="lines">
 
 
-44
 45
-46</pre>
+46
+47</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_i'>msg_i</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>eQ3MaxApKEQ0523864&gt;I\x00\x09\x7f\x2c\x01\x13</span><span class='tstring_end'>&quot;</span></span>
@@ -505,14 +516,14 @@
       <pre class="lines">
 
 
-48
 49
 50
 51
-52</pre>
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_n'>msg_n</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>eQ3MaxApKEQ0565026&gt;N</span><span class='tstring_end'>&#39;</span></span> \
@@ -539,7 +550,6 @@
       <pre class="lines">
 
 
-16
 17
 18
 19
@@ -550,10 +560,11 @@
 24
 25
 26
-27</pre>
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 17</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
   <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Starting socket on port </span><span class='embexpr_beg'>#{</span><span class='ivar'>@port</span><span class='embexpr_end'>}</span><span class='tstring_content'> ...\n\n</span><span class='tstring_end'>&quot;</span></span>
@@ -587,12 +598,12 @@
       <pre class="lines">
 
 
-29
 30
-31</pre>
+31
+32</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/udp/sample_socket.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_send_msg'>send_msg</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='id identifier rubyid_addr'>addr</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='rparen'>)</span>
   <span class='ivar'>@socket</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_addr'>addr</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='rparen'>)</span>
@@ -607,7 +618,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Feb 15 23:56:14 2018 by
+  Generated on Fri Feb 16 13:44:02 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.12 (ruby-2.5.0).
 </div>

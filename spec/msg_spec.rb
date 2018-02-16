@@ -4,7 +4,7 @@ require_relative 'spec_helper'
 
 include MaxCube
 
-describe 'MessageParser' do
+describe 'TCP::Parser' do
   subject(:parser) { Messages::TCP::Parser.new }
 
   # Proper message examples:
@@ -1001,7 +1001,7 @@ describe 'MessageParser' do
   end
 end
 
-describe 'MessageSerializer' do
+describe 'TCP::Serializer' do
   subject(:serializer) { Messages::TCP::Serializer.new }
 
   # Proper message examples:

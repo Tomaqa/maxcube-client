@@ -3,6 +3,8 @@ require 'maxcube/network/udp'
 module MaxCube
   module Network
     module UDP
+      # Class that provides yet only basic UDP communication
+      # with Cube devices.
       class Client
         def initialize(port = PORT)
           @socket = UDPSocket.new

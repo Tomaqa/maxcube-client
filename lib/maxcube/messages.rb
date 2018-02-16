@@ -3,7 +3,8 @@ require 'maxcube'
 module MaxCube
   # Encapsulates methods related to Cube messages,
   # i.e. parsing and serializing of TCP/UDP messages.
-  # It does not provide any network features.
+  # It does not provide any network features
+  # (this is responsibility of {Network}.
   module Messages
     # Device modes that determines geating scheduling.
     DEVICE_MODE = %i[auto manual vacation boost].freeze

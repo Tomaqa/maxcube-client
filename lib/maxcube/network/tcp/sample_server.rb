@@ -3,6 +3,7 @@ require 'maxcube/network/tcp'
 module MaxCube
   module Network
     module TCP
+      # Simple TCP server for Cube protocol testing purposes.
       class SampleServer
         def initialize(port = PORT)
           @port = port

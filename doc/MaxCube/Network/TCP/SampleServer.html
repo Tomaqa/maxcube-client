@@ -99,7 +99,18 @@
   
 </div>
 
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Simple TCP server for Cube protocol testing purposes.</p>
 
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
 
 
 
@@ -438,15 +449,15 @@
       <pre class="lines">
 
 
-7
 8
 9
 10
 11
-12</pre>
+12
+13</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 7</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 8</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_port'>port</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../TCP.html#PORT-constant" title="MaxCube::Network::TCP::PORT (constant)">PORT</a></span></span><span class='rparen'>)</span>
   <span class='ivar'>@port</span> <span class='op'>=</span> <span class='id identifier rubyid_port'>port</span>
@@ -481,13 +492,13 @@
       <pre class="lines">
 
 
-89
 90
 91
-92</pre>
+92
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 89</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_close'>close</span>
   <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\nClosing server ...</span><span class='tstring_end'>&quot;</span></span>
@@ -513,15 +524,15 @@
       <pre class="lines">
 
 
-50
 51
 52
 53
 54
-55</pre>
+55
+56</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 50</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cmd'>cmd</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_body'>body</span> <span class='op'>=</span> <span class='id identifier rubyid_msg'>msg</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>:</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -553,12 +564,12 @@
       <pre class="lines">
 
 
-57
 58
-59</pre>
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 58</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_a'>msg_a</span><span class='lparen'>(</span><span class='id identifier rubyid__body'>_body</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>A:</span><span class='tstring_end'>&#39;</span></span>
@@ -583,12 +594,12 @@
       <pre class="lines">
 
 
-64
 65
-66</pre>
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 64</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_c'>msg_c</span><span class='lparen'>(</span><span class='id identifier rubyid__body'>_body</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>C:01b491,EQG0kQUAEg9KRVEwMzA1MjA1</span><span class='tstring_end'>&#39;</span></span>
@@ -613,13 +624,13 @@
       <pre class="lines">
 
 
-80
 81
 82
-83</pre>
+83
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_f'>msg_f</span><span class='lparen'>(</span><span class='id identifier rubyid_body'>body</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='ivar'>@ntp_servers</span> <span class='op'>=</span> <span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>,</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_body'>body</span>
@@ -645,12 +656,12 @@
       <pre class="lines">
 
 
-68
 69
-70</pre>
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_h'>msg_h</span><span class='lparen'>(</span><span class='id identifier rubyid__body'>_body</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>H:KEQ0523864,097f2c,0113,00000000,477719c0,00,32,0d0c09,1404,03,0000</span><span class='tstring_end'>&#39;</span></span>
@@ -675,12 +686,12 @@
       <pre class="lines">
 
 
-72
 73
-74</pre>
+74
+75</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 72</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_l'>msg_l</span><span class='lparen'>(</span><span class='id identifier rubyid__body'>_body</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>L:Cw/a7QkSGBgoAMwACw/DcwkSGBgoAM8ACw/DgAkSGBgoAM4A</span><span class='tstring_end'>&#39;</span></span>
@@ -705,12 +716,12 @@
       <pre class="lines">
 
 
-76
 77
-78</pre>
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 76</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 77</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_n'>msg_n</span><span class='lparen'>(</span><span class='id identifier rubyid__body'>_body</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>N:Aw4VzExFUTAwMTUzNDD/</span><span class='tstring_end'>&#39;</span></span>
@@ -735,12 +746,12 @@
       <pre class="lines">
 
 
-85
 86
-87</pre>
+87
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 85</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_msg_s'>msg_s</span><span class='lparen'>(</span><span class='id identifier rubyid__body'>_body</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>S:00,0,31</span><span class='tstring_end'>&#39;</span></span>
@@ -765,7 +776,6 @@
       <pre class="lines">
 
 
-14
 15
 16
 17
@@ -779,10 +789,11 @@
 25
 26
 27
-28</pre>
+28
+29</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 14</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
   <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Starting server on port </span><span class='embexpr_beg'>#{</span><span class='ivar'>@port</span><span class='embexpr_end'>}</span><span class='tstring_content'> ...\n\n</span><span class='tstring_end'>&quot;</span></span>
@@ -819,7 +830,6 @@
       <pre class="lines">
 
 
-36
 37
 38
 39
@@ -831,10 +841,11 @@
 45
 46
 47
-48</pre>
+48
+49</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run_loop'>run_loop</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_msgs'>msgs</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_gets'>gets</span>
@@ -869,12 +880,12 @@
       <pre class="lines">
 
 
-30
 31
-32</pre>
+32
+33</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/network/tcp/sample_server.rb', line 31</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_send_msg'>send_msg</span><span class='lparen'>(</span><span class='id identifier rubyid_client'>client</span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_puts'>puts</span><span class='lparen'>(</span><span class='id identifier rubyid_msg'>msg</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\r\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -889,7 +900,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Feb 15 23:56:14 2018 by
+  Generated on Fri Feb 16 13:44:02 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.12 (ruby-2.5.0).
 </div>

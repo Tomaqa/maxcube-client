@@ -2,7 +2,7 @@
 
 ## Download
 
-Ruby [gem](https://rubygems.org/maxcube-client)
+Ruby [gem](https://rubygems.org/gems/maxcube-client)
 
 [GitHub](https://github.com/Tomaqa/maxcube-client) repository
 
@@ -29,6 +29,14 @@ Run `bin/maxcube-client help` and follow instructions. This script starts either
 You can also run `bin/console`, if you want to to handle objects yourself.
 
 Yet there are sample servers: `bin/sample_server` (TCP) and `bin/sample_socket` (UDP), but only with very basic features. However, they can be used to try simple connection with client.
+
+## Documentation
+
+Project is documented using YARD.
+
+MAX! Cube protocol itself is not documented here though.
+You should have a look [here](https://github.com/Bouni/max-cube-protocol),
+where I derived vast of specifications from.
 
 ## Development
 

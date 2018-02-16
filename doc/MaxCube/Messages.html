@@ -94,7 +94,8 @@
   <div class="discussion">
     
 <p>Encapsulates methods related to Cube messages, i.e. parsing and serializing
-of TCP/UDP messages. It does not provide any network features.</p>
+of TCP/UDP messages. It does not provide any network features (this is
+responsibility of <span class='object_link'><a href="Network.html" title="MaxCube::Network (module)">Network</a></span>.</p>
 
 
   </div>
@@ -722,15 +723,15 @@ raised).</p>
       <pre class="lines">
 
 
-175
 176
 177
 178
 179
-180</pre>
+180
+181</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 175</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ary_elem'>ary_elem</span><span class='lparen'>(</span><span class='id identifier rubyid_ary'>ary</span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_elem'>elem</span> <span class='op'>=</span> <span class='id identifier rubyid_ary'>ary</span><span class='lbracket'>[</span><span class='id identifier rubyid_id'>id</span><span class='rbracket'>]</span>
@@ -782,15 +783,15 @@ raised).</p>
       <pre class="lines">
 
 
-183
 184
 185
 186
 187
-188</pre>
+188
+189</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 184</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ary_elem_id'>ary_elem_id</span><span class='lparen'>(</span><span class='id identifier rubyid_ary'>ary</span><span class='comma'>,</span> <span class='id identifier rubyid_elem'>elem</span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_id'>id</span> <span class='op'>=</span> <span class='id identifier rubyid_ary'>ary</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_elem'>elem</span><span class='rparen'>)</span>
@@ -937,17 +938,17 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-73
 74
 75
 76
 77
 78
 79
-80</pre>
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_conv_args'>conv_args</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_info'>info</span> <span class='op'>=</span> <span class='id identifier rubyid_info'>info</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_tr'>tr</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>_</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -988,12 +989,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-211
 212
-213</pre>
+213
+214</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 211</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 212</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_day_of_week'>day_of_week</span><span class='lparen'>(</span><span class='id identifier rubyid_day_id'>day_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ary_elem'>ary_elem</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#DAYS_OF_WEEK-constant" title="MaxCube::Messages::DAYS_OF_WEEK (constant)">DAYS_OF_WEEK</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_day_id'>day_id</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>day of week</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -1029,15 +1030,15 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-216
 217
 218
 219
 220
-221</pre>
+221
+222</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 216</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 217</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_day_of_week_id'>day_of_week_id</span><span class='lparen'>(</span><span class='id identifier rubyid_day'>day</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_day'>day</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>to_i</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_day'>day</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='period'>.</span><span class='id identifier rubyid_between?'>between?</span><span class='lparen'>(</span><span class='int'>1</span><span class='comma'>,</span> <span class='int'>7</span><span class='rparen'>)</span>
@@ -1076,12 +1077,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-201
 202
-203</pre>
+203
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 201</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 202</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_device_mode'>device_mode</span><span class='lparen'>(</span><span class='id identifier rubyid_device_mode_id'>device_mode_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ary_elem'>ary_elem</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#DEVICE_MODE-constant" title="MaxCube::Messages::DEVICE_MODE (constant)">DEVICE_MODE</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_device_mode_id'>device_mode_id</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>device mode</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -1117,12 +1118,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-206
 207
-208</pre>
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 206</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 207</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_device_mode_id'>device_mode_id</span><span class='lparen'>(</span><span class='id identifier rubyid_device_mode'>device_mode</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ary_elem_id'>ary_elem_id</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#DEVICE_MODE-constant" title="MaxCube::Messages::DEVICE_MODE (constant)">DEVICE_MODE</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_device_mode'>device_mode</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>device mode</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -1158,12 +1159,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-191
 192
-193</pre>
+193
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 191</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 192</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_device_type'>device_type</span><span class='lparen'>(</span><span class='id identifier rubyid_device_type_id'>device_type_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ary_elem'>ary_elem</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#DEVICE_TYPE-constant" title="MaxCube::Messages::DEVICE_TYPE (constant)">DEVICE_TYPE</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_device_type_id'>device_type_id</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>device type</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -1199,12 +1200,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-196
 197
-198</pre>
+198
+199</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 196</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 197</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_device_type_id'>device_type_id</span><span class='lparen'>(</span><span class='id identifier rubyid_device_type'>device_type</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_ary_elem_id'>ary_elem_id</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#DEVICE_TYPE-constant" title="MaxCube::Messages::DEVICE_TYPE (constant)">DEVICE_TYPE</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_device_type'>device_type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>device type</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -1278,12 +1279,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-138
 139
-140</pre>
+140
+141</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 138</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 139</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_bool'>to_bool</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_to_bools'>to_bools</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -1357,7 +1358,6 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-120
 121
 122
 123
@@ -1369,10 +1369,11 @@ this method can be used also for type checking purposes only.</p>
 129
 130
 131
-132</pre>
+132
+133</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 121</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_bools'>to_bools</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_conv_args'>conv_args</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>boolean</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_arg'>arg</span><span class='op'>|</span>
@@ -1456,12 +1457,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-164
 165
-166</pre>
+166
+167</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 164</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 165</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_datetime'>to_datetime</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_to_datetimes'>to_datetimes</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -1535,7 +1536,6 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-145
 146
 147
 148
@@ -1549,10 +1549,11 @@ this method can be used also for type checking purposes only.</p>
 156
 157
 158
-159</pre>
+159
+160</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 145</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 146</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_datetimes'>to_datetimes</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_conv_args'>conv_args</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>datetime</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_arg'>arg</span><span class='op'>|</span>
@@ -1638,12 +1639,12 @@ this method can be used also for type checking purposes only.</p>
       <pre class="lines">
 
 
-112
 113
-114</pre>
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_float'>to_float</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_to_floats'>to_floats</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -1718,12 +1719,12 @@ data!) to floats.</p>
       <pre class="lines">
 
 
-105
 106
-107</pre>
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 105</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_floats'>to_floats</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_conv_args'>conv_args</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>float</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_x'>x</span><span class='op'>|</span> <span class='const'>Float</span><span class='lparen'>(</span><span class='id identifier rubyid_x'>x</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -1797,12 +1798,12 @@ data!) to floats.</p>
       <pre class="lines">
 
 
-97
 98
-99</pre>
+99
+100</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 98</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_int'>to_int</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_to_ints'>to_ints</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_arg'>arg</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -1894,13 +1895,13 @@ data!) to integers in given base (radix). For binary data use
       <pre class="lines">
 
 
-89
 90
 91
-92</pre>
+92
+93</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 89</span>
+      <pre class="code"><span class="info file"># File 'lib/maxcube/messages.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_to_ints'>to_ints</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='comma'>,</span> <span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_base_str'>base_str</span> <span class='op'>=</span> <span class='id identifier rubyid_base'>base</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_base'>base</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
@@ -1916,7 +1917,7 @@ data!) to integers in given base (radix). For binary data use
 </div>
 
       <div id="footer">
-  Generated on Thu Feb 15 23:56:12 2018 by
+  Generated on Fri Feb 16 13:44:01 2018 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.12 (ruby-2.5.0).
 </div>

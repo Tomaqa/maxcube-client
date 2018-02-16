@@ -3,6 +3,7 @@ require 'maxcube/network/udp'
 module MaxCube
   module Network
     module UDP
+      # Simple UDP 'server' for Cube protocol testing purposes.
       class SampleSocket
         def initialize(port = PORT)
           @port = port
