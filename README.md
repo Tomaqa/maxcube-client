@@ -2,13 +2,17 @@
 
 ## Announcement
 
-This software still has not been tested against real Cube gateway, simply because the developer does not have one. Owners of these devices are welcome to use this software, and asked to report discovered bugs to GitHub.
+**Project migrated to GitLab** in 8/2018.
+
+This software still has not been tested against real Cube gateway, simply because the developer does not have one. Owners of these devices are welcome to use this software, and asked to report discovered bugs to GitLab.
 
 ## Download
 
 Ruby [gem](https://rubygems.org/gems/maxcube-client)
 
-[GitHub](https://github.com/Tomaqa/maxcube-client) repository
+[GitLab](https://gitlab.com/Tomaqa/maxcube-client) repository
+
+*[GitHub](https://github.com/Tomaqa/maxcube-client) old archived repository used until 8/2018*
 
 ## Installation
 
@@ -50,7 +54,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/Tomaqa/maxcube-client.
+Bug reports and pull requests are welcome on GitLab at https://gitlab.com/Tomaqa/maxcube-client.
 
 ## License
 
